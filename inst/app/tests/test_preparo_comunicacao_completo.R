@@ -1,6 +1,6 @@
 invisible(Sys.setlocale("LC_ALL", "English_United States.utf8"))
 source("app.R", encoding = "UTF-8")
-source("tests/carregar_catalyser.R", encoding = "UTF-8")
+source("tests/carregar_trilha.R", encoding = "UTF-8")
 library(dplyr)
 source("tests/apoio_preparo_molde.R", encoding="UTF-8")
 library(tidyr)

@@ -1,4 +1,4 @@
-source(file.path("tests", "carregar_catalyser.R"), chdir = FALSE)
+source(file.path("tests", "carregar_trilha.R"), chdir = FALSE)
 
 dados <- data.frame(
   x = 1:12,

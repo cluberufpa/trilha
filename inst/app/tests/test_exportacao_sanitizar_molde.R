@@ -9,9 +9,9 @@ for (arquivo in c("registro_tratamentos.R", "registro_bases.R", "registro_execuc
 }
 
 entrada <- c(
-  "# Datas: use catalyser::converter_datas(); ajuda em ?catalyser::converter_datas.",
-  "dados <- dados |> dplyr::mutate(data = catalyser::converter_datas(data))",
-  "dados <- dados |> dplyr::mutate(peso_log = catalyser::catalyser_moda(peso))",
+  "# Datas: use trilha::converter_datas(); ajuda em ?trilha::converter_datas.",
+  "dados <- dados |> dplyr::mutate(data = trilha::converter_datas(data))",
+  "dados <- dados |> dplyr::mutate(peso_log = trilha::catalyser_moda(peso))",
   "dados <- dados |> dplyr::mutate(grupo = trat_moda(grupo))",
   "dados <- dados |> dplyr::mutate(quando = converter_data(quando))",
   "catalyser_conferir_base(dados, here(\"dados\", \"processados\", \"base_compartilhada.rds\"), rotulo = \"Base\")",
@@ -21,7 +21,7 @@ entrada <- c(
   "# Escolhas da importação e reestruturações, na ordem registrada na IDE.",
   "# a receita registrada na CatalyseR. Sai dados_da_analise, lido adiante.",
   "dados <- EAPADados::isoproteica_bagre",
-  "dados <- catalyser::funcao_que_nao_existe(dados)"
+  "dados <- trilha::funcao_que_nao_existe(dados)"
 )
 
 saida <- exportacao_sanitizar_molde(entrada)

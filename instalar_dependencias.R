@@ -144,5 +144,5 @@ cat("\n=======================================================================\n
 cat("Pronto. Para conferir o ambiente inteiro:\n")
 cat("  Rscript inst/app/tests/run_tests.R --diagnostico\n")
 cat("Para abrir a IDE:\n")
-cat("  catalyser::run_app()\n")
+cat("  trilha::run_app()\n")
 cat("=======================================================================\n")

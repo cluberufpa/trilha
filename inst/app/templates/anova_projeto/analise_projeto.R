@@ -52,14 +52,14 @@ if (!requireNamespace("EAPADados", quietly = TRUE)) {
 }
 library(EAPADados)
 # catalyser: catalyser_conferir_base(), a conferência das bases na seção 3.
-if (!requireNamespace("catalyser", quietly = TRUE)) {
+if (!requireNamespace("trilha", quietly = TRUE)) {
   stop(
-    "Este projeto usa o pacote catalyser, que não está instalado.",
+    "Este projeto usa o pacote trilha, que não está instalado.",
     " Instale uma vez, no console: remotes::install_github('astuciasnor/catalyser')",
     call. = FALSE
   )
 }
-library(catalyser)
+library(trilha)
 # As funções abaixo cuidam da apresentação; os cálculos continuam neste script.
 source(here::here("R", "funcoes.R"), encoding = "UTF-8")
 
@@ -302,7 +302,7 @@ if (metodo_usado == "classica") {
 # Letras são apresentação: esta função recebe os pares, os p ajustados e o alfa.
 # Ela não divide nomes no hífen nem modifica os cálculos estatísticos acima.
 posicao_pares <- match(paste0(pares_grupos[2, ], "-", pares_grupos[1, ]), tabela_tukey$Comparação)
-letras <- catalyser::catalyser_letras_tukey(
+letras <- trilha::catalyser_letras_tukey(
   pares = pares_grupos[c(2L, 1L), , drop = FALSE],
   p_ajustado = tabela_tukey$`p adj`[posicao_pares],
   medias = stats::setNames(tabela_resumo$media, as.character(tabela_resumo$grupo)),
@@ -736,7 +736,7 @@ versao_quarto <- if (nzchar(quarto_bin) && file.exists(quarto_bin)) {
   paste(system2(quarto_bin, "--version", stdout = TRUE), collapse = " ")
 } else "não encontrado nesta sessão"
 # Incluímos dependências carregadas indiretamente, além dos pacotes da análise.
-pacotes_ambiente <- sort(unique(c(loadedNamespaces(), "catalyser", "EAPADados")))
+pacotes_ambiente <- sort(unique(c(loadedNamespaces(), "trilha", "EAPADados")))
 # RemoteSha só existe quando a instalação preservou o commit do GitHub.
 # Sua ausência fica explícita: a versão não identifica sozinha uma revisão local.
 tabela_ambiente <- do.call(rbind, lapply(pacotes_ambiente, function(pacote) {

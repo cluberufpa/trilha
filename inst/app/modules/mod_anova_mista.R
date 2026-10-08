@@ -13,7 +13,7 @@ if (!exists("catalyser_anova_mista", mode = "function")) {
     source(arquivo_fonte, encoding = "UTF-8")
   } else {
     catalyser_anova_mista <- function(dados, p) {
-      getExportedValue("catalyser", "catalyser_anova_mista")(dados, p)
+      getExportedValue("trilha", "catalyser_anova_mista")(dados, p)
     }
   }
 }

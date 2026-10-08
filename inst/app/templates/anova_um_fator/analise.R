@@ -36,7 +36,7 @@
 # para o mesmo arquivo funcionar em computadores diferentes.
 
 library(EAPADados)     # dados e funções do ecossistema
-library(catalyser)     # mesmas funções usadas na IDE, incluindo converter_datas()
+library(trilha)     # mesmas funções usadas na IDE, incluindo converter_datas()
 library(here)
 library(readxl)        # leitura da planilha
 library(dplyr)         # manipulação de dados
@@ -99,7 +99,7 @@ glimpse(dados_brutos)
 # --- 2. Conferir a base reproduzida -------------------------
 # Compara a base refeita com a fotografia da IDE, sem sobrescrever a referência.
 # Se você mudar o preparo de propósito, confira a diferença informada no console.
-catalyser::catalyser_conferir_base(
+trilha::catalyser_conferir_base(
   base_compartilhada,
   here("dados", "processados", "base_compartilhada.rds"),
   rotulo = "Base Compartilhada"

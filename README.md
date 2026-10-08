@@ -29,19 +29,19 @@ A plataforma é dividida em módulos analíticos completos e independentes:
 Antes de atualizar uma CatalyseR que já foi usada nesta sessão, reinicie o R
 (no RStudio: **Session > Restart R**, ou **Ctrl+Shift+F10**). Se você já atualizou
 sem reiniciar e aparece “objeto não encontrado” ao abrir, reinicie o R e execute
-`catalyser::run_app(launch.browser = TRUE)` novamente. A reinstalação atualiza os
+`trilha::run_app(launch.browser = TRUE)` novamente. A reinstalação atualiza os
 arquivos no computador; uma sessão aberta pode continuar com o pacote antigo na memória.
 
 A forma **recomendada para os alunos** instala os dados (EAPADados) e a CatalyseR diretamente do código R, com dependências CRAN em **binário no Windows**, sem precisar de Rtools. O instalador apenas instala e mostra o comando de abertura. No console do R/RStudio, rode:
 
 ```r
-source("https://raw.githubusercontent.com/astuciasnor/catalyser/main/instalar_catalyser.R")
+source("https://raw.githubusercontent.com/astuciasnor/catalyser/main/instalar_trilha.R")
 ```
 
-Ou, pela interface do RStudio: baixe o arquivo `instalar_catalyser.R`, abra-o e clique em **Source** (canto superior direito do editor). Pode rodar novamente quando quiser: o instalador atualiza a CatalyseR pela branch `main` e preserva os pacotes CRAN compatíveis. A instalação fica no computador. Para abrir a IDE quando quiser, execute:
+Ou, pela interface do RStudio: baixe o arquivo `instalar_trilha.R`, abra-o e clique em **Source** (canto superior direito do editor). Pode rodar novamente quando quiser: o instalador atualiza a CatalyseR pela branch `main` e preserva os pacotes CRAN compatíveis. A instalação fica no computador. Para abrir a IDE quando quiser, execute:
 
 ```r
-catalyser::run_app(launch.browser = TRUE)
+trilha::run_app(launch.browser = TRUE)
 ```
 
 É necessário ter R >= 4.3 instalado e internet para a instalação. Não é necessário instalar Git.
@@ -58,7 +58,7 @@ remotes::install_github(
   upgrade = "never",
   type = "binary"
 )
-catalyser::run_app(launch.browser = TRUE)
+trilha::run_app(launch.browser = TRUE)
 ```
 
 Para instalar também os extras opcionais (mapas, hexágonos, teste de Nemenyi), acrescente `dependencies = TRUE` à chamada de `install_github()`.
@@ -77,13 +77,13 @@ Após a instalação, para iniciar a IDE Científica diretamente no navegador
 padrão:
 
 ```r
-catalyser::run_app(launch.browser = TRUE)
+trilha::run_app(launch.browser = TRUE)
 ```
 
 Para iniciar o servidor sem abrir o navegador automaticamente:
 
 ```r
-catalyser::run_app(launch.browser = FALSE)
+trilha::run_app(launch.browser = FALSE)
 ```
 
 Nesse caso, copie para o navegador o endereço local exibido no console.

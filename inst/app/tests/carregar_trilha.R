@@ -1,5 +1,5 @@
 # =============================================================================
-# carregar_catalyser.R — deixa as funções de análise disponíveis para os testes
+# carregar_trilha.R — deixa as funções de análise disponíveis para os testes
 # -----------------------------------------------------------------------------
 # As funções `catalyser_*` vivem em R/ e são exportadas pelo pacote. Um teste
 # pode rodar em dois momentos:
@@ -12,13 +12,13 @@
 # para conferir a instalação de verdade.
 # =============================================================================
 
-carregar_catalyser <- function() {
-  if (isTRUE(requireNamespace("catalyser", quietly = TRUE))) {
-    versao <- tryCatch(as.character(utils::packageVersion("catalyser")),
+carregar_trilha <- function() {
+  if (isTRUE(requireNamespace("trilha", quietly = TRUE))) {
+    versao <- tryCatch(as.character(utils::packageVersion("trilha")),
                        error = function(e) "?")
     # `attachNamespace` falha se já estiver anexado; `library` é idempotente.
-    suppressMessages(library("catalyser", character.only = TRUE))
-    cat(sprintf("[carregar] pacote catalyser %s instalado.\n", versao))
+    suppressMessages(library("trilha", character.only = TRUE))
+    cat(sprintf("[carregar] pacote trilha %s instalado.\n", versao))
     return(invisible("instalado"))
   }
 
@@ -49,4 +49,4 @@ carregar_catalyser <- function() {
   invisible("fonte")
 }
 
-carregar_catalyser()
+carregar_trilha()

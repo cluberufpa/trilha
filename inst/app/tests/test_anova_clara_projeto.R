@@ -79,8 +79,8 @@ stopifnot(!any(grepl("{{", c(linhas_script, readme), fixed = TRUE)),
   any(grepl("escrever_resultados()", linhas_script, fixed = TRUE)),
   any(grepl('"multcompView"', readme, fixed = TRUE)),
   any(grepl('"effectsize"', readme, fixed = TRUE)),
-  # Só CRAN: sem catalyser, EAPADados nem instalação pelo GitHub.
-  !any(grepl("catalyser|EAPADados", linhas_script)),
+  # Só CRAN: sem trilha, EAPADados nem instalação pelo GitHub.
+  !any(grepl("catalyser|trilha|EAPADados", linhas_script)),
   !any(grepl("install_github|\"remotes\"", readme)),
   # Receita e carimbo no lugar da fotografia: nada de .rds no projeto.
   !any(grepl("readRDS|all.equal", linhas_script)),

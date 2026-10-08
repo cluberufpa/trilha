@@ -20,7 +20,7 @@ info <- list(source = "local", file_name = "campo_original.xlsx", datapath = ori
     colunas = names(brutos), colunas_originais = names(brutos),
     tipos = list(data_coleta = "Date")))
 importada <- brutos
-importada$data_coleta <- catalyser::converter_datas(brutos$data_coleta)
+importada$data_coleta <- trilha::converter_datas(brutos$data_coleta)
 pipeline <- list(
   list(tipo = "padronizar_texto", params = list(coluna = "especie", metodo = "squish"), ativa = TRUE),
   list(tipo = "calcular", params = list(nome = "peso_kg", expr = "peso_g / 1000"), ativa = TRUE))

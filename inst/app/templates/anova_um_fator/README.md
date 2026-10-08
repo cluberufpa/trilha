@@ -22,7 +22,7 @@ pacotes de leitura, preparo e análise indicados no trecho `instalar` do script.
    e renderize novamente.
 
 Você precisa ter R (4.3 ou posterior), RStudio e Quarto instalados. A instalação
-inicial requer internet: `catalyser` e `EAPADados` vêm do GitHub; os demais
+inicial requer internet: `trilha` e `EAPADados` vêm do GitHub; os demais
 pacotes vêm do CRAN. O trecho `instalar` inclui `dplyr`, `tidyr`, `ggplot2`,
 `stringr`, `purrr`, `lubridate`, `readxl` e as dependências de análise e saída.
 Execute-o antes do primeiro Render. Depois de instalar ou atualizar pacotes,

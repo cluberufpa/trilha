@@ -9,7 +9,7 @@ stopifnot(length(bootstrap) == 1L)
 ramo_instalado <- bootstrap[[1]][[4]]
 
 # A cópia permite simular uma sessão antiga sem alterar o namespace real.
-ns_instalado <- asNamespace("catalyser")
+ns_instalado <- asNamespace("trilha")
 ns_simulado <- new.env(parent = emptyenv())
 for (nome in ls(ns_instalado, all.names = TRUE)) {
   assign(nome, get(nome, ns_instalado), ns_simulado)

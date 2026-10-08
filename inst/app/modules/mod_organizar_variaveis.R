@@ -611,8 +611,8 @@ mod_organizar_variaveis_server <- function(id, data_rv, on_usar = NULL, on_etapa
           tags$summary("Como escrever as datas?"),
           p("Use dia-mês-ano ou ano-mês-dia: 12/09/2026, 12-09-2026, 2026/09/12 ou 2026-09-12. Também são aceitos pontos (12.09.2026) e dia/mês sem zero à esquerda (1/9/2026). Prefira ano com quatro dígitos. O R exibe ano-mês-dia. A ordem mês-dia-ano não é utilizada."),
           p("Datas formatadas como Data no Excel também são aceitas. Deixe em branco as datas não informadas. Se houver uma data inválida, corrija a planilha e importe novamente; isso reinicia o preparo."),
-          p("No R, a função é ", tags$code("catalyser::converter_datas()"),
-            ". Consulte exemplos com ", tags$code("?catalyser::converter_datas"), ".")),
+          p("No R, a função é ", tags$code("trilha::converter_datas()"),
+            ". Consulte exemplos com ", tags$code("?trilha::converter_datas"), ".")),
         div(
           style = "max-height:430px; overflow-y:auto; padding-right:6px;",
           lapply(seq_along(colunas), function(i) {

@@ -139,14 +139,14 @@ arrumar_nomes_padrao <- function(n) paste(paste0("parte", seq_len(max(2L, n))), 
 # O código explicado mora no pacote. Em desenvolvimento, usa o fonte local;
 # no aplicativo instalado, usa a função pública da mesma instalação.
 preparo_codigo_data <- function() {
-  "# Datas: use catalyser::converter_datas(); ajuda em ?catalyser::converter_datas."
+  "# Datas: use trilha::converter_datas(); ajuda em ?trilha::converter_datas."
 }
 preparo_converter_data <- local({
   if (file.exists("../../R/converter_datas.R")) {
     ambiente <- new.env(parent = baseenv())
     sys.source("../../R/converter_datas.R", envir = ambiente)
     ambiente$converter_datas
-  } else getExportedValue("catalyser", "converter_datas")
+  } else getExportedValue("trilha", "converter_datas")
 })
 
 # Conserva no script as escolhas de leitura usadas na tela.
@@ -159,7 +159,7 @@ preparo_leitura_csv <- function(info, objeto = "dados") {
 
 # Tokens de tipo -> função de conversão (para o script .R).
 arrumar_tipo_fun <- c(texto = "as.character", numero = "as.numeric",
-                      inteiro = "as.integer", fator = "as.factor", data = "catalyser::converter_datas")
+                      inteiro = "as.integer", fator = "as.factor", data = "trilha::converter_datas")
 
 # Rótulos amigáveis para o seletor de tipo.
 arrumar_tipo_choices <- c("Texto" = "texto", "Número" = "numero",

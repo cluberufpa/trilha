@@ -10,7 +10,7 @@ if (file.exists(file.path("..", "..", "R", "descrevendo_dados.R"))) {
     "tabela_frequencia_exploratoria", "exploracao_tipos", "exploracao_base_visual",
     "exploracao_cores", "exploracao_grupo", "exploracao_retratos", "exploracao_mapa_ausentes", "exploracao_saude", "exploracao_normalidade_grupos"
   )) {
-    assign(nome, getFromNamespace(nome, "catalyser"), envir = globalenv())
+    assign(nome, getFromNamespace(nome, "trilha"), envir = globalenv())
   }
 }
 

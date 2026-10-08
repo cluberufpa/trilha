@@ -58,7 +58,7 @@ for (pareado in c(FALSE, TRUE)) {
       intervalo, tol = 1e-9)$root / sqrt(length(valores))
     ic_d <- c(limite(1 - (1 - conf) / 2), limite((1 - conf) / 2))
     perto(e$d_ic, ic_d, 1e-5)
-    replay <- catalyser::catalyser_teste_t(dados, p)
+    replay <- trilha::catalyser_teste_t(dados, p)
     perto(replay$tabela[['p-valor']], esperado$p.value)
     # Levene não faz parte dos dois desenhos.
     stopifnot(!exists('teste_levene', envir = e, inherits = FALSE))

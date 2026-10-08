@@ -55,9 +55,9 @@ linhas_script <- readLines(script, encoding = "UTF-8")
 stopifnot(!any(grepl("{{", linhas_script, fixed = TRUE)),
   !any(grepl("^## ---- ", linhas_script)),
   sum(grepl('source(here::here("R", "funcoes.R")', linhas_script, fixed = TRUE)) == 1L,
-  sum(grepl("library(catalyser)", linhas_script, fixed = TRUE)) == 1L,
+  sum(grepl("library(trilha)", linhas_script, fixed = TRUE)) == 1L,
   sum(grepl("library(EAPADados)", linhas_script, fixed = TRUE)) == 1L,
-  any(grepl('!requireNamespace("catalyser", quietly = TRUE)', linhas_script, fixed = TRUE)),
+  any(grepl('!requireNamespace("trilha", quietly = TRUE)', linhas_script, fixed = TRUE)),
   any(grepl('!requireNamespace("EAPADados", quietly = TRUE)', linhas_script, fixed = TRUE)),
   any(grepl("remotes::install_github('astuciasnor/catalyser')", linhas_script, fixed = TRUE)),
   any(grepl("remotes::install_github('astuciasnor/EAPADados')", linhas_script, fixed = TRUE)))
@@ -117,7 +117,7 @@ stopifnot(any(grepl("Preparar o computador", readme, fixed = TRUE)),
   any(grepl("Registre aqui a origem da planilha, a licença e o período de coleta", readme, fixed = TRUE)))
 pacotes_secao1 <- sub("^library\\((.*?)\\).*$", "\\1",
   grep("^library\\(", linhas_script, value = TRUE))
-pacotes_secao1 <- setdiff(pacotes_secao1, c("catalyser", "EAPADados"))
+pacotes_secao1 <- setdiff(pacotes_secao1, c("trilha", "EAPADados"))
 inicio <- grep("install.packages(", readme, fixed = TRUE)[1]
 fim <- inicio + which(readme[seq.int(inicio + 1L, length(readme))] == ")")[1]
 bloco <- paste(readme[seq.int(inicio, fim)], collapse = " ")

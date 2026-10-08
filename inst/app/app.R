@@ -17,7 +17,7 @@ if (file.exists(file.path("..", "..", "R", "descrevendo_dados.R"))) {
   # Modo desenvolvimento: runApp("inst/app") a partir da raiz do pacote.
   source(file.path("..", "..", "R", "descrevendo_dados.R"), encoding = "UTF-8")
 } else {
-  # Modo pacote instalado: traz as funcoes internas direto do namespace catalyser.
+  # Modo pacote instalado: traz as funcoes internas direto do namespace trilha.
   funcoes_motor <- c(
     "descricao_catalogo", "descricao_tipo", "exploracao_tipo_variavel",
     "catalyser_codigo_descricao", "catalyser_descricao", "cores_ocean", "tema_ocean",
@@ -26,22 +26,22 @@ if (file.exists(file.path("..", "..", "R", "descrevendo_dados.R"))) {
     "tabela_frequencia_exploratoria", "exploracao_tipos", "exploracao_base_visual",
     "exploracao_cores", "exploracao_grupo", "exploracao_retratos", "exploracao_mapa_ausentes", "exploracao_saude", "exploracao_normalidade_grupos"
   )
-  ns_catalyser <- asNamespace("catalyser")
+  ns_catalyser <- asNamespace("trilha")
   ausentes_motor <- funcoes_motor[!vapply(
     funcoes_motor, exists, logical(1), envir = ns_catalyser, inherits = FALSE
   )]
   if (length(ausentes_motor)) {
     stop(
-      "O aplicativo e o pacote catalyser carregado nesta sessão estão incompatíveis. ",
+      "O aplicativo e o pacote trilha carregado nesta sessão estão incompatíveis. ",
       "Após atualizar o pacote, reinicie o R (no RStudio: Session > Restart R ou Ctrl+Shift+F10) ",
-      "e execute catalyser::run_app(launch.browser = TRUE) novamente. ",
+      "e execute trilha::run_app(launch.browser = TRUE) novamente. ",
       "Se o erro persistir numa sessão nova, reinstale o pacote. ",
       "Funções ausentes: ", paste(ausentes_motor, collapse = ", "),
       call. = FALSE
     )
   }
   for (nome in funcoes_motor) {
-    assign(nome, getFromNamespace(nome, "catalyser"), envir = globalenv())
+    assign(nome, getFromNamespace(nome, "trilha"), envir = globalenv())
   }
 }
 
@@ -1846,12 +1846,12 @@ install.packages(\"knitr\")</code></pre>
         </ul>
 
         <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>2. Empacotamento em Pacote R (A mais portátil e offline)</h5>
-        <p>A CatalyseR já é distribuída como pacote de R, chamado <code>catalyser</code>, no GitHub.</p>
+        <p>A CatalyseR já é distribuída como pacote de R, chamado <code>trilha</code>, no GitHub.</p>
         <ul>
           <li><b>Como funciona:</b> O usuário instala o pacote uma vez e, depois, abre a IDE com um comando:
             <pre style='background: #f1f3f5; padding: 8px; border-radius: 6px; font-size: 0.85rem;'>install.packages(\"pak\")
 pak::pkg_install(\"astuciasnor/catalyser\", upgrade = FALSE)
-catalyser::run_app(launch.browser = TRUE)</pre>
+trilha::run_app(launch.browser = TRUE)</pre>
           </li>
           <li><b>Vantagem pedagógica:</b> Serve como um excelente passo intermediário de transição, onde o aluno executa um comando simples para abrir a interface em sua própria máquina, offline, familiarizando-se com o terminal do RStudio.</li>
         </ul>

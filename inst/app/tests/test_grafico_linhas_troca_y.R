@@ -5,7 +5,7 @@
 # independentes do mesmo seletor Y, cada uma registrada como execução própria.
 
 source("app.R", encoding = "UTF-8")
-source(file.path("tests", "carregar_catalyser.R"), chdir = FALSE)
+source(file.path("tests", "carregar_trilha.R"), chdir = FALSE)
 
 # Biometria de corvinas com comprimento e peso completos (Base Derivada B).
 base_graficos_corvina <- data.frame(

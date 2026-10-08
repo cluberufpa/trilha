@@ -12,7 +12,18 @@ relatório, uma só trilha de análise.* Logo e cores: ver
 transferência para a conta do Clube do Código no GitHub foi decidida, mas
 fica para depois (etapa 8).
 
-Este documento é o plano; nada foi renomeado no código ainda.
+## Andamento
+
+- **Etapa 1 feita** (branch `trilha`, 8/10/2026): o pacote se chama `trilha`
+  (versão 0.2.0), com `trilha.Rproj`, `instalar_trilha.R` e todas as
+  chamadas `catalyser::`, `library(catalyser)` e `asNamespace("catalyser")`
+  trocadas, inclusive nos projetos que o exportador gera. As funções seguem
+  com o prefixo `catalyser_` (etapa 2), e a interface ainda diz "CatalyseR"
+  (etapa 3). O `instalar_catalyser.R` virou uma linha que chama o
+  `instalar_trilha.R`, para o endereço antigo continuar funcionando. A suíte
+  passou em 34 de 38 arquivos; os 4 que falham (`test_descrevendo_interface`,
+  `test_estados_execucao`, `test_logisticas_separadas`, `test_anova_mista`)
+  já falhavam antes do renome.
 
 ## Tamanho do trabalho (levantamento de 8/10/2026)
 

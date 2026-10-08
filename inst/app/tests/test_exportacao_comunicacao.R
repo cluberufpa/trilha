@@ -2,7 +2,7 @@ source("app.R", local = TRUE)
 # As funcoes de analise agora vivem no pacote. Este helper usa a versao
 # instalada quando ela existe e, senao, carrega os arquivos de R/ direto do
 # codigo-fonte - assim o teste roda antes e depois de instalar.
-source(file.path("tests", "carregar_catalyser.R"), chdir = FALSE)
+source(file.path("tests", "carregar_trilha.R"), chdir = FALSE)
 
 bloco_console <- exportacao_trecho_componente(
   "resultado_execucao_0001", "execucao_0001", "console"
@@ -403,7 +403,7 @@ stopifnot(
   !any(grepl("analises_registradas", qmd, fixed = TRUE)),
   !any(grepl("registro_execucoes.rds", qmd, fixed = TRUE)),
   # As funcoes vem do pacote instalado, nao mais de um arquivo copiado.
-  any(grepl("library(catalyser)", qmd, fixed = TRUE)),
+  any(grepl("library(trilha)", qmd, fixed = TRUE)),
   # O replay opaco por sys.source saiu do relatório.
   !any(grepl("sys.source(", qmd, fixed = TRUE))
 )

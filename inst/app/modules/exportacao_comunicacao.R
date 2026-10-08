@@ -190,8 +190,8 @@ exportacao_trecho_instalar <- function() {
     "    packageVersion(\"EAPADados\") < package_version(\"0.1.10\")) {",
     "  remotes::install_github(\"astuciasnor/EAPADados\", upgrade = \"never\")",
     "}",
-    "if (!\"catalyser\" %in% rownames(installed.packages()) ||",
-    "    packageVersion(\"catalyser\") < package_version(\"0.1.18\")) {",
+    "if (!\"trilha\" %in% rownames(installed.packages()) ||",
+    "    packageVersion(\"trilha\") < package_version(\"0.1.18\")) {",
     "  remotes::install_github(\"astuciasnor/catalyser\", upgrade = \"never\")",
     "}",
     "# Depois de instalar ou atualizar, reinicie o R antes de executar a análise.",
@@ -225,12 +225,12 @@ exportacao_trecho_pacotes <- function() {
     "",
     "# As funções de análise: as mesmas que a CatalyseR usou na tela, para o",
     "# resultado ser idêntico. ?catalyser_anova mostra a ajuda de qualquer uma.",
-    "if (!requireNamespace(\"catalyser\", quietly = TRUE) ||",
-    "    getNamespaceVersion(\"catalyser\") < package_version(\"0.1.18\")) {",
-    "  stop(\"Este projeto requer catalyser >= 0.1.18. Atualize e reinicie o R: \",",
+    "if (!requireNamespace(\"trilha\", quietly = TRUE) ||",
+    "    getNamespaceVersion(\"trilha\") < package_version(\"0.1.18\")) {",
+    "  stop(\"Este projeto requer trilha >= 0.1.18. Atualize e reinicie o R: \",",
     "       \"remotes::install_github('astuciasnor/catalyser')\", call. = FALSE)",
     "}",
-    "library(catalyser)",
+    "library(trilha)",
     "",
     "# As receitas das bases estão nos trechos de preparo deste script."
   )
@@ -350,7 +350,7 @@ exportacao_bloco_trilha <- function(pipeline, reg = tratamentos) {
     linhas <- c(
       linhas,
       sprintf("# Etapa %d: %s", i, tratamento$rotulo(etapa$params)),
-      gsub("trat_moda(", "catalyser::catalyser_moda(", tratamento$codigo(etapa$params), fixed = TRUE),
+      gsub("trat_moda(", "trilha::catalyser_moda(", tratamento$codigo(etapa$params), fixed = TRUE),
       ""
     )
   }
@@ -947,7 +947,7 @@ exportacao_codigo_estudo <- function(execucao, incluir_carregamento = TRUE,
       "# Para estudar os cálculos linha a linha, exporte esta ANOVA sozinha:",
       "# o molde novo mostra todo o percurso em R/analise.R.",
       "parametros_anova <-", parametros,
-      "resultado_anova <- catalyser::catalyser_anova(dados, parametros_anova)",
+      "resultado_anova <- trilha::catalyser_anova(dados, parametros_anova)",
       "tabela_anova <- resultado_anova$tabela",
       "comparacoes_anova <- resultado_anova$comparacoes",
       "metodo_anova <- resultado_anova$metodo_usado",
@@ -1189,7 +1189,7 @@ exportacao_trecho_base <- function(item, raiz, registro_bases) {
       bases_codigo(base, incluir_print = FALSE), "\n", fixed = TRUE
     )[[1]]
     receita <- exportacao_encadear_preparo(receita, entrada = "dados_analise", saida = base$nome_r)
-    receita <- gsub("trat_moda(", "catalyser::catalyser_moda(", receita, fixed = TRUE)
+    receita <- gsub("trat_moda(", "trilha::catalyser_moda(", receita, fixed = TRUE)
     return(c(
       exportacao_marcador(paste0(raiz, "-base")),
       "# Constrói a base desta análise num salto só a partir de dados_analise, com",
@@ -1342,7 +1342,7 @@ exportacao_preparo_sem_funcao_data <- function(codigo) {
   }
   if (length(remover)) linhas <- linhas[-unique(remover)]
   # Atualiza também receitas guardadas quando a função viajava no script.
-  gsub("\\bconverter_data\\s*\\(", "catalyser::converter_datas(", linhas)
+  gsub("\\bconverter_data\\s*\\(", "trilha::converter_datas(", linhas)
 }
 
 # As edições de variáveis já trazem código que parte da base corrente.
@@ -1403,7 +1403,7 @@ exportacao_preparo_importacao <- function(import_info = list()) {
       numeric = sprintf('as.numeric(gsub(",", ".", as.character(%s), fixed = TRUE))', col),
       integer = sprintf('as.integer(gsub(",", ".", as.character(%s), fixed = TRUE))', col),
       factor = sprintf("factor(%s)", col), character = sprintf("as.character(%s)", col),
-      logical = sprintf("as.logical(%s)", col), Date = sprintf("catalyser::converter_datas(%s)", col), NULL)
+      logical = sprintf("as.logical(%s)", col), Date = sprintf("trilha::converter_datas(%s)", col), NULL)
     if (!is.null(expr)) linhas <- c(linhas, sprintf("dados <- dados |> dplyr::mutate(%s = %s)", col, expr))
   }
   for (nome in names(preparo$filtros_niveis)) {
@@ -1565,7 +1565,7 @@ exportacao_preparo_anova <- function(manifesto, import_info = list(), pipeline =
     linhas <- c(linhas, "# Preparo específico da base escolhida para a ANOVA.",
       exportacao_encadear_preparo(ramo, entrada = "base_compartilhada", saida = "dados"))
   }
-  gsub("trat_moda(", "catalyser::catalyser_moda(", linhas, fixed = TRUE)
+  gsub("trat_moda(", "trilha::catalyser_moda(", linhas, fixed = TRUE)
 }
 
 # Confere ainda na IDE, antes do ZIP, sem acrescentar manutenção ao projeto.
@@ -1948,7 +1948,7 @@ exportacao_molde_base_analise <- function(item, raiz, registro_bases) {
       bases_codigo(base, incluir_print = FALSE), "\n", fixed = TRUE
     )[[1]]
     receita <- exportacao_encadear_preparo(receita, entrada = "dados_analise", saida = base$nome_r)
-    receita <- gsub("trat_moda(", "catalyser::catalyser_moda(", receita, fixed = TRUE)
+    receita <- gsub("trat_moda(", "trilha::catalyser_moda(", receita, fixed = TRUE)
     receita <- receita[!grepl("^library\\((dplyr|tidyr)\\)$", trimws(receita))]
     arquivo <- exportacao_rds_base(item)
     rotulo <- trimws(base$nome_amigavel %||% "")
@@ -1984,7 +1984,7 @@ exportacao_molde_base_analise <- function(item, raiz, registro_bases) {
 exportacao_molde_bloco_bibliotecas <- function(pacotes, declaradas = character()) {
   nucleo <- c("readxl", "dplyr", "ggplot2")
   lista <- sort(setdiff(unique(c(nucleo, pacotes)),
-                        c(declaradas, "catalyser", "EAPADados", "remotes")))
+                        c(declaradas, "trilha", "EAPADados", "remotes")))
   c(
     "# Bibliotecas da leitura, do preparo e dos gráficos: só o que este",
     "# projeto usa. O README traz a linha de instalação completa.",
@@ -2010,15 +2010,15 @@ exportacao_molde_pacotes_declarados <- function(modelo) {
 # continua intacta.
 exportacao_sanitizar_molde <- function(linhas) {
   # O comentário de datas vem antes das trocas de código: ele também contém
-  # "catalyser::converter_datas(", que a troca seguinte reescreveria primeiro,
+  # "trilha::converter_datas(", que a troca seguinte reescreveria primeiro,
   # impedindo a substituição do comentário inteiro.
   linhas <- gsub(
-    "# Datas: use catalyser::converter_datas\\(\\); ajuda em \\?catalyser::converter_datas\\.",
+    "# Datas: use trilha::converter_datas\\(\\); ajuda em \\?trilha::converter_datas\\.",
     "# Datas: use converter_datas(), definida em R/funcoes.R.",
     linhas
   )
-  linhas <- gsub("catalyser::catalyser_moda\\s*\\(", "moda(", linhas)
-  linhas <- gsub("catalyser::converter_datas\\s*\\(", "converter_datas(", linhas)
+  linhas <- gsub("trilha::catalyser_moda\\s*\\(", "moda(", linhas)
+  linhas <- gsub("trilha::converter_datas\\s*\\(", "converter_datas(", linhas)
   linhas <- gsub("trat_moda\\s*\\(", "moda(", linhas)
   linhas <- gsub("\\bconverter_data\\s*\\(", "converter_datas(", linhas)
   # Comentários dos trechos compartilhados que citam a IDE: o molde os
@@ -2208,7 +2208,7 @@ exportacao_versao_clara <- function(templates_dir = "templates") {
 # A revisão só aparece quando é um commit do GitHub; um pacote do CRAN
 # aparece como CRAN. Na rota ClaRa, a ClaRa entra na tabela, logo abaixo do R.
 exportacao_ambiente_computacional <- function(pacotes, clara = NULL) {
-  nomes <- sort(unique(c("catalyser", "EAPADados", pacotes)))
+  nomes <- sort(unique(c("trilha", "EAPADados", pacotes)))
   linhas <- vapply(nomes, function(nome) {
     descricao <- suppressWarnings(utils::packageDescription(nome))
     if (!is.list(descricao)) return(paste("|", nome, "| não instalado | não registrado |"))
@@ -3789,7 +3789,7 @@ exportacao_leiame_projeto <- function(nome_projeto, import_info = list()) {
     "   que é o que o `here()` usa para montar os caminhos.",
     "2. Em computador novo, rode o chunk `instalar` de `relatorios/relatorio.qmd`",
     "   uma vez (Ctrl+Shift+Enter com o cursor nele). Ele instala só o que",
-    "   falta: `catalyser` e `EAPADados` vêm do GitHub; `dplyr`, `tidyr`,",
+    "   falta: `trilha` e `EAPADados` vêm do GitHub; `dplyr`, `tidyr`,",
     "   `ggplot2`, `stringr`, `purrr`, `lubridate`, `readxl` e os demais vêm do CRAN. Faça isso",
     "   antes do primeiro Render: o relatório usa o `here` logo na primeira linha.",
     "3. Reinicie o R (Ctrl+Shift+F10). Na seta do **Render**, escolha **Word**",
@@ -3843,7 +3843,7 @@ exportacao_leiame_projeto <- function(nome_projeto, import_info = list()) {
     "## Funções de apoio", "",
     "A ANOVA usa `aov()`, `TukeyHSD()` e os ajudantes de `R/funcoes.R`, como",
     "`resumir_grupo()`, `fmt()` e `flextable_ocean()`. Outras análises também",
-    "usam funções do pacote `catalyser`, com ajuda em português:",
+    "usam funções do pacote `trilha`, com ajuda em português:",
     "", "- `catalyser_executar()` — reproduz uma execução registrada;",
     "- `catalyser_conferir_base()` — compara a base reconstruída com a fotografia;",
     "- `catalyser_completos()` — remove e conta casos incompletos;",
@@ -3978,7 +3978,7 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
     )
   }
 
-  # As funções de análise não viajam como arquivo: vêm do pacote catalyser,
+  # As funções de análise não viajam como arquivo: vêm do pacote trilha,
   # documentadas e com ajuda em português (`?catalyser_anova`). Viajam três
   # templates: o modelo de página do Word e o tema do HTML, ao lado do
   # relatório, e o funcoes.R com a ligação script <-> relatório.
@@ -4085,14 +4085,14 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
     }
     # A lista exata de pacotes do projeto (script + funções) alimenta o
     # install.packages() do README, para bater com o que o Render vai usar.
-    # catalyser e EAPADados ficam de fora: são instalados do GitHub, nas
+    # trilha e EAPADados ficam de fora: são instalados do GitHub, nas
     # linhas seguintes do README, com remotes.
     pacotes_projeto <- setdiff(
       exportacao_molde_pacotes(c(
         linhas_script,
         readLines(funcoes_molde, encoding = "UTF-8", warn = FALSE)
       )),
-      c("catalyser", "EAPADados", "remotes")
+      c("trilha", "EAPADados", "remotes")
     )
     # A ClaRa carrega os seus pacotes ao rodar cada análise; eles entram na
     # lista de instalação do README. Só do CRAN: a rota ClaRa dispensa remotes.
@@ -4155,7 +4155,7 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
       "Renderize relatorios/relatorio_completo.qmd para HTML e relatorios/relatorio_artigo.qmd para Word.",
       "Os documentos gerados ficam em saida/relatorios/. Cada Render reconstrói os resultados da seleção.",
       "Nesta rota, após editar o script, atualize os chunks dos dois QMDs com atualizar_codigo(qmd = ...).",
-      "A rota integrada ainda usa funções do pacote catalyser para reconstruir as análises.",
+      "A rota integrada ainda usa funções do pacote trilha para reconstruir as análises.",
       "", leiame
     )
   }

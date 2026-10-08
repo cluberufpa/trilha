@@ -18,11 +18,11 @@
 run_app <- function(
     launch.browser = TRUE,
     ...) {
-  app_dir <- system.file("app", package = "catalyser")
+  app_dir <- system.file("app", package = "trilha")
   if (app_dir == "") {
     stop(
       "N\u00e3o foi poss\u00edvel encontrar o diret\u00f3rio do aplicativo. ",
-      "Tente reinstalar o pacote `catalyser`.",
+      "Tente reinstalar o pacote `trilha`.",
       call. = FALSE
     )
   }

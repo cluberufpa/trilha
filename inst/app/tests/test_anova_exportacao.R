@@ -5,7 +5,7 @@ source("app.R", local = TRUE)
 # As funcoes de analise agora vivem no pacote. Este helper usa a versao
 # instalada quando ela existe e, senao, carrega os arquivos de R/ direto do
 # codigo-fonte - assim o teste roda antes e depois de instalar.
-source(file.path("tests", "carregar_catalyser.R"), chdir = FALSE)
+source(file.path("tests", "carregar_trilha.R"), chdir = FALSE)
 
 quase_igual <- function(x, y, tol = 1e-6) {
   isTRUE(is.finite(x) && is.finite(y) && abs(x - y) <= tol)
@@ -301,7 +301,7 @@ stopifnot(
   # A ANOVA tem código validado: o chunk da análise roda em silêncio.
   any(grepl("#| output: false", qmd, fixed = TRUE)),
   # As funcoes vem do pacote instalado, nao mais de um arquivo copiado.
-  any(grepl("library(catalyser)", qmd, fixed = TRUE)),
+  any(grepl("library(trilha)", qmd, fixed = TRUE)),
   !any(grepl("sys.source(", qmd, fixed = TRUE)),
   # Cada análise abre com a pergunta que responde.
   any(grepl("eta_squared(modelo", qmd, fixed = TRUE)),

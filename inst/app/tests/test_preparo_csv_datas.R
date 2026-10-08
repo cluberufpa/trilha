@@ -4,7 +4,7 @@
 # entrega para uso fora do R.
 invisible(Sys.setlocale("LC_ALL", "English_United_States.utf8"))
 source("app.R", encoding = "UTF-8")
-source("tests/carregar_catalyser.R", encoding = "UTF-8")
+source("tests/carregar_trilha.R", encoding = "UTF-8")
 library(dplyr)
 library(tidyr)
 arquivos <- normalizePath("../../docs/testes/fases-3/arquivos_preparo_v1", winslash = "/")
@@ -30,13 +30,13 @@ stopifnot(iguais(preparo_converter_data(c("12/09/2026", "2026-09-12", "", NA)),
 cat("PASSOU: formatos, ausentes, bissexto e rejeição de datas inválidas.\n")
 
 # A função pública é a mesma executada na IDE; o download contém só chamadas.
-stopifnot(identical(body(catalyser::converter_datas), body(preparo_converter_data)),
-          identical(catalyser::converter_datas(character()), as.Date(character())))
+stopifnot(identical(body(trilha::converter_datas), body(preparo_converter_data)),
+          identical(trilha::converter_datas(character()), as.Date(character())))
 # Receitas anteriores e várias conversões deixam somente as chamadas no projeto.
 legado <- c("## ---- tratar ----", "# Datas", "converter_data <- function(x) {",
             "  as.Date(x)", "}", "dados <- converter_data(dados)")
 limpo <- exportacao_preparo_sem_funcao_data(legado)
-stopifnot(identical(limpo, c("## ---- tratar ----", "dados <- catalyser::converter_datas(dados)")))
+stopifnot(identical(limpo, c("## ---- tratar ----", "dados <- trilha::converter_datas(dados)")))
 
 # Uma data preenchida pela moda continua sendo data fora da IDE.
 d <- data.frame(data_coleta = as.Date(c("2026-09-01", NA, "2026-09-01")))
