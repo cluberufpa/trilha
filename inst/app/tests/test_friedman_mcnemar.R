@@ -9,7 +9,7 @@ friedman_dados <- data.frame(
   condicao = rep(c("controle", "dose_1", "dose_2"), 6),
   crescimento = c(4, 6, 9, 5, 8, 11, 3, 7, 10, 6, 9, 12, 5, 8, 13, 4, 7, 11)
 )
-friedman <- catalyser_friedman(
+friedman <- trilha_friedman(
   friedman_dados,
   list(resposta = "crescimento", condicao = "condicao", bloco = "bloco",
        posteste = "holm", nivel_confianca = 0.95)
@@ -21,7 +21,7 @@ stopifnot(
 )
 
 incompleto <- try(
-  catalyser_friedman(
+  trilha_friedman(
     friedman_dados[-1, ],
     list(resposta = "crescimento", condicao = "condicao", bloco = "bloco")
   ),
@@ -33,7 +33,7 @@ mcnemar_dados <- data.frame(
   antes = c("não", "não", "sim", "sim", "não", "sim", "não", "sim"),
   depois = c("sim", "não", "sim", "não", "sim", "sim", "sim", "não")
 )
-mcnemar <- catalyser_mcnemar(
+mcnemar <- trilha_mcnemar(
   mcnemar_dados,
   list(variavel_1 = "antes", variavel_2 = "depois", correcao = TRUE)
 )
@@ -43,7 +43,7 @@ codigo_app <- paste(readLines("app.R", encoding = "UTF-8"), collapse = "\n")
 stopifnot(
   grepl("Friedman (k grupos pareados)", codigo_app, fixed = TRUE),
   grepl("McNemar (pares binários)", codigo_app, fixed = TRUE),
-  inherits(catalyser_executar(
+  inherits(trilha_executar(
     list(tipo = "friedman", parametros = list(
       resposta = "crescimento", condicao = "condicao", bloco = "bloco",
       posteste = "holm", nivel_confianca = 0.95

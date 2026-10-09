@@ -181,9 +181,9 @@ mod_proporcoes_server <- function(id, tipo, dados_rv, registro_bases_rv,
     })
     analisar <- function(dados, p) {
       switch(tipo,
-        uma = catalyser_proporcao_uma(dados, p),
-        duas = catalyser_proporcao_duas(dados, p),
-        aderencia = catalyser_aderencia(dados, p)
+        uma = trilha_proporcao_uma(dados, p),
+        duas = trilha_proporcao_duas(dados, p),
+        aderencia = trilha_aderencia(dados, p)
       )
     }
     observeEvent(input$executar, {

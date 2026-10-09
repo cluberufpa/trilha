@@ -28,14 +28,14 @@ parametros_anova <- list(
 )
 
 # =============================================================================
-# 1. catalyser_executar() reconhece anova_um_fator
+# 1. trilha_executar() reconhece anova_um_fator
 # =============================================================================
 execucao_replay <- list(
   id = "execucao_0001", tipo = "anova_um_fator",
   titulo = "Profundidade de captura entre espécies",
   parametros = parametros_anova
 )
-replay <- catalyser_executar(execucao_replay, dados)
+replay <- trilha_executar(execucao_replay, dados)
 
 stopifnot(
   inherits(replay, "resultado_catalyser"),
@@ -107,7 +107,7 @@ stopifnot(
 # O replay usa somente os parâmetros congelados: trocar a resposta muda o resultado.
 execucao_outra <- execucao_replay
 execucao_outra$parametros$resposta <- "comprimento_cm"
-replay_outra <- catalyser_executar(execucao_outra, dados)
+replay_outra <- trilha_executar(execucao_outra, dados)
 stopifnot(!quase_igual(
   suppressWarnings(as.numeric(replay_outra$tabela[["F"]][1])), f_replay, 1e-8
 ))
@@ -115,7 +115,7 @@ stopifnot(!quase_igual(
 # Casos incompletos são removidos e informados
 dados_na <- dados
 dados_na$profundidade_m[c(1, 5)] <- NA
-replay_na <- catalyser_executar(execucao_replay, dados_na)
+replay_na <- trilha_executar(execucao_replay, dados_na)
 stopifnot(
   indicador(replay_na$diagnosticos, "n analisado") == 10,
   indicador(replay_na$diagnosticos, "Casos exclu") == 2
@@ -123,9 +123,9 @@ stopifnot(
 
 # Validações do replay
 stopifnot(
-  inherits(tryCatch(catalyser_executar(execucao_replay, dados[c("especie")]),
+  inherits(tryCatch(trilha_executar(execucao_replay, dados[c("especie")]),
                     error = function(e) e), "error"),
-  inherits(tryCatch(catalyser_anova(dados, list(resposta = "especie", fator = "especie")),
+  inherits(tryCatch(trilha_anova(dados, list(resposta = "especie", fator = "especie")),
                     error = function(e) e), "error")
 )
 
@@ -287,14 +287,14 @@ stopifnot(
   # O relatório lê RDS; a receita e sua conferência permanecem no script.
   any(grepl("#| label: carregar-compartilhada", qmd, fixed = TRUE)),
   !any(grepl("#| label: tratar", qmd, fixed = TRUE)),
-  any(grepl("catalyser_conferir_base(", script, fixed = TRUE)),
+  any(grepl("trilha_conferir_base(", script, fixed = TRUE)),
   all(grepl("funcoes.R", grep("source(", qmd, fixed = TRUE, value = TRUE), fixed = TRUE)),
   # E constrói a base derivada da ANOVA no chunk da própria análise.
   any(grepl("#| label: anova-profundidade-m", qmd, fixed = TRUE)),
   any(grepl("base_anova_profundidade_especie <- dados", script, fixed = TRUE)),
   any(grepl("dados_da_analise <- readRDS", qmd, fixed = TRUE)),
   # A ANOVA explícita alimenta diretamente as tabelas e figuras.
-  !any(grepl("anova_profundidade_m <- catalyser_executar(", qmd, fixed = TRUE)),
+  !any(grepl("anova_profundidade_m <- trilha_executar(", qmd, fixed = TRUE)),
   any(grepl('modelo <- aov(profundidade_m ~ especie, data = dados)', qmd, fixed = TRUE)),
   any(grepl('flextable_ocean()', qmd, fixed = TRUE)),
   !any(grepl("analises_registradas", qmd, fixed = TRUE)),

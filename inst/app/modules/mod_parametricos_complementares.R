@@ -171,9 +171,9 @@ mod_parametrico_complementar_server <- function(id, tipo, dados_rv, registro_bas
     observeEvent(input$executar, {
       p <- parametros()
       resultado <- tryCatch(switch(tipo,
-        anova_medidas_repetidas = catalyser_anova_medidas_repetidas(dados(), p),
-        qui_quadrado_variancia = catalyser_variancia_uma(dados(), p),
-        teste_f_variancias = catalyser_variancias_duas(dados(), p)
+        anova_medidas_repetidas = trilha_anova_medidas_repetidas(dados(), p),
+        qui_quadrado_variancia = trilha_variancia_uma(dados(), p),
+        teste_f_variancias = trilha_variancias_duas(dados(), p)
       ), error = function(e) e)
       if (inherits(resultado, "error")) {
         resultado_rv(NULL); estado_rv(NULL)

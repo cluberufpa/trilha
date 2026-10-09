@@ -49,7 +49,7 @@ if (!requireNamespace("EAPADados", quietly = TRUE)) {
   )
 }
 library(EAPADados)
-# catalyser: catalyser_conferir_base(), a conferência das bases na seção 3.
+# catalyser: trilha_conferir_base(), a conferência das bases na seção 3.
 if (!requireNamespace("trilha", quietly = TRUE)) {
   stop(
     "Este projeto usa o pacote trilha, que não está instalado.",

@@ -7,13 +7,13 @@ library(ggplot2)
 
 if (!exists("%||%")) `%||%` <- function(a, b) if (is.null(a) || !length(a)) b else a
 
-if (!exists("catalyser_anova_mista", mode = "function")) {
+if (!exists("trilha_anova_mista", mode = "function")) {
   arquivo_fonte <- file.path("..", "..", "R", "anova_mista.R")
   if (file.exists(arquivo_fonte)) {
     source(arquivo_fonte, encoding = "UTF-8")
   } else {
-    catalyser_anova_mista <- function(dados, p) {
-      getExportedValue("trilha", "catalyser_anova_mista")(dados, p)
+    trilha_anova_mista <- function(dados, p) {
+      getExportedValue("trilha", "trilha_anova_mista")(dados, p)
     }
   }
 }
@@ -190,7 +190,7 @@ mod_anova_mista_server <- function(id, dados_rv, ficha_rv = NULL) {
         subamostra = input$subamostra,
         nivel_confianca = 0.95
       )
-      catalyser_anova_mista(dados, parametros)
+      trilha_anova_mista(dados, parametros)
     }, ignoreInit = FALSE)
 
     exec_ctrl <- execucao_explicita_server(

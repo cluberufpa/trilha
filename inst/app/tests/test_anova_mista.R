@@ -18,7 +18,7 @@ parametros <- list(
   unidade = "praia", subamostra = "arrasto"
 )
 
-resultado <- catalyser_anova_mista(dados, parametros)
+resultado <- trilha_anova_mista(dados, parametros)
 stopifnot(
   resultado$n == 27L,
   resultado$n_unidades == 9L,
@@ -41,7 +41,7 @@ stopifnot(
 dados_invalidos <- dados
 dados_invalidos$praia[1] <- dados_invalidos$praia[dados_invalidos$condicao != dados_invalidos$condicao[1]][1]
 erro <- tryCatch({
-  catalyser_anova_mista(dados_invalidos, parametros)
+  trilha_anova_mista(dados_invalidos, parametros)
   NULL
 }, error = conditionMessage)
 stopifnot(is.character(erro), grepl("único nível", erro, fixed = TRUE))

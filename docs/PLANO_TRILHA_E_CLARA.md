@@ -135,7 +135,19 @@ nunca para um segundo documento.
   `trilha_` e textos da tela), para o pacote `clara` nascer conversando com
   uma `trilha` já sem o nome antigo.
 
+**Andamento (9/10/2026):** plano aprovado pelo professor, com as decisões
+A a M registradas na regra 4 do `ClaRa/CLAUDE.md`; regra 4 e
+`PLANO_TRILHA.md` atualizados; prefixo `catalyser_` → `trilha_` feito
+(etapa 2). Faltam tornar `cluberufpa/ClaRa` público (no GitHub, pelo
+professor) e a etapa 3 do renome (textos da tela).
+
 ### Fase 1 · A ClaRa como pacote
+
+**Feita em 9/10/2026** (ClaRa 0.9.0, ramo `pacote` do `cluberufpa/ClaRa`):
+`R CMD check` com 0 erros, 0 notas e só o aviso conhecido dos acentos
+(decisão J); 71 verificações no testthat; os seis roteiros de `exemplos/`
+dão os mesmos números e figuras da 0.8.9. As vinhetas e os dados
+exportados ficaram para depois (dados só nos testes, decisão I).
 
 - `DESCRIPTION` (`Package: clara`), `NAMESPACE` e documentação pelo
   roxygen2. Os cabeçalhos atuais (Pergunta, Argumentos, Devolve, Exemplo)

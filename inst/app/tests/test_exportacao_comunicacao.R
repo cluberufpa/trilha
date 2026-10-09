@@ -78,10 +78,10 @@ saveRDS(dados, fotografia)
 divergente <- dados
 divergente$coluna_extra <- 1
 invisible(utils::capture.output({
-  conferencia_igual <- catalyser_conferir_base(dados, fotografia, rotulo = "teste")
-  conferencia_extra <- catalyser_conferir_base(divergente, fotografia, rotulo = "teste")
-  conferencia_curta <- catalyser_conferir_base(dados[1:3, ], fotografia, rotulo = "teste")
-  conferencia_ausente <- catalyser_conferir_base(dados, tempfile(), rotulo = "teste")
+  conferencia_igual <- trilha_conferir_base(dados, fotografia, rotulo = "teste")
+  conferencia_extra <- trilha_conferir_base(divergente, fotografia, rotulo = "teste")
+  conferencia_curta <- trilha_conferir_base(dados[1:3, ], fotografia, rotulo = "teste")
+  conferencia_ausente <- trilha_conferir_base(dados, tempfile(), rotulo = "teste")
 }))
 stopifnot(
   isTRUE(conferencia_igual),
@@ -304,9 +304,9 @@ stopifnot(
   any(grepl("read_excel(caminho_planilha, sheet = aba_planilha)", script, fixed = TRUE)),
   any(grepl('here("dados", "brutos", "captura_teste.xlsx")', script, fixed = TRUE)),
   any(grepl("dados_analise <- dados", script, fixed = TRUE)),
-  any(grepl("catalyser_conferir_base(", script, fixed = TRUE)),
+  any(grepl("trilha_conferir_base(", script, fixed = TRUE)),
   any(grepl('here("dados", "processados", "base_compartilhada.rds")', qmd, fixed = TRUE)),
-  !any(grepl("trat_moda <- catalyser_moda", script, fixed = TRUE)),
+  !any(grepl("trat_moda <- trilha_moda", script, fixed = TRUE)),
   # Sem operação estrutural, a sequência começa diretamente na planilha.
   any(grepl("dados_analise <- dados_brutos", script, fixed = TRUE)),
   # O único source() do relatório é o do funcoes.R que liga os dois arquivos.
@@ -396,10 +396,10 @@ stopifnot(
   any(grepl("## ---- descritiva-captura-base ----", script, fixed = TRUE)),
   any(grepl('dados_da_analise <- readRDS(here("dados", "processados", "base_compartilhada.rds"))', qmd, fixed = TRUE)),
   # A apresentação escreve os parâmetros por extenso; nada de metadados no QMD.
-  any(grepl("linhas_captura <- catalyser_executar(", qmd, fixed = TRUE)),
+  any(grepl("linhas_captura <- trilha_executar(", qmd, fixed = TRUE)),
   any(grepl('tipo = "grafico_linhas"', qmd, fixed = TRUE)),
   any(grepl('x = "ano"', qmd, fixed = TRUE)),
-  any(grepl('catalyser_mostrar(linhas_captura[["grafico"]])', qmd, fixed = TRUE)),
+  any(grepl('trilha_mostrar(linhas_captura[["grafico"]])', qmd, fixed = TRUE)),
   !any(grepl("analises_registradas", qmd, fixed = TRUE)),
   !any(grepl("registro_execucoes.rds", qmd, fixed = TRUE)),
   # As funcoes vem do pacote instalado, nao mais de um arquivo copiado.

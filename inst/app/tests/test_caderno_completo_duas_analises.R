@@ -7,7 +7,7 @@ dados <- as.data.frame(EAPADados::artemia)
 dados$indice_simulado <- seq_len(nrow(dados))
 p_t <- list(tipo_teste = "two_ind", resposta = "taxa_crescimento_mg_dia", grupo = "racao",
   alternativa = "two.sided", variancias_iguais = FALSE, nivel_confianca = .95)
-r_t <- catalyser_teste_t(dados, p_t)
+r_t <- trilha_teste_t(dados, p_t)
 for (nome in c("grafico_caixa", "grafico_residuos", "grafico_qq", "grafico_dispersao"))
   stopifnot(inherits(r_t[[nome]], "ggplot"))
 ref <- t.test(taxa_crescimento_mg_dia ~ racao, dados, var.equal = FALSE)
@@ -16,7 +16,7 @@ letras <- ggplot2::ggplot_build(r_t$grafico)$data[[6]]$label
 stopifnot(identical(sort(letras), c("a", "b")))
 p_r <- list(resposta = "taxa_crescimento_mg_dia", preditor = "indice_simulado",
   grupo = "racao", regressao_por_grupo = TRUE, tipo_modelo = "linear")
-r_r <- catalyser_regressao(dados, p_r)
+r_r <- trilha_regressao(dados, p_r)
 for (nome in c("grafico_residuos", "grafico_qq", "grafico_dispersao", "grafico_influencia"))
   stopifnot(inherits(r_r[[nome]], "ggplot"))
 stopifnot(nrow(ggplot2::ggplot_build(r_r$grafico_residuos)$data[[1]]) == nrow(dados))

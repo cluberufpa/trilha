@@ -9,17 +9,17 @@ base_original <- dados
 for (modo in unname(unlist(descricao_catalogo()))) {
   p <- list(analise = modo, variavel = if (modo == "frequencias") "sexo" else nomes_num[1],
             outra = nomes_num[2], grupo = "sexo")
-  resultado <- catalyser_descricao(dados, p)
+  resultado <- trilha_descricao(dados, p)
   independente <- new.env(parent = baseenv()); independente$dados <- dados
-  eval(parse(text = catalyser_codigo_descricao(p)), independente)
-  replay <- catalyser_executar(list(tipo = "descricao_exploratoria", parametros = p), dados)
+  eval(parse(text = trilha_codigo_descricao(p)), independente)
+  replay <- trilha_executar(list(tipo = "descricao_exploratoria", parametros = p), dados)
   stopifnot(identical(resultado$tabela, independente$resultado$tabela),
             identical(resultado$tabela, replay$tabela),
             identical(resultado$narrativa, replay$narrativa), is.data.frame(resultado$tabela))
   if (!is.null(resultado$grafico)) ggplot2::ggplot_build(resultado$grafico)
 }
 stopifnot(identical(dados, base_original))
-calc <- function(modo, d = dados, ...) catalyser_descricao(d, c(list(analise = modo, variavel = nomes_num[1]), list(...)))
+calc <- function(modo, d = dados, ...) trilha_descricao(d, c(list(analise = modo, variavel = nomes_num[1]), list(...)))
 falha <- function(expr) inherits(tryCatch(force(expr), error = identity), "error")
 x <- dados[[nomes_num[1]]]
 resumo <- calc("resumo")$tabela
@@ -27,7 +27,7 @@ stopifnot(isTRUE(all.equal(resumo$Valor[resumo$Medida == "Média"], mean(x))),
           isTRUE(all.equal(resumo$Valor[resumo$Medida == "DP"], stats::sd(x))),
           sum(calc("histograma")$tabela$Frequência) == nrow(dados),
           identical(calc("normalidade")$tabela$p_valor, stats::shapiro.test(x)$p.value))
-frequencias <- catalyser_descricao(dados, list(analise = "frequencias", variavel = "sexo"))$tabela
+frequencias <- trilha_descricao(dados, list(analise = "frequencias", variavel = "sexo"))$tabela
 stopifnot(sum(frequencias$Absoluta) == 2641L, tail(frequencias$Acumulada_percentual, 1) == 100)
 for (metodo in c("pearson", "spearman")) {
   esperado <- stats::cor.test(x, dados[[nomes_num[2]]], method = metodo, exact = FALSE)
@@ -54,7 +54,7 @@ stopifnot(identical(names(resumo_continuas), c("variavel", "n_validos", "ausente
           inherits(desenhar_distribuicao(dados, nomes_num[1]), "ggplot"),
           inherits(desenhar_barras_ocean(dados, "sexo"), "ggplot"))
 # O panorama traduz os nomes internos e oferece uma pista diferente para cada tipo.
-panorama_tipos <- catalyser_descricao(
+panorama_tipos <- trilha_descricao(
   data.frame(nominal = factor(c("F", "M")), ordinal = ordered(c("baixo", "alto"), levels = c("baixo", "alto")),
              discreta = c(1L, 2L), continua = c(1.2, 2.7)),
   list(analise = "panorama")
@@ -65,13 +65,13 @@ stopifnot(identical(names(panorama_tipos), c("Nome da variável", "Tipo de vari�
 # O link acompanha a quantidade observada de grupos sem impedir que o aluno escolha outro caminho.
 dois_grupos <- data.frame(grupo = factor(rep(c("A", "B"), each = 4)), resposta = seq_len(8))
 tres_grupos <- data.frame(grupo = factor(rep(c("A", "B", "C"), each = 4)), resposta = seq_len(12))
-sugestao_t <- catalyser_descricao(dois_grupos, list(analise = "relacao", variavel = "grupo", outra = "resposta"))$sugestao
-sugestao_anova <- catalyser_descricao(tres_grupos, list(analise = "relacao", variavel = "grupo", outra = "resposta"))$sugestao
+sugestao_t <- trilha_descricao(dois_grupos, list(analise = "relacao", variavel = "grupo", outra = "resposta"))$sugestao
+sugestao_anova <- trilha_descricao(tres_grupos, list(analise = "relacao", variavel = "grupo", outra = "resposta"))$sugestao
 stopifnot(identical(sugestao_t$destino, "Teste t de Student"),
           identical(sugestao_anova$destino, "ANOVA de um fator"))
-na <- catalyser_descricao(tipada, list(analise = "faltantes"))$tabela
+na <- trilha_descricao(tipada, list(analise = "faltantes"))$tabela
 stopifnot(identical(na$Ausentes, c(1L, 0L, 1L)), identical(na$Percentual, c(25, 0, 25)))
-stopifnot(falha(catalyser_descricao(tipada, list(analise = "resumo", variavel = "data"))))
+stopifnot(falha(trilha_descricao(tipada, list(analise = "resumo", variavel = "data"))))
 constante <- dados[1:4, ]; constante[[nomes_num[1]]] <- 2
 stopifnot(falha(calc("normalidade", constante)), falha(calc("densidade", constante)),
           falha(calc("boxplot", constante, forma = "violino")),

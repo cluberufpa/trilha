@@ -72,7 +72,7 @@ trat_contingencia_tidy <- function(df, linha, coluna, percentual = "none") {
     tidy$percentual <- ifelse(denominador > 0, 100 * tidy$n / denominador, 0)
   }
 
-  attr(tidy, "catalyser_contingencia") <- list(
+  attr(tidy, "trilha_contingencia") <- list(
     var_row = linha,
     var_col = coluna,
     freq = "n",

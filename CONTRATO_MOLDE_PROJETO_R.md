@@ -69,7 +69,7 @@ Regras da árvore:
   `cluberufpa/trilha` e `astuciasnor/EAPADados`); o README traz os mesmos
   dois comandos. As funções de apoio que viajam (`moda()`, `converter_datas()`)
   vão em `R/funcoes.R`; a conferência das bases usa
-  `catalyser::catalyser_conferir_base()`. O exportador aplica a regra num ponto
+  `catalyser::trilha_conferir_base()`. O exportador aplica a regra num ponto
   único (`exportacao_sanitizar_molde()`), antes de gravar o script.
 - O estilo padrão é **APA** (`relatorios/apa.csl`). `abnt.csl` não é mais
   copiado para projetos novos.
@@ -121,7 +121,7 @@ dela, nos marcadores `{{BIBLIOTECAS_PREPARO}}`, `{{TRECHO_IMPORTAR}}` e
    etapas, um objeto por etapa**, sem banner no meio da seção: **3.1
    Reconstruir** a receita registrada sobre `dados_brutos`
    (`base_reconstruida`); **3.2 Conferir** `base_reconstruida` contra a
-   fotografia de `dados/processados/` com `catalyser_conferir_base()` — a
+   fotografia de `dados/processados/` com `trilha_conferir_base()` — a
    análise segue com a fotografia em qualquer caso, e um comentário
    `# saveRDS(...)` por base ensina a regravar a fotografia; **3.3 Adotar** —
    **uma única leitura** do RDS (`dados_analise <- readRDS(...)`); **3.4 Base
@@ -314,7 +314,7 @@ uma linha, o valor entra no lugar. O catálogo por arquivo:
 
 | Arquivo | Marcadores |
 |---|---|
-| `analise_projeto.R` | `{{TITULO_COMENTARIO}}`, `{{PERGUNTA_COMENTARIO}}`, `{{BIBLIOTECAS_PREPARO}}` (bloco derivado de `library()` da leitura/preparo, na seção 1), `{{TRECHO_IMPORTAR}}` (da planilha a `dados_brutos`, na seção 2), `{{TRECHO_PREPARO}}` (etapas 3.1–3.4: reconstruir, conferir com `catalyser_conferir_base()`, adotar com leitura única do RDS e montar `dados_da_analise`, na seção 3), variáveis e rótulos (`{{RESPOSTA_R}}`, `{{PREDITOR_R}}`, `{{GRUPO_R}}`, `{{FATOR_R}}`, `{{ROTULO_*_R}}`), `{{CONFIANCA}}`, `{{TITULO_R}}`, `{{EQUACAO}}`, `{{AUTOCORRELACAO}}` (regressão) |
+| `analise_projeto.R` | `{{TITULO_COMENTARIO}}`, `{{PERGUNTA_COMENTARIO}}`, `{{BIBLIOTECAS_PREPARO}}` (bloco derivado de `library()` da leitura/preparo, na seção 1), `{{TRECHO_IMPORTAR}}` (da planilha a `dados_brutos`, na seção 2), `{{TRECHO_PREPARO}}` (etapas 3.1–3.4: reconstruir, conferir com `trilha_conferir_base()`, adotar com leitura única do RDS e montar `dados_da_analise`, na seção 3), variáveis e rótulos (`{{RESPOSTA_R}}`, `{{PREDITOR_R}}`, `{{GRUPO_R}}`, `{{FATOR_R}}`, `{{ROTULO_*_R}}`), `{{CONFIANCA}}`, `{{TITULO_R}}`, `{{EQUACAO}}`, `{{AUTOCORRELACAO}}` (regressão) |
 | `relatorio_completo.qmd` / `relatorio_artigo.qmd` | `{{TITULO}}`, `{{INTRODUCAO}}`, `{{METODOS}}`, `{{DISCUSSAO}}`, `{{CONCLUSAO}}`, `{{ARQUIVO_BRUTO}}`, `{{ARQUIVO_BASE}}` |
 | `README.md` | `{{TITULO}}`, `{{PROJETO_RPROJ}}`, `{{ARQUIVO_BRUTO}}`, `{{RESPOSTA}}`, `{{PREDITOR}}`/`{{FATOR}}`/`{{GRUPO}}`, `{{IC}}`, `{{PACOTES_INSTALAR}}`, `{{AMBIENTE_COMPUTACIONAL}}` |
 

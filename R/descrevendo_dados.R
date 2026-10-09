@@ -333,7 +333,7 @@ tabela_frequencia_exploratoria <- function(dados, variavel, tipo, classes = NULL
 #' @param parametros Lista com analise, variavel e opções específicas do método.
 #' @return Vetor de linhas R, que espera um data.frame chamado dados.
 #' @export
-catalyser_codigo_descricao <- function(parametros) {
+trilha_codigo_descricao <- function(parametros) {
   p <- parametros
   # Mantém o replay de resultados criados antes da reformulação da interface.
   modos <- c(unname(unlist(descricao_catalogo())), "estrutura", "faltantes", "tipos",
@@ -838,12 +838,12 @@ exploracao_normalidade_grupos <- function(dados, variavel, grupo) {
 
 #' Executar uma análise do menu Descrevendo Dados
 #' @param dados Base compartilhada ou derivada, sem modificações por esta função.
-#' @param parametros Opções usadas por [catalyser_codigo_descricao()].
+#' @param parametros Opções usadas por [trilha_codigo_descricao()].
 #' @return Lista com narrativa, tabela e, conforme o método, gráfico e console.
 #' @export
-catalyser_descricao <- function(dados, parametros) {
+trilha_descricao <- function(dados, parametros) {
   ambiente <- new.env(parent = baseenv())
   ambiente$dados <- dados
-  eval(parse(text = catalyser_codigo_descricao(parametros)), envir = ambiente)
+  eval(parse(text = trilha_codigo_descricao(parametros)), envir = ambiente)
   ambiente$resultado
 }

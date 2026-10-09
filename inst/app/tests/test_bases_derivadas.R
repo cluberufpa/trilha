@@ -204,7 +204,7 @@ registro_cont <- bases_adicionar_etapa(
 )
 base_cont <- bases_obter(registro_cont, "base_0101")
 cache_cont <- bases_recalcular_cache(dados_resumo, base_cont, 1L)
-meta_cont <- attr(cache_cont$df, "catalyser_contingencia", exact = TRUE)
+meta_cont <- attr(cache_cont$df, "trilha_contingencia", exact = TRUE)
 stopifnot(
   cache_cont$linhas == 4L,
   cache_cont$colunas == 4L,

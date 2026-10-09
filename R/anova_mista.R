@@ -57,7 +57,7 @@ anova_mista_num <- function(x, casas = 2L) {
 #'   opcionalmente, `nivel_confianca` e `tema`.
 #' @return Lista de componentes para a interface e o Projeto R.
 #' @export
-catalyser_anova_mista <- function(dados, p) {
+trilha_anova_mista <- function(dados, p) {
   valor_ou <- function(x, padrao = "") if (is.null(x) || !length(x)) padrao else x
   resposta <- as.character(valor_ou(p$resposta))
   fator <- as.character(valor_ou(p$fator))

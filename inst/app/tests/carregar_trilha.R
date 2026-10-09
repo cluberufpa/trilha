@@ -1,7 +1,7 @@
 # =============================================================================
 # carregar_trilha.R — deixa as funções de análise disponíveis para os testes
 # -----------------------------------------------------------------------------
-# As funções `catalyser_*` vivem em R/ e são exportadas pelo pacote. Um teste
+# As funções `trilha_*` vivem em R/ e são exportadas pelo pacote. Um teste
 # pode rodar em dois momentos:
 #
 #   - DEPOIS de instalar  -> usa o pacote instalado, que é o que o aluno terá;

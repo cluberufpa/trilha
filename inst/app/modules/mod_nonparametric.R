@@ -232,7 +232,7 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
       updateSelectInput(session, "chi_col", choices = cat_cols,
                         selected = manter(isolate(input$chi_col), cat_cols,
                                           if (length(cat_cols) > 1) cat_cols[2] else cat_cols[1]))
-      meta_contingencia <- attr(df, "catalyser_contingencia", exact = TRUE)
+      meta_contingencia <- attr(df, "trilha_contingencia", exact = TRUE)
       tem_meta_contingencia <- !is.null(meta_contingencia)
       linha_tidy <- meta_contingencia$var_row %||% cat_cols[1]
       coluna_tidy <- meta_contingencia$var_col %||%
@@ -275,14 +275,14 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
     observeEvent(data_rv(), {
       df <- data_rv()
       req(df)
-      if (!is.null(attr(df, "catalyser_contingencia", exact = TRUE)))
+      if (!is.null(attr(df, "trilha_contingencia", exact = TRUE)))
         updateRadioButtons(session, "chi_source", selected = "tidy")
     }, ignoreInit = FALSE)
 
     output$chi_tidy_status <- renderUI({
       df <- data_rv()
       req(df)
-      meta <- attr(df, "catalyser_contingencia", exact = TRUE)
+      meta <- attr(df, "trilha_contingencia", exact = TRUE)
       if (is.null(meta)) {
         div(
           class = "alert alert-warning py-2 mb-2",
@@ -359,7 +359,7 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
       if (src == "tidy") {
         df <- data_rv()
         req(df)
-        meta <- attr(df, "catalyser_contingencia", exact = TRUE)
+        meta <- attr(df, "trilha_contingencia", exact = TRUE)
         validate(need(
           !is.null(meta),
           paste(

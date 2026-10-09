@@ -15,50 +15,50 @@ execucao <- function(tipo, parametros) list(
 )
 
 resultados <- list(
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "estatistica_descritiva",
     list(variaveis = c("x", "y"), grupo = "grupo", metricas = NULL)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "regressao_linear",
     list(resposta = "y", preditor = "x", grupo = "none")
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "regressao_linear",
     list(resposta = "y", preditor = "x", grupo = "grupo", regressao_por_grupo = TRUE)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "regressao_logistica",
     list(resposta = "resposta_binaria", preditor = "x", grupo = "none")
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "teste_t_one_val",
     list(tipo_teste = "one_val", variavel = "y", media_hipotetica = 10,
          alternativa = "two.sided", nivel_confianca = 0.95)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "teste_t_two_ind",
     list(tipo_teste = "two_ind", resposta = "y", grupo = "grupo",
          variancias_iguais = FALSE, alternativa = "two.sided", nivel_confianca = 0.95)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "teste_t_paired",
     list(tipo_teste = "paired", variavel_1 = "y", variavel_2 = "z",
          alternativa = "two.sided", nivel_confianca = 0.95)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "grafico_linhas",
     list(x = "x", y = "y", grupo = "grupo", mostrar_pontos = TRUE, espessura_linha = 1)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "qui_quadrado",
     list(var_row = "grupo", var_col = "especie", tabela = NULL, yates = TRUE)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "pca",
     list(variaveis = c("x", "y", "z"), padronizar = TRUE)
   ), dados),
-  catalyser_executar(execucao(
+  trilha_executar(execucao(
     "hca",
     list(variaveis = c("x", "y", "z"), distancia = "euclidean",
          ligacao = "complete", numero_grupos = 3L, padronizar = TRUE)

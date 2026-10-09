@@ -158,7 +158,7 @@ mod_pareados_categoricos_server <- function(id, tipo, dados_rv, registro_bases_r
     observeEvent(input$executar, {
       p <- parametros()
       resultado <- tryCatch(
-        if (identical(tipo, "friedman")) catalyser_friedman(dados(), p) else catalyser_mcnemar(dados(), p),
+        if (identical(tipo, "friedman")) trilha_friedman(dados(), p) else trilha_mcnemar(dados(), p),
         error = function(e) e
       )
       if (inherits(resultado, "error")) {

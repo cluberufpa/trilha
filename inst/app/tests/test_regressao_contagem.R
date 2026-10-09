@@ -16,7 +16,7 @@ dados_poisson <- data.frame(
   esforco_horas = esforco
 )
 
-poisson <- catalyser_regressao_contagem(
+poisson <- trilha_regressao_contagem(
   dados_poisson,
   list(
     resposta = "individuos", preditores = "temperatura",
@@ -37,13 +37,13 @@ dados_superdispersos <- transform(
   individuos = MASS::rnegbin(n, mu = media, theta = 0.45)
 )
 
-poisson_superdisperso <- catalyser_regressao_contagem(
+poisson_superdisperso <- trilha_regressao_contagem(
   dados_superdispersos,
   list(resposta = "individuos", preditores = "temperatura"),
   familia = "poisson"
 )
 
-binomial_negativa <- catalyser_regressao_contagem(
+binomial_negativa <- trilha_regressao_contagem(
   dados_superdispersos,
   list(
     resposta = "individuos", preditores = "temperatura",
@@ -61,7 +61,7 @@ stopifnot(
 
 # A resposta não pode aceitar medidas contínuas ou contagens negativas.
 erro_continuo <- try(
-  catalyser_regressao_contagem(
+  trilha_regressao_contagem(
     transform(dados_poisson, individuos = individuos + 0.5),
     list(resposta = "individuos", preditores = "temperatura"),
     familia = "poisson"

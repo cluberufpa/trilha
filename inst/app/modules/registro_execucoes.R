@@ -20,7 +20,7 @@ execucoes_rotulos_saidas <- c(
 )
 execucoes_saidas_validas <- names(execucoes_rotulos_saidas)
 
-# Contrato único dos tipos que catalyser_executar() sabe reconstruir. O nome
+# Contrato único dos tipos que trilha_executar() sabe reconstruir. O nome
 # analise_id identifica a tela; o campo tipo identifica a execução reproduzível.
 execucoes_tipos_reconstruiveis <- c(
   "descricao_exploratoria", "estatistica_descritiva", "grafico_linhas",

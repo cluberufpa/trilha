@@ -62,7 +62,7 @@ for (nome in names(cenarios)) {
         grepl(r$post_teste, relatar_anova(r), fixed = TRUE))
       p <- list(resposta = 'peso_g', fator = 'racao', nivel_confianca = conf,
         metodo = metodo, rotulo_y = 'Peso final (g)', rotulo_x = 'Ração')
-      replay <- trilha::catalyser_anova(dados, p)
+      replay <- trilha::trilha_anova(dados, p)
       stopifnot(identical(replay$metodo_usado, r$metodo_usado),
         identical(replay$post_teste, r$post_teste),
         identical(replay$descritivos[['Diferença']], unname(r$letras[as.character(r$descritivos_df$Grupo)])))
@@ -123,7 +123,7 @@ for (nome in names(cenarios)) {
   }
 }
 # Registros antigos não mudam automaticamente para Welch.
-antigo <- trilha::catalyser_anova(cenarios$heterogeneo,
+antigo <- trilha::trilha_anova(cenarios$heterogeneo,
   list(resposta = 'peso_g', fator = 'racao'))
 stopifnot(identical(antigo$metodo_usado, 'classica'))
 # Variância nula impede Welch com uma mensagem, sem resultados artificiais.

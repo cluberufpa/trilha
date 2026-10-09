@@ -4,7 +4,7 @@ if (file.exists(file.path("..", "..", "R", "descrevendo_dados.R"))) {
 } else {
   for (nome in c(
     "descricao_catalogo", "descricao_tipo", "exploracao_tipo_variavel",
-    "catalyser_codigo_descricao", "catalyser_descricao", "cores_ocean", "tema_ocean",
+    "trilha_codigo_descricao", "trilha_descricao", "cores_ocean", "tema_ocean",
     "aplicar_faceta_ocean", "desenhar_distribuicao", "desenhar_barras_ocean",
     "desenhar_caixa_ocean", "desenhar_dispersao_ocean", "resumir_continuas",
     "tabela_frequencia_exploratoria", "exploracao_tipos", "exploracao_base_visual",
@@ -480,7 +480,7 @@ mod_descrevendo_dados_server <- function(id, area, dados_rv, registro_bases_rv,
         req(is.data.frame(seletor$dados()), ncol(seletor$dados()) > 0)
         p <- parametros(modo)
         dados <- seletor$dados()
-        resposta <- tryCatch(catalyser_descricao(dados, p), error = identity)
+        resposta <- tryCatch(trilha_descricao(dados, p), error = identity)
         if (inherits(resposta, "error")) {
           # Uma tentativa inválida não deixa uma prévia antiga parecer atual.
           atuais <- resultados(); atuais[[modo]] <- NULL; resultados(atuais)
@@ -494,7 +494,7 @@ mod_descrevendo_dados_server <- function(id, area, dados_rv, registro_bases_rv,
                        titulo = titulo, parametros = p,
                        # Detalhes e sugestão orientam a tela; o relatório recebe apenas componentes editoriais.
                        saidas_disponiveis = intersect(names(resposta), c("narrativa", "tabela", "grafico", "console")),
-                       codigo_r = paste(catalyser_codigo_descricao(p), collapse = "\n"))
+                       codigo_r = paste(trilha_codigo_descricao(p), collapse = "\n"))
         anteriores <- historico()
         iguais <- which(vapply(anteriores, function(z) identical(z$parametros, p), logical(1)))
         identificador <- if (length(iguais)) names(anteriores)[iguais[1]] else sprintf("previa_%04d", length(anteriores) + 1L)
@@ -574,7 +574,7 @@ mod_descrevendo_dados_server <- function(id, area, dados_rv, registro_bases_rv,
         }
       })
       output[[chave("grafico")]] <- renderPlot({ req(resposta()$grafico); print(resposta()$grafico) })
-      output[[chave("codigo")]] <- renderText({ req(pronto()); paste(catalyser_codigo_descricao(parametros(modo)), collapse = "\n") })
+      output[[chave("codigo")]] <- renderText({ req(pronto()); paste(trilha_codigo_descricao(parametros(modo)), collapse = "\n") })
       output[[chave("console")]] <- renderText(paste(resposta()$console, collapse = "\n"))
     })
     observeEvent(input$previa_id, {

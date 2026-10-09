@@ -148,7 +148,7 @@ dados_cont_tidy <- data.frame(
   n = c(10L, 5L, 3L, 12L),
   stringsAsFactors = FALSE
 )
-attr(dados_cont_tidy, "catalyser_contingencia") <- list(
+attr(dados_cont_tidy, "trilha_contingencia") <- list(
   var_row = "especie", var_col = "local", freq = "n", percentual = "none"
 )
 dados_cont_tidy_rv <- reactiveVal(dados_cont_tidy)

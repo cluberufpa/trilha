@@ -32,11 +32,11 @@ stopifnot(length(unique(ggplot2::ggplot_build(por_grupo)$data[[2]]$group)) == 3L
 
 # As leituras confirmadas sobrevivem ao código independente, sem depender da sessão Shiny.
 p <- list(analise = "panorama", leituras = tipos)
-resultado <- catalyser_descricao(dados, p)
+resultado <- trilha_descricao(dados, p)
 ambiente <- new.env(parent = baseenv()); ambiente$dados <- dados
-eval(parse(text = catalyser_codigo_descricao(p)), ambiente)
+eval(parse(text = trilha_codigo_descricao(p)), ambiente)
 stopifnot(identical(resultado$tabela, ambiente$resultado$tabela))
-normalidade <- catalyser_descricao(dados, list(analise = "normalidade", variavel = "massa_g", grupo = "especie"))
+normalidade <- trilha_descricao(dados, list(analise = "normalidade", variavel = "massa_g", grupo = "especie"))
 stopifnot(nrow(normalidade$tabela) == 3L, sum(normalidade$tabela$n) == 342L)
 ficha <- shiny::reactiveVal(list())
 shiny::isolate({

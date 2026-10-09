@@ -42,7 +42,7 @@ stopifnot(file.exists(script),
   dir.exists(file.path(projeto, "imagens")),
   !file.exists(file.path(projeto, "relatorios", "relatorio.qmd")))
 # O funcoes.R do molde não tem a seção de manutenção do relatório sincronizado
-# nem a conferência de bases: ela é catalyser_conferir_base(), do pacote.
+# nem a conferência de bases: ela é trilha_conferir_base(), do pacote.
 funcoes <- readLines(file.path(projeto, "R", "funcoes.R"), encoding = "UTF-8")
 stopifnot(!any(grepl("conferir_codigo", funcoes, fixed = TRUE)),
   !any(grepl("conferir_base", funcoes, fixed = TRUE)))
@@ -70,7 +70,7 @@ stopifnot(all(vapply(objetos_contrato, function(nome)
   any(grepl(nome, linhas_script, fixed = TRUE)), logical(1))))
 
 # Seção 1 é a única portadora de library(); a seção 3 segue as etapas 3.1–3.4
-# (uma leitura por RDS, conferência com catalyser_conferir_base, sem régua de
+# (uma leitura por RDS, conferência com trilha_conferir_base, sem régua de
 # banner no meio da seção).
 linha_secao2 <- grep("^# 2\\. Definir as escolhas", linhas_script)
 linha_secao4 <- grep("^# 4\\. Explorar", linhas_script)
@@ -82,7 +82,7 @@ stopifnot(
   sum(grepl('readRDS(here("dados", "processados", "base_compartilhada.rds"))',
     secao3, fixed = TRUE)) == 1L,
   any(grepl("base_reconstruida", secao3, fixed = TRUE)),
-  any(grepl("catalyser_conferir_base(", secao3, fixed = TRUE)),
+  any(grepl("trilha_conferir_base(", secao3, fixed = TRUE)),
   any(grepl("dados_da_analise <- dados_analise", secao3, fixed = TRUE)),
   any(grepl("# 3.1 Reconstruir.", secao3, fixed = TRUE)),
   any(grepl("# 3.2 Conferir.", secao3, fixed = TRUE)),

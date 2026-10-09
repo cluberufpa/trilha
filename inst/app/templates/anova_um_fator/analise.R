@@ -99,7 +99,7 @@ glimpse(dados_brutos)
 # --- 2. Conferir a base reproduzida -------------------------
 # Compara a base refeita com a fotografia da IDE, sem sobrescrever a referência.
 # Se você mudar o preparo de propósito, confira a diferença informada no console.
-trilha::catalyser_conferir_base(
+trilha::trilha_conferir_base(
   base_compartilhada,
   here("dados", "processados", "base_compartilhada.rds"),
   rotulo = "Base Compartilhada"

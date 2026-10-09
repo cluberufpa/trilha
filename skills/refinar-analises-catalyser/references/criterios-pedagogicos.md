@@ -33,7 +33,7 @@ Evitar como superfície principal:
 
 ```r
 execucao <- structure(list(... centenas de caracteres ...))
-resultado <- catalyser_executar(execucao, dados)
+resultado <- trilha_executar(execucao, dados)
 ```
 
 O registro técnico pode ser lido de `metadados/registro_execucoes.rds` no fim do

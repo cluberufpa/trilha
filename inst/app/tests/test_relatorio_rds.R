@@ -9,7 +9,7 @@ for (nome in c("pesca_anova", "pesca_varias")) {
   sys.source(file.path(projeto, "R/funcoes.R"), ambiente)
   qmd <- readLines(file.path(projeto, "relatorios/relatorio_completo.qmd"), encoding = "UTF-8")
   chunks <- ambiente$chunks_do_relatorio(qmd)
-  stopifnot(!any(grepl("read_excel|catalyser_conferir_base|# fonte: tratar", qmd)))
+  stopifnot(!any(grepl("read_excel|trilha_conferir_base|# fonte: tratar", qmd)))
   for (ch in chunks) {
     if (ch$rotulo %in% c("codigo-do-script", "atualizar", "instalar")) next
     codigo <- qmd[ch$ini:ch$fim]

@@ -110,7 +110,7 @@ Ainda na 0.1.5, sobre o commit `6aa407a`:
   cada grupo e os p de Shapiro-Wilk e Levene, que já estão nas tabelas ao lado.
   Ficou com pergunta, amostra e exclusões, decisão sobre H0 com F e p, tamanho de
   efeito com leitura, síntese dos pares de Tukey e remissão explícita às tabelas.
-- **A narrativa do replay acompanha a da interface.** `catalyser_anova()` foi
+- **A narrativa do replay acompanha a da interface.** `trilha_anova()` foi
   alinhada à mesma regra, senão o Word contaria uma história diferente da tela.
   As duas são textos irmãos: mudar uma obriga a mudar a outra, e um teste compara
   os marcadores das duas.
@@ -131,7 +131,7 @@ Ainda na 0.1.5, sobre o commit `6aa407a`:
   incompletas com um aviso discreto. Agora o módulo, o replay e o código
   exportado usam `dados_grafico` com `complete.cases()`, e a interface informa
   quantas observações entraram e quantas saíram — o mesmo padrão do `dados_anova`.
-- **Mini-refatoração:** `catalyser_completos()` centraliza a exclusão contada e
+- **Mini-refatoração:** `trilha_completos()` centraliza a exclusão contada e
   serve à ANOVA e ao gráfico.
 
 ### Novo caminho dos dados no Projeto R
@@ -140,7 +140,7 @@ Mudança estrutural do exportador feita no mesmo ciclo:
 
 - a **planilha bruta** vai no `.xlsx` dentro de `dados/` e é o ponto de entrada;
 - `R/01_base_compartilhada.R` é o **único** arquivo que produz `dados_analise`,
-  com conferência contra a fotografia por `catalyser_conferir_base()`;
+  com conferência contra a fotografia por `trilha_conferir_base()`;
 - os antigos `00_importar.R`, `01_operacoes_estruturais.R` e
   `02_preparo_compartilhado.R` foram fundidos nele;
 - os scripts `03_*` das bases derivadas **deixaram de existir**: cada análise
@@ -150,7 +150,7 @@ Mudança estrutural do exportador feita no mesmo ciclo:
   `dados_analise.rds` (conferência) e `base_compartilhada.xlsx` (entrega). Saíram
   `dados_brutos.rds`, `dados_analise.csv` e as fotografias das derivadas;
 - o QMD não usa mais `sys.source()` em ambiente oculto: chama
-  `catalyser_executar()` direto sobre a base construída no chunk anterior.
+  `trilha_executar()` direto sobre a base construída no chunk anterior.
 
 Ao mexer no exportador, conferir `exportacao_trecho_importar()`,
 `exportacao_trecho_tratar()`, `exportacao_trecho_base()`,
@@ -180,7 +180,7 @@ Conferido no Word pelo autor em 28/07/2026. **Não desfazer sem pedido explícit
 
 - boxplot substituído por **barras + IC 95% + letras de diferença**, eixo Y em zero;
 - tabela virou `Grupo | n | Média ± DP | IC da média | Diferença`;
-- letras por `anova_letras_tukey()` / `catalyser_letras_tukey()`, algoritmo
+- letras por `anova_letras_tukey()` / `trilha_letras_tukey()`, algoritmo
   "inserir e absorver" escrito no projeto, sem `multcompView`;
 - `console` saiu de `saidas_disponiveis` (segue na interface, só para estudo).
 

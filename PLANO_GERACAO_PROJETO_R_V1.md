@@ -49,7 +49,7 @@ variável do mesmo conjunto usado na regressão, tabela de cinco medidas e
 histograma. O script tem 102 linhas (incluindo comentários e linhas vazias);
 os QMDs completo e artigo têm 69 e 56 linhas. Ambos foram renderizados; o
 Word tem duas páginas. Os cinco resumos foram comparados ao motor
-`catalyser_resumo_descritivo()` e coincidem, assim como as contagens.
+`trilha_resumo_descritivo()` e coincidem, assim como as contagens.
 HTML e Word foram inspecionados visualmente. A revisão didática do autor
 está pendente. O exemplo foi construído diretamente, sem alterar o exportador.
 

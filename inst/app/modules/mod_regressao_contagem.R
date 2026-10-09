@@ -18,9 +18,9 @@ regressao_contagem_codigo <- function(p, familia) {
   preditores <- paste(vapply(p$preditores, texto, character(1)), collapse = ", ")
   linha_offset <- if (isTRUE(p$usar_offset)) c(
     "# Transforme o esforço, a área ou o volume em log antes do ajuste.",
-    sprintf("dados_modelo$.catalyser_offset_log <- log(dados_modelo[[%s]])", texto(p$offset))
+    sprintf("dados_modelo$.trilha_offset_log <- log(dados_modelo[[%s]])", texto(p$offset))
   ) else character()
-  termos <- c(vapply(p$preditores, texto, character(1)), if (isTRUE(p$usar_offset)) '"offset(.catalyser_offset_log)"')
+  termos <- c(vapply(p$preditores, texto, character(1)), if (isTRUE(p$usar_offset)) '"offset(.trilha_offset_log)"')
   ajustar <- if (identical(familia, "poisson")) {
     "modelo <- stats::glm(formula_modelo, data = dados_modelo, family = stats::poisson())"
   } else {
@@ -195,7 +195,7 @@ mod_regressao_contagem_server <- function(id, familia, dados_rv,
         return()
       }
       resultado <- tryCatch(
-        catalyser_regressao_contagem(seletor$dados(), p, familia = familia),
+        trilha_regressao_contagem(seletor$dados(), p, familia = familia),
         error = function(e) e
       )
       if (inherits(resultado, "error")) {
@@ -246,7 +246,7 @@ mod_regressao_contagem_server <- function(id, familia, dados_rv,
       div(class = "alert alert-secondary", resultado_rv()$narrativa)
     })
 
-    # O Viewer usa uma tabela navegável; o Projeto R usa catalyser_tabela_ocean().
+    # O Viewer usa uma tabela navegável; o Projeto R usa trilha_tabela_ocean().
     tabela_dt <- function(x) {
       DT::datatable(
         x,

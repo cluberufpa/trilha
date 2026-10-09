@@ -10,12 +10,12 @@ repetidas <- expand.grid(
   ocasiao = factor(c("antes", "meio", "depois"), levels = c("antes", "meio", "depois"))
 )
 repetidas$resposta <- rnorm(nrow(repetidas), rep(c(10, 12, 15), each = 12), 1)
-resultado_repetidas <- catalyser_anova_medidas_repetidas(
+resultado_repetidas <- trilha_anova_medidas_repetidas(
   repetidas, list(resposta = "resposta", sujeito = "unidade", momento = "ocasiao")
 )
 
 uma_variancia <- data.frame(comprimento = rnorm(50, 30, 2))
-resultado_qui <- catalyser_variancia_uma(
+resultado_qui <- trilha_variancia_uma(
   uma_variancia,
   list(variavel = "comprimento", desvio_hipotetico = 2,
        alternativa = "two.sided", nivel_confianca = 0.95)
@@ -25,7 +25,7 @@ duas_variancias <- data.frame(
   resposta = c(rnorm(30, 0, 1), rnorm(28, 0, 2)),
   grupo = factor(rep(c("A", "B"), c(30, 28)))
 )
-resultado_f <- catalyser_variancias_duas(
+resultado_f <- trilha_variancias_duas(
   duas_variancias,
   list(resposta = "resposta", grupo = "grupo", alternativa = "two.sided", nivel_confianca = 0.95)
 )
@@ -35,7 +35,7 @@ stopifnot(
   is.finite(resultado_repetidas$tabela$F[1]),
   is.finite(resultado_qui$tabela[["Qui-quadrado"]]),
   is.finite(resultado_f$tabela$F),
-  inherits(catalyser_executar(list(
+  inherits(trilha_executar(list(
     tipo = "qui_quadrado_variancia",
     parametros = list(variavel = "comprimento", desvio_hipotetico = 2,
                       alternativa = "two.sided", nivel_confianca = 0.95)

@@ -18,7 +18,7 @@ for (i in seq_along(modos)) {
   modo <- modos[i]
   p <- list(analise = modo, variavel = if (modo == "frequencias") "sexo" else numericas[1],
             outra = numericas[2], grupo = "sexo")
-  resposta <- catalyser_descricao(ctx$df, p)
+  resposta <- trilha_descricao(ctx$df, p)
   # Pistas da interface não se tornam seções independentes do relatório.
   saidas_relatorio <- intersect(names(resposta), c("narrativa", "tabela", "grafico", "console"))
   estado <- list(analise_id = "descricao_teste", tipo = "descricao_exploratoria",

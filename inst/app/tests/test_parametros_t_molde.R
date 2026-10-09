@@ -50,7 +50,7 @@ for (igual in c(TRUE, FALSE)) {
       isTRUE(all.equal(ambiente$teste_t$conf.int, esperado$conf.int)),
       grepl(ambiente$metodo_teste, ambiente$texto_levene_decisao, fixed = TRUE))
     # O replay é a reconstrução usada pela Comunicação de Resultados.
-    replay <- trilha::catalyser_executar(item, dados)
+    replay <- trilha::trilha_executar(item, dados)
     stopifnot(isTRUE(all.equal(replay$tabela[['p-valor']], esperado$p.value)),
       isTRUE(all.equal(replay$tabela[['IC inferior']], unname(esperado$conf.int[1]))),
       isTRUE(all.equal(replay$tabela[['IC superior']], unname(esperado$conf.int[2]))))

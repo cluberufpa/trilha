@@ -93,7 +93,7 @@ execucao_anova2 <- list(
     nivel_confianca = 0.95
   )
 )
-replay <- catalyser_executar(execucao_anova2, salvelino)
+replay <- trilha_executar(execucao_anova2, salvelino)
 stopifnot(
   is.data.frame(replay$celulas),
   nrow(replay$celulas) == 4L,

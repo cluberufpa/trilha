@@ -2,7 +2,7 @@
 # que a rota legada escreve com o pacote local são reescritas para as funções
 # equivalentes de R/funcoes.R (moda, converter_datas) e os comentários que
 # citam a IDE ganham texto neutro — sem tocar na conferência
-# (catalyser_conferir_base) nem em outras chamadas com pacote.
+# (trilha_conferir_base) nem em outras chamadas com pacote.
 for (arquivo in c("registro_tratamentos.R", "registro_bases.R", "registro_execucoes.R",
                   "registro_comunicacao.R", "exportacao_comunicacao.R")) {
   source(file.path("modules", arquivo), encoding = "UTF-8")
@@ -11,10 +11,10 @@ for (arquivo in c("registro_tratamentos.R", "registro_bases.R", "registro_execuc
 entrada <- c(
   "# Datas: use trilha::converter_datas(); ajuda em ?trilha::converter_datas.",
   "dados <- dados |> dplyr::mutate(data = trilha::converter_datas(data))",
-  "dados <- dados |> dplyr::mutate(peso_log = trilha::catalyser_moda(peso))",
+  "dados <- dados |> dplyr::mutate(peso_log = trilha::trilha_moda(peso))",
   "dados <- dados |> dplyr::mutate(grupo = trat_moda(grupo))",
   "dados <- dados |> dplyr::mutate(quando = converter_data(quando))",
-  "catalyser_conferir_base(dados, here(\"dados\", \"processados\", \"base_compartilhada.rds\"), rotulo = \"Base\")",
+  "trilha_conferir_base(dados, here(\"dados\", \"processados\", \"base_compartilhada.rds\"), rotulo = \"Base\")",
   "# A CatalyseR também exportou uma fotografia de `dados_analise`. A função",
   "# Houve mudança estrutural promovida na CatalyseR (Pivotar/Separar ou",
   "# viu na tela, o script carrega a fotografia materializada na exportação.",
@@ -32,7 +32,7 @@ stopifnot(
   identical(saida[3], "dados <- dados |> dplyr::mutate(peso_log = moda(peso))"),
   identical(saida[4], "dados <- dados |> dplyr::mutate(grupo = moda(grupo))"),
   identical(saida[5], "dados <- dados |> dplyr::mutate(quando = converter_datas(quando))"),
-  # A conferência do molde é catalyser_conferir_base() e NÃO é reescrita.
+  # A conferência do molde é trilha_conferir_base() e NÃO é reescrita.
   identical(saida[6], entrada[6]),
   # Comentários dos trechos compartilhados, com texto neutro no molde.
   identical(saida[7], "# O projeto traz uma fotografia de `dados_analise` em dados/processados/. A função"),
@@ -45,4 +45,4 @@ stopifnot(
   identical(saida[13], entrada[13])
 )
 
-cat("OK: exportacao_sanitizar_molde reescreve moda/converter_datas e os comentários da IDE, preservando catalyser_conferir_base e as demais chamadas com pacote.\n")
+cat("OK: exportacao_sanitizar_molde reescreve moda/converter_datas e os comentários da IDE, preservando trilha_conferir_base e as demais chamadas com pacote.\n")

@@ -24,14 +24,25 @@ relatório, uma só trilha de análise.* Logo e cores: ver
   passou em 34 de 38 arquivos; os 4 que falham (`test_descrevendo_interface`,
   `test_estados_execucao`, `test_logisticas_separadas`, `test_anova_mista`)
   já falhavam antes do renome.
+- **Etapa 2 feita** (`main`, 9/10/2026): as 30 funções `catalyser_*`
+  viraram `trilha_*` (`trilha_anova()`, `trilha_letras_tukey()`,
+  `trilha_num()`...) em `R/`, nos módulos, nos moldes exportados, nos testes
+  e nos documentos (fora `docs/historico/` e `docs/testes/`, que são
+  registro do passado); `NAMESPACE` e `man/` refeitos pelo roxygen2. Sem
+  apelidos com o nome antigo: um projeto exportado pela 0.2.x com
+  `trilha::catalyser_*()` precisa ser exportado de novo. Os logos antigos
+  de `docs/identidade_visual/` (`catalyser_logo_*.svg`) ficaram como estão.
+  Próxima: a etapa 3 (textos da tela), que não é troca mecânica: há "o
+  CatalyseR" no masculino e a seção "A Origem do Nome CatalyseR" do Sobre,
+  que pede texto novo do professor.
 
 ## Tamanho do trabalho (levantamento de 8/10/2026)
 
 - cerca de 410 menções a "CatalyseR" (interface, documentos, comentários) e
   230 a "catalyser" (pacote, chamadas `catalyser::`, arquivos);
-- umas 30 funções exportadas com o prefixo `catalyser_` (`catalyser_num`,
-  `catalyser_executar`, `catalyser_conferir_base`, `catalyser_letras_tukey`,
-  `catalyser_ou`...), com as páginas de `man/` e o `NAMESPACE`;
+- umas 30 funções exportadas com o prefixo `catalyser_` (`trilha_num`,
+  `trilha_executar`, `trilha_conferir_base`, `trilha_letras_tukey`,
+  `trilha_ou`...), com as páginas de `man/` e o `NAMESPACE`;
 - arquivos com o nome: `catalyser.Rproj`, `instalar_catalyser.R`,
   `inst/app/tests/carregar_catalyser.R`, a skill
   `skills/refinar-analises-catalyser/`;
@@ -74,7 +85,7 @@ Cada etapa é um commit, numa branch própria (`trilha`), com os testes de
 ## Cuidados
 
 - **Projetos já exportados.** Os projetos do molde antigo chamam
-  `catalyser::catalyser_letras_tukey()` e parentes. Depois do renome, eles só
+  `catalyser::trilha_letras_tukey()` e parentes. Depois do renome, eles só
   rodam enquanto o pacote `catalyser` antigo continuar instalado na máquina
   do aluno. Opções: (a) avisar no README do instalador que projetos antigos
   pedem o `catalyser` antigo; (b) publicar uma última versão do `catalyser`
@@ -88,6 +99,13 @@ Cada etapa é um commit, numa branch própria (`trilha`), com os testes de
   no código. Não usar "TrilhaR", "Trilha do R" nem "Trilha Studio".
 
 ## A ClaRa na Trilha
+
+> **Superado em 9/10/2026:** a ClaRa virou o pacote `clara` (0.9.0, Fase 1
+> de [PLANO_TRILHA_E_CLARA.md](PLANO_TRILHA_E_CLARA.md)), porque a Trilha
+> vai executá-la, e não só copiá-la. O texto abaixo fica como registro da
+> posição de 8/10; o caminho em vigor é o do plano novo (Fase 2: a Trilha
+> declara `clara` em `Imports` e a cópia de `templates/clara/` deixa de
+> ser mantida à mão).
 
 A ClaRa **já vem junto** com a Trilha: a cópia em `inst/app/templates/clara/`
 é instalada com o pacote, e o exportador a põe em `R/clara/` de cada projeto,

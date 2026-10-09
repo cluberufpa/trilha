@@ -51,7 +51,7 @@ if (!requireNamespace("EAPADados", quietly = TRUE)) {
   )
 }
 library(EAPADados)
-# catalyser: catalyser_conferir_base(), a conferência das bases na seção 3.
+# catalyser: trilha_conferir_base(), a conferência das bases na seção 3.
 if (!requireNamespace("trilha", quietly = TRUE)) {
   stop(
     "Este projeto usa o pacote trilha, que não está instalado.",
@@ -302,7 +302,7 @@ if (metodo_usado == "classica") {
 # Letras são apresentação: esta função recebe os pares, os p ajustados e o alfa.
 # Ela não divide nomes no hífen nem modifica os cálculos estatísticos acima.
 posicao_pares <- match(paste0(pares_grupos[2, ], "-", pares_grupos[1, ]), tabela_tukey$Comparação)
-letras <- trilha::catalyser_letras_tukey(
+letras <- trilha::trilha_letras_tukey(
   pares = pares_grupos[c(2L, 1L), , drop = FALSE],
   p_ajustado = tabela_tukey$`p adj`[posicao_pares],
   medias = stats::setNames(tabela_resumo$media, as.character(tabela_resumo$grupo)),

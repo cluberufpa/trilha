@@ -79,7 +79,7 @@ Referências dos procedimentos: documentação de
 ## Código e compatibilidade
 
 `R/descrevendo_dados.R` reúne catálogo, tipos e código canônico. A interface,
-`catalyser_executar()` e o código de estudo exportado executam esse mesmo código.
+`trilha_executar()` e o código de estudo exportado executam esse mesmo código.
 O projeto mostra as escolhas e as funções estatísticas, com trechos nomeados pelo
 método e variáveis. Nenhum cálculo depende da sessão Shiny.
 

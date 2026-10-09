@@ -224,7 +224,7 @@ exportacao_trecho_pacotes <- function() {
     "library(EAPADados)",
     "",
     "# As funções de análise: as mesmas que a CatalyseR usou na tela, para o",
-    "# resultado ser idêntico. ?catalyser_anova mostra a ajuda de qualquer uma.",
+    "# resultado ser idêntico. ?trilha_anova mostra a ajuda de qualquer uma.",
     "if (!requireNamespace(\"trilha\", quietly = TRUE) ||",
     "    getNamespaceVersion(\"trilha\") < package_version(\"0.1.18\")) {",
     "  stop(\"Este projeto requer trilha >= 0.1.18. Atualize e reinicie o R: \",",
@@ -350,7 +350,7 @@ exportacao_bloco_trilha <- function(pipeline, reg = tratamentos) {
     linhas <- c(
       linhas,
       sprintf("# Etapa %d: %s", i, tratamento$rotulo(etapa$params)),
-      gsub("trat_moda(", "trilha::catalyser_moda(", tratamento$codigo(etapa$params), fixed = TRUE),
+      gsub("trat_moda(", "trilha::trilha_moda(", tratamento$codigo(etapa$params), fixed = TRUE),
       ""
     )
   }
@@ -375,7 +375,7 @@ exportacao_trecho_tratar <- function(pipeline, base_externa = NULL,
     "# A CatalyseR também exportou uma fotografia de `dados_analise`. A função",
     "# abaixo compara a base reconstruída com ela e avisa se algo divergir.",
     "# O QUE CONFERIR: a mensagem deve dizer que a base é idêntica à fotografia.",
-    "catalyser_conferir_base(",
+    "trilha_conferir_base(",
     "  dados_analise,",
     "  here(\"dados\", \"processados\", \"base_compartilhada.rds\"),",
     "  rotulo = \"Base Compartilhada\"",
@@ -512,10 +512,10 @@ exportacao_codigo_estudo <- function(execucao, incluir_carregamento = TRUE,
     preditores <- vetor_r(p$preditores)
     colunas <- vetor_r(c(p$resposta, p$preditores, if (isTRUE(p$usar_offset)) p$offset))
     offset <- if (isTRUE(p$usar_offset)) c(
-      sprintf("dados_modelo$.catalyser_offset_log <- log(dados_modelo[[%s]])", texto_r(p$offset))
+      sprintf("dados_modelo$.trilha_offset_log <- log(dados_modelo[[%s]])", texto_r(p$offset))
     ) else character()
     termos <- if (isTRUE(p$usar_offset)) {
-      sprintf("c(%s, %s)", preditores, texto_r("offset(.catalyser_offset_log)"))
+      sprintf("c(%s, %s)", preditores, texto_r("offset(.trilha_offset_log)"))
     } else {
       preditores
     }
@@ -537,7 +537,7 @@ exportacao_codigo_estudo <- function(execucao, incluir_carregamento = TRUE,
 
   codigo <- switch(
     execucao$tipo,
-    descricao_exploratoria = catalyser_codigo_descricao(p),
+    descricao_exploratoria = trilha_codigo_descricao(p),
     regressao_linear = c(
       sprintf(
         "formula_modelo <- stats::reformulate(%s, response = %s)",
@@ -708,9 +708,9 @@ exportacao_codigo_estudo <- function(execucao, incluir_carregamento = TRUE,
       "omega_quadrado <- effectsize::omega_squared(modelo_anova)",
       "",
       "# 7. Letras de diferença: grupos com a mesma letra não diferiram.",
-      "#    Ajuda completa: ?catalyser_letras_tukey",
+      "#    Ajuda completa: ?trilha_letras_tukey",
       "combinacoes <- utils::combn(levels(dados_anova[[variavel_fator]]), 2)",
-      "letras_diferenca <- catalyser_letras_tukey(",
+      "letras_diferenca <- trilha_letras_tukey(",
       "  pares = combinacoes[c(2, 1), , drop = FALSE],",
       "  p_ajustado = comparacoes_tukey[[1]][, 'p adj'],",
       "  medias = tapply(",
@@ -932,7 +932,7 @@ exportacao_codigo_estudo <- function(execucao, incluir_carregamento = TRUE,
       c(
         "# Este tipo de análise ainda não tem código passo a passo; o trecho",
         "# -resultado, logo abaixo, a refaz pela função da CatalyseR.",
-        "resultado <- catalyser_executar(execucao, dados)"
+        "resultado <- trilha_executar(execucao, dados)"
       )
     }
   }
@@ -947,7 +947,7 @@ exportacao_codigo_estudo <- function(execucao, incluir_carregamento = TRUE,
       "# Para estudar os cálculos linha a linha, exporte esta ANOVA sozinha:",
       "# o molde novo mostra todo o percurso em R/analise.R.",
       "parametros_anova <-", parametros,
-      "resultado_anova <- trilha::catalyser_anova(dados, parametros_anova)",
+      "resultado_anova <- trilha::trilha_anova(dados, parametros_anova)",
       "tabela_anova <- resultado_anova$tabela",
       "comparacoes_anova <- resultado_anova$comparacoes",
       "metodo_anova <- resultado_anova$metodo_usado",
@@ -1085,7 +1085,7 @@ exportacao_trecho_componente <- function(variavel, execucao_id, componente,
       variavel
     )
   } else {
-    sprintf("catalyser_mostrar(%s[[\"%s\"]])", variavel, componente)
+    sprintf("trilha_mostrar(%s[[\"%s\"]])", variavel, componente)
   }
   c(
     exportacao_marcador(nome),
@@ -1097,7 +1097,7 @@ exportacao_trecho_componente <- function(variavel, execucao_id, componente,
 }
 
 # O chunk do componente no relatório: um título de terceiro nível e a casca.
-# `results: asis` porque catalyser_mostrar() escreve markdown direto.
+# `results: asis` porque trilha_mostrar() escreve markdown direto.
 exportacao_chunk_componente <- function(execucao_id, componente,
                                         raiz_chunk = NULL, tipo = NULL) {
   rotulo <- as.list(comunicacao_rotulos_saidas)[[componente]] %||% exportacao_figuras_estudo_t[[componente]] %||% componente
@@ -1130,7 +1130,7 @@ exportacao_trecho_resultado <- function(item, raiz, variavel) {
     "# tabelas e gráficos já formatados, com os parâmetros abaixo exatamente como",
     "# você escolheu na tela.",
     sprintf("# Sai %s, o objeto que os trechos de apresentação mostram.", variavel),
-    sprintf("%s <- catalyser_executar(", variavel),
+    sprintf("%s <- trilha_executar(", variavel),
     paste0("  ", lista),
     "  dados_da_analise",
     ")",
@@ -1189,7 +1189,7 @@ exportacao_trecho_base <- function(item, raiz, registro_bases) {
       bases_codigo(base, incluir_print = FALSE), "\n", fixed = TRUE
     )[[1]]
     receita <- exportacao_encadear_preparo(receita, entrada = "dados_analise", saida = base$nome_r)
-    receita <- gsub("trat_moda(", "trilha::catalyser_moda(", receita, fixed = TRUE)
+    receita <- gsub("trat_moda(", "trilha::trilha_moda(", receita, fixed = TRUE)
     return(c(
       exportacao_marcador(paste0(raiz, "-base")),
       "# Constrói a base desta análise num salto só a partir de dados_analise, com",
@@ -1565,7 +1565,7 @@ exportacao_preparo_anova <- function(manifesto, import_info = list(), pipeline =
     linhas <- c(linhas, "# Preparo específico da base escolhida para a ANOVA.",
       exportacao_encadear_preparo(ramo, entrada = "base_compartilhada", saida = "dados"))
   }
-  gsub("trat_moda(", "trilha::catalyser_moda(", linhas, fixed = TRUE)
+  gsub("trat_moda(", "trilha::trilha_moda(", linhas, fixed = TRUE)
 }
 
 # Confere ainda na IDE, antes do ZIP, sem acrescentar manutenção ao projeto.
@@ -1914,11 +1914,11 @@ exportacao_molde_tratar <- function(pipeline, base_externa = NULL,
     cadeia,
     "",
     "# 3.2 Conferir. O projeto traz uma fotografia da base preparada em",
-    "# dados/processados/. catalyser_conferir_base() compara a receita com ela",
+    "# dados/processados/. trilha_conferir_base() compara a receita com ela",
     "# e avisa se algo divergir; a análise segue com a fotografia em qualquer",
     "# caso.",
     "# O QUE CONFERIR: a mensagem deve dizer que as duas bases são idênticas.",
-    "catalyser_conferir_base(",
+    "trilha_conferir_base(",
     "  base_reconstruida,",
     '  here("dados", "processados", "base_compartilhada.rds"),',
     '  rotulo = "Base Compartilhada"',
@@ -1948,7 +1948,7 @@ exportacao_molde_base_analise <- function(item, raiz, registro_bases) {
       bases_codigo(base, incluir_print = FALSE), "\n", fixed = TRUE
     )[[1]]
     receita <- exportacao_encadear_preparo(receita, entrada = "dados_analise", saida = base$nome_r)
-    receita <- gsub("trat_moda(", "trilha::catalyser_moda(", receita, fixed = TRUE)
+    receita <- gsub("trat_moda(", "trilha::trilha_moda(", receita, fixed = TRUE)
     receita <- receita[!grepl("^library\\((dplyr|tidyr)\\)$", trimws(receita))]
     arquivo <- exportacao_rds_base(item)
     rotulo <- trimws(base$nome_amigavel %||% "")
@@ -1959,7 +1959,7 @@ exportacao_molde_base_analise <- function(item, raiz, registro_bases) {
       "# repete a garantia da etapa 3.2 para a fotografia do próprio ramo.",
       receita,
       "# Confere o ramo reconstruído contra a fotografia antes de adotá-lo.",
-      "catalyser_conferir_base(",
+      "trilha_conferir_base(",
       sprintf("  %s,", base$nome_r),
       sprintf('  here("dados", "processados", "%s"),', arquivo),
       sprintf('  rotulo = "%s"', rotulo),
@@ -2003,7 +2003,7 @@ exportacao_molde_pacotes_declarados <- function(modelo) {
   sub("^library\\(\\s*[\"']?", "", achados)
 }
 
-# A conferência fica no pacote catalyser (catalyser_conferir_base), como na
+# A conferência fica no pacote catalyser (trilha_conferir_base), como na
 # IDE; as demais chamadas que a rota legada escreve com o pacote local são
 # reescritas aqui para as funções equivalentes de R/funcoes.R (moda,
 # converter_datas), antes de o script ser gravado no projeto. A rota legada
@@ -2017,7 +2017,7 @@ exportacao_sanitizar_molde <- function(linhas) {
     "# Datas: use converter_datas(), definida em R/funcoes.R.",
     linhas
   )
-  linhas <- gsub("trilha::catalyser_moda\\s*\\(", "moda(", linhas)
+  linhas <- gsub("trilha::trilha_moda\\s*\\(", "moda(", linhas)
   linhas <- gsub("trilha::converter_datas\\s*\\(", "converter_datas(", linhas)
   linhas <- gsub("trat_moda\\s*\\(", "moda(", linhas)
   linhas <- gsub("\\bconverter_data\\s*\\(", "converter_datas(", linhas)
@@ -3842,10 +3842,10 @@ exportacao_leiame_projeto <- function(nome_projeto, import_info = list()) {
     "A ANOVA usa `aov()`, `TukeyHSD()` e os ajudantes de `R/funcoes.R`, como",
     "`resumir_grupo()`, `fmt()` e `flextable_ocean()`. Outras análises também",
     "usam funções do pacote `trilha`, com ajuda em português:",
-    "", "- `catalyser_executar()` — reproduz uma execução registrada;",
-    "- `catalyser_conferir_base()` — compara a base reconstruída com a fotografia;",
-    "- `catalyser_completos()` — remove e conta casos incompletos;",
-    "- `catalyser_mostrar()` e `catalyser_tabela_ocean()` — camada de apresentação."
+    "", "- `trilha_executar()` — reproduz uma execução registrada;",
+    "- `trilha_conferir_base()` — compara a base reconstruída com a fotografia;",
+    "- `trilha_completos()` — remove e conta casos incompletos;",
+    "- `trilha_mostrar()` e `trilha_tabela_ocean()` — camada de apresentação."
   )
 }
 
@@ -3977,7 +3977,7 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
   }
 
   # As funções de análise não viajam como arquivo: vêm do pacote trilha,
-  # documentadas e com ajuda em português (`?catalyser_anova`). Viajam três
+  # documentadas e com ajuda em português (`?trilha_anova`). Viajam três
   # templates: o modelo de página do Word e o tema do HTML, ao lado do
   # relatório, e o funcoes.R com a ligação script <-> relatório.
   templates <- if (isTRUE(molde$clara)) c(
@@ -4184,7 +4184,7 @@ exportacao_qmd_integrado_formato <- function(linhas, arquivo) {
 }
 
 exportacao_empacotar_projeto <- function(file, ...) {
-  raiz <- tempfile("catalyser_projeto_")
+  raiz <- tempfile("trilha_projeto_")
   dir.create(raiz, recursive = TRUE)
   on.exit(unlink(raiz, recursive = TRUE, force = TRUE), add = TRUE)
   projeto <- exportacao_criar_projeto(destino = raiz, ...)

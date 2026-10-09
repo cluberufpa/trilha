@@ -34,7 +34,7 @@ remotes::install_github("cluberufpa/trilha")
 ```
 
 Nenhum pacote é instalado automaticamente. Os dois pacotes do ecossistema
-são exigidos mesmo com dados locais; o script usa `catalyser_conferir_base`
+são exigidos mesmo com dados locais; o script usa `trilha_conferir_base`
 para conferir o preparo. EAPADados é carregado por compatibilidade.
 
 ## Gerar e adaptar os documentos

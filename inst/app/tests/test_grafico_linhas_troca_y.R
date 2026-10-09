@@ -157,8 +157,8 @@ stopifnot(
 # =============================================================================
 # Cada replay usa a sua própria variável Y
 # =============================================================================
-replay_1 <- catalyser_executar(registro$execucao_0002, base_graficos_corvina)
-replay_2 <- catalyser_executar(registro$execucao_0003, base_graficos_corvina)
+replay_1 <- trilha_executar(registro$execucao_0002, base_graficos_corvina)
+replay_2 <- trilha_executar(registro$execucao_0003, base_graficos_corvina)
 y_1 <- ggplot2::ggplot_build(replay_1$grafico)$data[[1]]$y
 y_2 <- ggplot2::ggplot_build(replay_2$grafico)$data[[1]]$y
 
@@ -194,7 +194,7 @@ stopifnot(
 )
 
 # O replay também conta as observações e usa somente as completas.
-replay_falhas <- catalyser_linhas(
+replay_falhas <- trilha_linhas(
   base_com_falhas,
   list(x = "id", y = "peso_g", grupo = "none", mostrar_pontos = TRUE,
        espessura_linha = 1, tema = "minimal", posicao_legenda = "right")

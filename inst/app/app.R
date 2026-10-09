@@ -20,7 +20,7 @@ if (file.exists(file.path("..", "..", "R", "descrevendo_dados.R"))) {
   # Modo pacote instalado: traz as funcoes internas direto do namespace trilha.
   funcoes_motor <- c(
     "descricao_catalogo", "descricao_tipo", "exploracao_tipo_variavel",
-    "catalyser_codigo_descricao", "catalyser_descricao", "cores_ocean", "tema_ocean",
+    "trilha_codigo_descricao", "trilha_descricao", "cores_ocean", "tema_ocean",
     "aplicar_faceta_ocean", "desenhar_distribuicao", "desenhar_barras_ocean",
     "desenhar_caixa_ocean", "desenhar_dispersao_ocean", "resumir_continuas",
     "tabela_frequencia_exploratoria", "exploracao_tipos", "exploracao_base_visual",

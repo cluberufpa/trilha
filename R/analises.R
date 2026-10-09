@@ -7,38 +7,38 @@ utils::globalVariables(c(
 # Funcoes de analise da CatalyseR
 # -----------------------------------------------------------------------------
 # Estas sao as funcoes que o ALUNO usa. Elas aparecem nos scripts do Projeto R
-# exportado e tem ajuda em portugues: digite ?catalyser_anova, por exemplo.
+# exportado e tem ajuda em portugues: digite ?trilha_anova, por exemplo.
 #
 # Nao confundir com as funcoes de inst/app/templates/, que sao internas da
 # interface: aquelas a IDE chama, estas a pessoa chama.
 #
 # Convencao dos nomes:
 #   catalyser_<analise>()  executa uma analise e devolve todos os componentes
-#   catalyser_executar()   escolhe a analise certa a partir da configuracao
+#   trilha_executar()   escolhe a analise certa a partir da configuracao
 #   as demais sao apoio: preparo, conferencia e apresentacao
 # =============================================================================
 
 # Funções canônicas do Projeto R integrado da CatalyseR
 # -----------------------------------------------------------------------------
 # Este arquivo é copiado para o projeto exportado. Cada script de execução
-# chama catalyser_executar() com a configuração registrada na IDE e a base
+# chama trilha_executar() com a configuração registrada na IDE e a base
 # correspondente. A camada de apresentação é deliberadamente separada.
 
-catalyser_ou <- function(x, padrao) {
+trilha_ou <- function(x, padrao) {
   if (is.null(x) || !length(x)) padrao else x
 }
 
-catalyser_num <- function(x, digitos = 3L) {
+trilha_num <- function(x, digitos = 3L) {
   if (!length(x) || is.na(x[[1]])) return("NA")
   formatC(as.numeric(x[[1]]), digits = digitos, format = "f", decimal.mark = ",")
 }
 
-catalyser_p <- function(x) {
+trilha_p <- function(x) {
   if (!length(x) || is.na(x[[1]])) return("p não disponível")
-  if (x[[1]] < 0.001) "p < 0,001" else paste0("p = ", catalyser_num(x[[1]], 3L))
+  if (x[[1]] < 0.001) "p < 0,001" else paste0("p = ", trilha_num(x[[1]], 3L))
 }
 
-catalyser_colunas <- function(dados, colunas) {
+trilha_colunas <- function(dados, colunas) {
   ausentes <- setdiff(unique(colunas), names(dados))
   if (length(ausentes)) {
     stop(
@@ -49,7 +49,7 @@ catalyser_colunas <- function(dados, colunas) {
   invisible(TRUE)
 }
 
-catalyser_formula <- function(resposta, preditor) {
+trilha_formula <- function(resposta, preditor) {
   stats::reformulate(preditor, response = resposta)
 }
 
@@ -75,9 +75,9 @@ catalyser_formula <- function(resposta, preditor) {
 #'   nrow = 2
 #' )
 #' # Apenas os extremos diferem entre si:
-#' catalyser_letras_tukey(pares, c(0.9, 0.001, 0.9), medias)
+#' trilha_letras_tukey(pares, c(0.9, 0.001, 0.9), medias)
 #' @export
-catalyser_letras_tukey <- function(pares, p_ajustado, medias, alfa = 0.05) {
+trilha_letras_tukey <- function(pares, p_ajustado, medias, alfa = 0.05) {
   grupos <- names(medias)
   if (!length(grupos)) return(character())
   if (length(grupos) == 1L) return(stats::setNames("a", grupos))
@@ -130,9 +130,9 @@ catalyser_letras_tukey <- function(pares, p_ajustado, medias, alfa = 0.05) {
 #' @param x Um vetor de qualquer tipo.
 #' @return O valor mais frequente, ignorando os ausentes.
 #' @examples
-#' catalyser_moda(c("norte", "sul", "norte", NA))
+#' trilha_moda(c("norte", "sul", "norte", NA))
 #' @export
-catalyser_moda <- function(x) {
+trilha_moda <- function(x) {
   valores <- x[!is.na(x)]
   if (!length(valores)) return(NA)
   nomes <- names(sort(table(valores), decreasing = TRUE))
@@ -156,7 +156,7 @@ catalyser_moda <- function(x) {
 #' @return `TRUE` quando as bases sao equivalentes, `FALSE` caso contrario
 #'   (invisivel nos dois casos). Nunca interrompe o relatorio.
 #' @export
-catalyser_conferir_base <- function(reconstruida, caminho_fotografia,
+trilha_conferir_base <- function(reconstruida, caminho_fotografia,
                                     rotulo = "base compartilhada") {
   if (!file.exists(caminho_fotografia)) {
     cat(sprintf("[%s] Fotografia ausente em '%s'; conferência não realizada.\n",
@@ -221,13 +221,13 @@ catalyser_conferir_base <- function(reconstruida, caminho_fotografia,
 #' @return Lista com `dados` (o subconjunto completo), `n` e `descartadas`.
 #' @examples
 #' dados <- data.frame(x = c(1, 2, NA, 4), y = c("a", "b", "c", NA))
-#' preparo <- catalyser_completos(dados, c("x", "y"))
+#' preparo <- trilha_completos(dados, c("x", "y"))
 #' preparo$n
 #' preparo$descartadas
 #' @export
-catalyser_completos <- function(dados, colunas) {
+trilha_completos <- function(dados, colunas) {
   colunas <- unique(as.character(colunas))
-  catalyser_colunas(dados, colunas)
+  trilha_colunas(dados, colunas)
   mantidas <- stats::complete.cases(dados[colunas])
   list(
     dados = dados[mantidas, , drop = FALSE],
@@ -250,7 +250,7 @@ catalyser_completos <- function(dados, colunas) {
 #' @return Um objeto `flextable`, ou uma tabela `knitr::kable` se o pacote
 #'   flextable nao estiver instalado.
 #' @export
-catalyser_tabela_ocean <- function(x) {
+trilha_tabela_ocean <- function(x) {
   x <- as.data.frame(x, check.names = FALSE)
   if (!requireNamespace("flextable", quietly = TRUE)) {
     return(knitr::kable(x, digits = 3))
@@ -274,16 +274,16 @@ catalyser_tabela_ocean <- function(x) {
 #' flextable, grafico e impresso, texto e escrito. Esta funcao olha o que
 #' recebeu e escolhe sozinha.
 #'
-#' @param x Um componente devolvido por [catalyser_executar()].
+#' @param x Um componente devolvido por [trilha_executar()].
 #' @return O proprio objeto, de forma invisivel, depois de exibi-lo.
 #' @export
-catalyser_mostrar <- function(x) {
+trilha_mostrar <- function(x) {
   if (is.null(x)) {
     cat("*Componente não produzido por esta execução.*\n")
     return(invisible(NULL))
   }
   if (is.data.frame(x) || is.matrix(x) || is.table(x)) {
-    return(catalyser_tabela_ocean(as.data.frame(x, check.names = FALSE)))
+    return(trilha_tabela_ocean(as.data.frame(x, check.names = FALSE)))
   }
   if (inherits(x, "ggplot")) {
     print(x)
@@ -308,10 +308,10 @@ catalyser_mostrar <- function(x) {
 #'   `metricas` (quais colunas exibir).
 #' @return Lista com `narrativa`, `tabela` e `console`.
 #' @export
-catalyser_resumo_descritivo <- function(dados, p) {
+trilha_resumo_descritivo <- function(dados, p) {
   variaveis <- unique(as.character(p$variaveis))
-  grupo <- catalyser_ou(p$grupo, "none")
-  catalyser_colunas(dados, c(variaveis, if (!identical(grupo, "none")) grupo))
+  grupo <- trilha_ou(p$grupo, "none")
+  trilha_colunas(dados, c(variaveis, if (!identical(grupo, "none")) grupo))
 
   uma_linha <- function(x, variavel, grupo_valor = NULL) {
     x_num <- suppressWarnings(as.numeric(x))
@@ -377,13 +377,13 @@ catalyser_resumo_descritivo <- function(dados, p) {
 #' @return Lista com `narrativa`, `tabela`, `grafico`, `pressupostos`,
 #'   `diagnosticos`, `console` e `objeto`.
 #' @export
-catalyser_regressao <- function(dados, p, logistica = FALSE) {
+trilha_regressao <- function(dados, p, logistica = FALSE) {
   resposta <- p$resposta
   preditor <- p$preditor
-  grupo <- catalyser_ou(p$grupo, "none")
+  grupo <- trilha_ou(p$grupo, "none")
   por_grupo <- isTRUE(p$regressao_por_grupo) && !identical(grupo, "none")
   colunas <- c(resposta, preditor, if (por_grupo) grupo)
-  catalyser_colunas(dados, colunas)
+  trilha_colunas(dados, colunas)
   d <- dados[stats::complete.cases(dados[colunas]), , drop = FALSE]
   if (nrow(d) < 3L) stop("A regressão precisa de pelo menos três observações completas.", call. = FALSE)
 
@@ -401,9 +401,9 @@ catalyser_regressao <- function(dados, p, logistica = FALSE) {
 
   ajustar <- function(df) {
     if (logistica) {
-      stats::glm(catalyser_formula(resposta, preditor), data = df, family = stats::binomial())
+      stats::glm(trilha_formula(resposta, preditor), data = df, family = stats::binomial())
     } else {
-      stats::lm(catalyser_formula(resposta, preditor), data = df)
+      stats::lm(trilha_formula(resposta, preditor), data = df)
     }
   }
   tabela_coeficientes <- function(ajuste, nome_grupo = NULL) {
@@ -433,9 +433,9 @@ catalyser_regressao <- function(dados, p, logistica = FALSE) {
       sm <- summary(ajuste)
       p_modelo <- sm$coefficients[min(2L, nrow(sm$coefficients)), ncol(sm$coefficients)]
       if (logistica) {
-        sprintf("%s: N = %d, AIC = %s e %s para o preditor", nome, stats::nobs(ajuste), catalyser_num(stats::AIC(ajuste), 2L), catalyser_p(p_modelo))
+        sprintf("%s: N = %d, AIC = %s e %s para o preditor", nome, stats::nobs(ajuste), trilha_num(stats::AIC(ajuste), 2L), trilha_p(p_modelo))
       } else {
-        sprintf("%s: N = %d, R² = %s e %s para o preditor", nome, stats::nobs(ajuste), catalyser_num(sm$r.squared), catalyser_p(p_modelo))
+        sprintf("%s: N = %d, R² = %s e %s para o preditor", nome, stats::nobs(ajuste), trilha_num(sm$r.squared), trilha_p(p_modelo))
       }
     }, ajustes, names(ajustes))
     narrativa <- sprintf(
@@ -477,7 +477,7 @@ catalyser_regressao <- function(dados, p, logistica = FALSE) {
     if (logistica) {
       narrativa <- sprintf(
         "A regressão logística de %s em função de %s foi ajustada com %d observações (AIC = %s; %s para o preditor).",
-        resposta, preditor, nrow(d), catalyser_num(stats::AIC(ajuste), 2L), catalyser_p(p_modelo)
+        resposta, preditor, nrow(d), trilha_num(stats::AIC(ajuste), 2L), trilha_p(p_modelo)
       )
       diagnosticos <- data.frame(
         Indicador = c("N", "AIC", "Desvio residual"),
@@ -487,13 +487,13 @@ catalyser_regressao <- function(dados, p, logistica = FALSE) {
     } else {
       narrativa <- sprintf(
         "A regressão linear de %s em função de %s foi ajustada com %d observações (R² = %s; %s para o preditor).",
-        resposta, preditor, nrow(d), catalyser_num(sm$r.squared, 3L), catalyser_p(p_modelo)
+        resposta, preditor, nrow(d), trilha_num(sm$r.squared, 3L), trilha_p(p_modelo)
       )
       shapiro <- if (nrow(d) >= 3L && nrow(d) <= 5000L) stats::shapiro.test(stats::residuals(ajuste)) else NULL
       pressupostos <- if (is.null(shapiro)) {
         "O teste de Shapiro-Wilk dos resíduos não foi calculado para este tamanho amostral."
       } else {
-        sprintf("Normalidade dos resíduos (Shapiro-Wilk): W = %s; %s.", catalyser_num(shapiro$statistic), catalyser_p(shapiro$p.value))
+        sprintf("Normalidade dos resíduos (Shapiro-Wilk): W = %s; %s.", trilha_num(shapiro$statistic), trilha_p(shapiro$p.value))
       }
       diagnosticos <- data.frame(
         Indicador = c("N", "R²", "R² ajustado", "AIC"),
@@ -537,7 +537,7 @@ catalyser_regressao <- function(dados, p, logistica = FALSE) {
       ggplot2::theme(axis.title = ggplot2::element_text(size = 10), axis.text = ggplot2::element_text(size = 9)) +
       ggplot2::labs(x = preditor, y = resposta,
         subtitle = if (por_grupo && !logistica) paste(vapply(names(ajustes), function(g) {
-          sprintf("%s: R² = %s", g, catalyser_num(summary(ajustes[[g]])$r.squared))
+          sprintf("%s: R² = %s", g, trilha_num(summary(ajustes[[g]])$r.squared))
         }, character(1)), collapse = "\n") else NULL)
   }
 
@@ -590,14 +590,14 @@ catalyser_regressao <- function(dados, p, logistica = FALSE) {
 #' @return Lista com narrativa, tabela de coeficientes, diagnóstico, gráfico,
 #'   pressupostos, console e o objeto do modelo.
 #' @export
-catalyser_regressao_contagem <- function(dados, p,
+trilha_regressao_contagem <- function(dados, p,
                                           familia = c("poisson", "binomial_negativa")) {
   # Escolha explicitamente qual motor estatístico será usado.
   familia <- match.arg(familia)
   # Leia os nomes escolhidos na interface e descarte repetições acidentais.
-  resposta <- as.character(catalyser_ou(p$resposta, ""))
-  preditores <- unique(as.character(catalyser_ou(p$preditores, character())))
-  offset <- as.character(catalyser_ou(p$offset, ""))
+  resposta <- as.character(trilha_ou(p$resposta, ""))
+  preditores <- unique(as.character(trilha_ou(p$preditores, character())))
+  offset <- as.character(trilha_ou(p$offset, ""))
   usar_offset <- isTRUE(p$usar_offset) && nzchar(offset)
   # A resposta e pelo menos um preditor são necessários para a pergunta proposta.
   if (!nzchar(resposta)) stop("Escolha a variável de contagem.", call. = FALSE)
@@ -610,9 +610,9 @@ catalyser_regressao_contagem <- function(dados, p,
   }
   # Confira todos os nomes antes de filtrar linhas da base.
   colunas <- c(resposta, preditores, if (usar_offset) offset)
-  catalyser_colunas(dados, colunas)
+  trilha_colunas(dados, colunas)
   # Remova somente os casos incompletos nas variáveis que entram neste ajuste.
-  preparo <- catalyser_completos(dados, colunas)
+  preparo <- trilha_completos(dados, colunas)
   d <- preparo$dados
   if (nrow(d) < 3L) {
     stop("A regressão de contagem precisa de pelo menos três observações completas.", call. = FALSE)
@@ -630,10 +630,10 @@ catalyser_regressao_contagem <- function(dados, p,
       stop("O offset precisa ser numérico e maior que zero em todas as linhas usadas no modelo.", call. = FALSE)
     }
     offset_log <- log(exposicao)
-    d$.catalyser_offset_log <- offset_log
+    d$.trilha_offset_log <- offset_log
   }
   # Monte a fórmula com os nomes reais das colunas, sem concatenar texto inseguro.
-  termos_formula <- c(preditores, if (usar_offset) "offset(.catalyser_offset_log)")
+  termos_formula <- c(preditores, if (usar_offset) "offset(.trilha_offset_log)")
   formula_modelo <- stats::reformulate(termos_formula, response = resposta)
   # Ajuste o Poisson ou a Binomial Negativa com o offset explicitamente na fórmula.
   modelo <- tryCatch(
@@ -654,7 +654,7 @@ catalyser_regressao_contagem <- function(dados, p,
   residuos_pearson <- stats::residuals(modelo, type = "pearson")
   dispersao <- sum(residuos_pearson^2, na.rm = TRUE) / graus_liberdade
   # Construa intervalos de Wald na escala do log e depois volte à razão de taxas.
-  nivel <- as.numeric(catalyser_ou(p$nivel_confianca, 0.95))
+  nivel <- as.numeric(trilha_ou(p$nivel_confianca, 0.95))
   if (!is.finite(nivel) || nivel <= 0 || nivel >= 1) nivel <- 0.95
   z_critico <- stats::qnorm((1 + nivel) / 2)
   coeficientes_brutos <- as.data.frame(summary(modelo)$coefficients, check.names = FALSE)
@@ -686,12 +686,12 @@ catalyser_regressao_contagem <- function(dados, p,
   # Traduza a dispersão em uma próxima decisão, sem declarar que o modelo é verdade final.
   if (identical(familia, "poisson")) {
     orientacao <- dplyr::case_when(
-      dispersao <= 1.5 ~ sprintf("A dispersão de Pearson foi %s, próxima de 1. Não há sinal forte de superdispersão por este diagnóstico; ainda examine o desenho e os resíduos.", catalyser_num(dispersao, 2L)),
-      dispersao <= 2 ~ sprintf("A dispersão de Pearson foi %s, acima de 1. Há variação residual extra; compare com a Regressão Binomial Negativa antes de concluir.", catalyser_num(dispersao, 2L)),
-      TRUE ~ sprintf("A dispersão de Pearson foi %s, bem acima de 1. O Poisson pode subestimar a incerteza; ajuste também a Regressão Binomial Negativa.", catalyser_num(dispersao, 2L))
+      dispersao <= 1.5 ~ sprintf("A dispersão de Pearson foi %s, próxima de 1. Não há sinal forte de superdispersão por este diagnóstico; ainda examine o desenho e os resíduos.", trilha_num(dispersao, 2L)),
+      dispersao <= 2 ~ sprintf("A dispersão de Pearson foi %s, acima de 1. Há variação residual extra; compare com a Regressão Binomial Negativa antes de concluir.", trilha_num(dispersao, 2L)),
+      TRUE ~ sprintf("A dispersão de Pearson foi %s, bem acima de 1. O Poisson pode subestimar a incerteza; ajuste também a Regressão Binomial Negativa.", trilha_num(dispersao, 2L))
     )
   } else {
-    orientacao <- sprintf("A Binomial Negativa permite variação maior que a média. A dispersão de Pearson foi %s; interprete-a junto aos resíduos, ao theta e ao delineamento.", catalyser_num(dispersao, 2L))
+    orientacao <- sprintf("A Binomial Negativa permite variação maior que a média. A dispersão de Pearson foi %s; interprete-a junto aos resíduos, ao theta e ao delineamento.", trilha_num(dispersao, 2L))
   }
   # Descreva o que foi ajustado sem transformar associação estatística em causalidade.
   nome_familia <- if (identical(familia, "poisson")) "Poisson" else "Binomial Negativa"
@@ -699,7 +699,7 @@ catalyser_regressao_contagem <- function(dados, p,
     "A regressão de %s para '%s' foi ajustada com %d observações e %d preditor(es)%s. AIC = %s e dispersão de Pearson = %s. %s",
     nome_familia, resposta, nrow(d), length(preditores),
     if (usar_offset) sprintf(", com offset log(%s)", offset) else "",
-    catalyser_num(stats::AIC(modelo), 2L), catalyser_num(dispersao, 2L), orientacao
+    trilha_num(stats::AIC(modelo), 2L), trilha_num(dispersao, 2L), orientacao
   )
   # Liste as verificações que dependem de ciência do estudo, não apenas de software.
   pressupostos <- c(
@@ -754,22 +754,22 @@ catalyser_regressao_contagem <- function(dados, p,
 #' @return Lista com `narrativa`, `tabela`, `grafico`, `pressupostos`,
 #'   `diagnosticos`, `console` e `objeto`.
 #' @export
-catalyser_teste_t <- function(dados, p) {
+trilha_teste_t <- function(dados, p) {
   tipo <- p$tipo_teste
-  alternativa <- catalyser_ou(p$alternativa, "two.sided")
-  conf <- as.numeric(catalyser_ou(p$nivel_confianca, 0.95))
+  alternativa <- trilha_ou(p$alternativa, "two.sided")
+  conf <- as.numeric(trilha_ou(p$nivel_confianca, 0.95))
   grafico <- NULL
   pressupostos <- NULL
   graficos_estudo <- list()
 
   if (identical(tipo, "one_val")) {
-    catalyser_colunas(dados, p$variavel)
+    trilha_colunas(dados, p$variavel)
     x <- dados[[p$variavel]]
     teste <- stats::t.test(x, mu = as.numeric(p$media_hipotetica), alternative = alternativa, conf.level = conf)
     valido <- x[!is.na(x)]
     if (length(valido) >= 3L && length(valido) <= 5000L) {
       sh <- stats::shapiro.test(valido)
-      pressupostos <- sprintf("Normalidade da variável (Shapiro-Wilk): W = %s; %s.", catalyser_num(sh$statistic), catalyser_p(sh$p.value))
+      pressupostos <- sprintf("Normalidade da variável (Shapiro-Wilk): W = %s; %s.", trilha_num(sh$statistic), trilha_p(sh$p.value))
     }
     if (requireNamespace("ggplot2", quietly = TRUE)) {
       dg <- data.frame(valor = valido)
@@ -779,9 +779,9 @@ catalyser_teste_t <- function(dados, p) {
         ggplot2::theme_minimal(base_size = 12) + ggplot2::labs(x = p$variavel, y = "Frequência")
     }
   } else if (identical(tipo, "two_ind")) {
-    catalyser_colunas(dados, c(p$resposta, p$grupo))
+    trilha_colunas(dados, c(p$resposta, p$grupo))
     teste <- stats::t.test(
-      catalyser_formula(p$resposta, p$grupo), data = dados,
+      trilha_formula(p$resposta, p$grupo), data = dados,
       var.equal = isTRUE(p$variancias_iguais), alternative = alternativa, conf.level = conf
     )
     grupos <- split(dados[[p$resposta]], dados[[p$grupo]], drop = TRUE)
@@ -866,7 +866,7 @@ catalyser_teste_t <- function(dados, p) {
         ggplot2::labs(x = p$grupo, y = "Resíduo absoluto", title = "Dispersão dos resíduos por grupo")
     }
   } else if (identical(tipo, "paired")) {
-    catalyser_colunas(dados, c(p$variavel_1, p$variavel_2))
+    trilha_colunas(dados, c(p$variavel_1, p$variavel_2))
     teste <- stats::t.test(
       dados[[p$variavel_1]], dados[[p$variavel_2]], paired = TRUE,
       alternative = alternativa, conf.level = conf
@@ -875,7 +875,7 @@ catalyser_teste_t <- function(dados, p) {
     diferencas <- diferencas[!is.na(diferencas)]
     if (length(diferencas) >= 3L && length(diferencas) <= 5000L) {
       sh <- stats::shapiro.test(diferencas)
-      pressupostos <- sprintf("Normalidade das diferenças (Shapiro-Wilk): W = %s; %s.", catalyser_num(sh$statistic), catalyser_p(sh$p.value))
+      pressupostos <- sprintf("Normalidade das diferenças (Shapiro-Wilk): W = %s; %s.", trilha_num(sh$statistic), trilha_p(sh$p.value))
     }
     if (requireNamespace("ggplot2", quietly = TRUE)) {
       dg <- data.frame(
@@ -901,8 +901,8 @@ catalyser_teste_t <- function(dados, p) {
   )
   narrativa <- sprintf(
     "O teste t resultou em t = %s, gl = %s e %s; IC de %.0f%% [%s; %s].",
-    catalyser_num(teste$statistic), catalyser_num(teste$parameter, 1L), catalyser_p(teste$p.value),
-    100 * conf, catalyser_num(teste$conf.int[1]), catalyser_num(teste$conf.int[2])
+    trilha_num(teste$statistic), trilha_num(teste$parameter, 1L), trilha_p(teste$p.value),
+    100 * conf, trilha_num(teste$conf.int[1]), trilha_num(teste$conf.int[2])
   )
   c(list(
     narrativa = narrativa, tabela = tabela, grafico = grafico,
@@ -920,18 +920,18 @@ catalyser_teste_t <- function(dados, p) {
 #' @param p Lista com `resposta`, `sujeito`, `momento` e `nivel_confianca`.
 #' @return Lista com narrativa, tabela, gráfico, pressupostos e modelo.
 #' @export
-catalyser_anova_medidas_repetidas <- function(dados, p) {
-  resposta <- as.character(catalyser_ou(p$resposta, ""))
-  sujeito <- as.character(catalyser_ou(p$sujeito, ""))
-  momento <- as.character(catalyser_ou(p$momento, ""))
-  catalyser_colunas(dados, c(resposta, sujeito, momento))
+trilha_anova_medidas_repetidas <- function(dados, p) {
+  resposta <- as.character(trilha_ou(p$resposta, ""))
+  sujeito <- as.character(trilha_ou(p$sujeito, ""))
+  momento <- as.character(trilha_ou(p$momento, ""))
+  trilha_colunas(dados, c(resposta, sujeito, momento))
   if (length(unique(c(resposta, sujeito, momento))) != 3L) {
     stop("Resposta, unidade e ocasião precisam ser três variáveis diferentes.", call. = FALSE)
   }
   if (!is.numeric(dados[[resposta]])) {
     stop("A resposta da ANOVA de medidas repetidas precisa ser numérica.", call. = FALSE)
   }
-  preparo <- catalyser_completos(dados, c(resposta, sujeito, momento))
+  preparo <- trilha_completos(dados, c(resposta, sujeito, momento))
   d <- preparo$dados[c(resposta, sujeito, momento)]
   names(d) <- c("valor", "sujeito", "momento")
   d$sujeito <- droplevels(as.factor(d$sujeito))
@@ -973,7 +973,7 @@ catalyser_anova_medidas_repetidas <- function(dados, p) {
     Verificação = c("Unidades completas", "Normalidade dos resíduos", "Esfericidade"),
     Resultado = c(
       sprintf("%d unidades em %d ocasiões", nlevels(d$sujeito), nlevels(d$momento)),
-      if (is.null(shapiro)) "Não estimável" else sprintf("W = %s; %s", catalyser_num(shapiro$statistic), catalyser_p(shapiro$p.value)),
+      if (is.null(shapiro)) "Não estimável" else sprintf("W = %s; %s", trilha_num(shapiro$statistic), trilha_p(shapiro$p.value)),
       if (nlevels(d$momento) == 2L) "Automática com duas ocasiões" else "Precisa ser avaliada antes da conclusão; correções de Greenhouse-Geisser ficam para a versão avançada"
     ), check.names = FALSE
   )
@@ -993,7 +993,7 @@ catalyser_anova_medidas_repetidas <- function(dados, p) {
   narrativa <- sprintf(
     "A ANOVA de medidas repetidas comparou %d ocasiões em %d unidades completas: F(%d, %d) = %s, %s. Eta quadrado parcial = %s.",
     nlevels(d$momento), nlevels(d$sujeito), gl_momento, gl_residuo,
-    catalyser_num(f_valor), catalyser_p(p_valor), catalyser_num(eta_parcial)
+    trilha_num(f_valor), trilha_p(p_valor), trilha_num(eta_parcial)
   )
   list(narrativa = narrativa, tabela = tabela, grafico = grafico,
        pressupostos = pressupostos,
@@ -1015,11 +1015,11 @@ catalyser_anova_medidas_repetidas <- function(dados, p) {
 #'   `nivel_confianca`.
 #' @return Lista com narrativa, tabela, comparações, gráfico e diagnóstico.
 #' @export
-catalyser_friedman <- function(dados, p) {
-  resposta <- as.character(catalyser_ou(p$resposta, ""))
-  condicao <- as.character(catalyser_ou(p$condicao, ""))
-  bloco <- as.character(catalyser_ou(p$bloco, ""))
-  catalyser_colunas(dados, c(resposta, condicao, bloco))
+trilha_friedman <- function(dados, p) {
+  resposta <- as.character(trilha_ou(p$resposta, ""))
+  condicao <- as.character(trilha_ou(p$condicao, ""))
+  bloco <- as.character(trilha_ou(p$bloco, ""))
+  trilha_colunas(dados, c(resposta, condicao, bloco))
   if (length(unique(c(resposta, condicao, bloco))) != 3L) {
     stop("Resposta, condição e bloco precisam ser três variáveis diferentes.", call. = FALSE)
   }
@@ -1060,13 +1060,13 @@ catalyser_friedman <- function(dados, p) {
 
   d <- d[order(d$bloco, d$condicao), , drop = FALSE]
   teste <- stats::friedman.test(y = d$valor, groups = d$condicao, blocks = d$bloco)
-  alfa <- 1 - as.numeric(catalyser_ou(p$nivel_confianca, 0.95))
+  alfa <- 1 - as.numeric(trilha_ou(p$nivel_confianca, 0.95))
   if (!is.finite(alfa) || alfa <= 0 || alfa >= 1) alfa <- 0.05
   posteste <- NULL
   pares <- NULL
   metodo_posteste <- "Não aplicado: o teste global não indicou diferença."
   if (is.finite(teste$p.value) && teste$p.value < alfa) {
-    metodo_escolhido <- as.character(catalyser_ou(p$posteste, "holm"))
+    metodo_escolhido <- as.character(trilha_ou(p$posteste, "holm"))
     usar_nemenyi <- identical(metodo_escolhido, "nemenyi") &&
       requireNamespace("PMCMRplus", quietly = TRUE)
     if (usar_nemenyi) {
@@ -1140,7 +1140,7 @@ catalyser_friedman <- function(dados, p) {
   narrativa <- sprintf(
     "O teste de Friedman, correspondente não paramétrico da ANOVA de medidas repetidas, comparou %d condições em %d blocos completos: qui-quadrado(%d) = %s e %s. %s",
     nlevels(d$condicao), nlevels(d$bloco), as.integer(teste$parameter),
-    catalyser_num(teste$statistic), catalyser_p(teste$p.value), leitura
+    trilha_num(teste$statistic), trilha_p(teste$p.value), leitura
   )
   list(
     narrativa = narrativa, tabela = tabela, comparacoes = posteste, grafico = grafico,
@@ -1165,10 +1165,10 @@ catalyser_friedman <- function(dados, p) {
 #' @param p Lista com `variavel_1`, `variavel_2` e `correcao`.
 #' @return Lista com narrativa, tabela, gráfico e resultado do teste.
 #' @export
-catalyser_mcnemar <- function(dados, p) {
-  variavel_1 <- as.character(catalyser_ou(p$variavel_1, ""))
-  variavel_2 <- as.character(catalyser_ou(p$variavel_2, ""))
-  catalyser_colunas(dados, c(variavel_1, variavel_2))
+trilha_mcnemar <- function(dados, p) {
+  variavel_1 <- as.character(trilha_ou(p$variavel_1, ""))
+  variavel_2 <- as.character(trilha_ou(p$variavel_2, ""))
+  trilha_colunas(dados, c(variavel_1, variavel_2))
   if (identical(variavel_1, variavel_2)) {
     stop("Escolha duas variáveis binárias diferentes.", call. = FALSE)
   }
@@ -1210,7 +1210,7 @@ catalyser_mcnemar <- function(dados, p) {
   }
   list(
     narrativa = sprintf("O teste de McNemar comparou %d pares completos: qui-quadrado(1) = %s e %s. %s",
-                        nrow(d), catalyser_num(teste$statistic), catalyser_p(teste$p.value), leitura),
+                        nrow(d), trilha_num(teste$statistic), trilha_p(teste$p.value), leitura),
     tabela = tabela, grafico = grafico,
     pressupostos = data.frame(
       Verificação = c("Pares completos", "Resposta binária", "Independência entre pares"),
@@ -1228,18 +1228,18 @@ catalyser_mcnemar <- function(dados, p) {
 #' @param p Lista com `variavel`, `desvio_hipotetico`, `alternativa` e `nivel_confianca`.
 #' @return Lista com narrativa, tabela, gráfico, pressupostos e estatísticas do teste.
 #' @export
-catalyser_variancia_uma <- function(dados, p) {
-  variavel <- as.character(catalyser_ou(p$variavel, ""))
-  catalyser_colunas(dados, variavel)
+trilha_variancia_uma <- function(dados, p) {
+  variavel <- as.character(trilha_ou(p$variavel, ""))
+  trilha_colunas(dados, variavel)
   if (!is.numeric(dados[[variavel]])) stop("Escolha uma variável numérica.", call. = FALSE)
   x <- dados[[variavel]]
   x <- x[is.finite(x)]
   if (length(x) < 2L || stats::sd(x) == 0) stop("São necessários pelo menos dois valores e variação observada.", call. = FALSE)
-  desvio0 <- as.numeric(catalyser_ou(p$desvio_hipotetico, NA_real_))
+  desvio0 <- as.numeric(trilha_ou(p$desvio_hipotetico, NA_real_))
   if (!is.finite(desvio0) || desvio0 <= 0) stop("O desvio padrão de referência precisa ser maior que zero.", call. = FALSE)
-  alternativa <- as.character(catalyser_ou(p$alternativa, "two.sided"))
+  alternativa <- as.character(trilha_ou(p$alternativa, "two.sided"))
   if (!alternativa %in% c("two.sided", "less", "greater")) stop("Escolha uma hipótese alternativa válida.", call. = FALSE)
-  conf <- as.numeric(catalyser_ou(p$nivel_confianca, 0.95))
+  conf <- as.numeric(trilha_ou(p$nivel_confianca, 0.95))
   n <- length(x); gl <- n - 1L; variancia <- stats::var(x)
   estatistica <- gl * variancia / desvio0^2
   p_inferior <- stats::pchisq(estatistica, gl)
@@ -1259,7 +1259,7 @@ catalyser_variancia_uma <- function(dados, p) {
   pressupostos <- data.frame(
     Pressuposto = c("Observações independentes", "Normalidade da variável"),
     Leitura = c("Depende do planejamento e da unidade amostral",
-                if (is.null(shapiro)) "Shapiro-Wilk não calculado" else sprintf("W = %s; %s", catalyser_num(shapiro$statistic), catalyser_p(shapiro$p.value))),
+                if (is.null(shapiro)) "Shapiro-Wilk não calculado" else sprintf("W = %s; %s", trilha_num(shapiro$statistic), trilha_p(shapiro$p.value))),
     check.names = FALSE
   )
   grafico <- NULL
@@ -1276,8 +1276,8 @@ catalyser_variancia_uma <- function(dados, p) {
   }
   narrativa <- sprintf(
     "O teste qui-quadrado para a variância de '%s' comparou o desvio padrão amostral %s com %s: χ²(%d) = %s e %s.",
-    variavel, catalyser_num(sqrt(variancia)), catalyser_num(desvio0), gl,
-    catalyser_num(estatistica), catalyser_p(p_valor)
+    variavel, trilha_num(sqrt(variancia)), trilha_num(desvio0), gl,
+    trilha_num(estatistica), trilha_p(p_valor)
   )
   objeto <- list(statistic = c(`X-squared` = estatistica), parameter = c(df = gl),
                  p.value = p_valor, estimate = c(variance = variancia), null.value = c(variance = desvio0^2),
@@ -1295,19 +1295,19 @@ catalyser_variancia_uma <- function(dados, p) {
 #' @param p Lista com `resposta`, `grupo`, `alternativa` e `nivel_confianca`.
 #' @return Lista com narrativa, tabela, gráfico, pressupostos e objeto `htest`.
 #' @export
-catalyser_variancias_duas <- function(dados, p) {
-  resposta <- as.character(catalyser_ou(p$resposta, ""))
-  grupo <- as.character(catalyser_ou(p$grupo, ""))
-  catalyser_colunas(dados, c(resposta, grupo))
+trilha_variancias_duas <- function(dados, p) {
+  resposta <- as.character(trilha_ou(p$resposta, ""))
+  grupo <- as.character(trilha_ou(p$grupo, ""))
+  trilha_colunas(dados, c(resposta, grupo))
   if (!is.numeric(dados[[resposta]])) stop("A resposta precisa ser numérica.", call. = FALSE)
-  preparo <- catalyser_completos(dados, c(resposta, grupo))
+  preparo <- trilha_completos(dados, c(resposta, grupo))
   d <- preparo$dados[c(resposta, grupo)]
   names(d) <- c("resposta", "grupo")
   d$grupo <- droplevels(as.factor(d$grupo))
   if (nlevels(d$grupo) != 2L) stop("O teste F compara exatamente dois grupos.", call. = FALSE)
   if (any(table(d$grupo) < 2L)) stop("Cada grupo precisa de pelo menos duas observações.", call. = FALSE)
-  alternativa <- as.character(catalyser_ou(p$alternativa, "two.sided"))
-  conf <- as.numeric(catalyser_ou(p$nivel_confianca, 0.95))
+  alternativa <- as.character(trilha_ou(p$alternativa, "two.sided"))
+  conf <- as.numeric(trilha_ou(p$nivel_confianca, 0.95))
   teste <- stats::var.test(resposta ~ grupo, data = d, ratio = 1,
                            alternative = alternativa, conf.level = conf)
   partes <- split(d$resposta, d$grupo)
@@ -1340,7 +1340,7 @@ catalyser_variancias_duas <- function(dados, p) {
   narrativa <- sprintf(
     "O teste F comparou as variâncias de '%s' entre %s e %s: F(%d, %d) = %s e %s. Razão estimada = %s.",
     resposta, names(partes)[1], names(partes)[2], unname(teste$parameter[1]), unname(teste$parameter[2]),
-    catalyser_num(teste$statistic), catalyser_p(teste$p.value), catalyser_num(teste$estimate)
+    trilha_num(teste$statistic), trilha_p(teste$p.value), trilha_num(teste$estimate)
   )
   list(narrativa = narrativa, tabela = tabela, grafico = grafico,
        pressupostos = pressupostos,
@@ -1366,10 +1366,10 @@ catalyser_variancias_duas <- function(dados, p) {
 #'   0,95), `titulo_grafico`, `rotulo_x`, `rotulo_y` e `tema`.
 #' @return Lista com `narrativa`, `descritivos`, `tabela`, `comparacoes`,
 #'   `grafico`, `pressupostos`, `diagnosticos`, `console` e `objeto`.
-#' @seealso [catalyser_letras_tukey()] para as letras de diferenca.
+#' @seealso [trilha_letras_tukey()] para as letras de diferenca.
 #' @examples
 #' \dontrun{
-#' resultado <- catalyser_anova(
+#' resultado <- trilha_anova(
 #'   dados_analise,
 #'   list(resposta = "profundidade_m", fator = "especie")
 #' )
@@ -1378,25 +1378,25 @@ catalyser_variancias_duas <- function(dados, p) {
 #' cat(resultado$narrativa)
 #' }
 #' @export
-catalyser_anova <- function(dados, p) {
-  metodo <- match.arg(as.character(catalyser_ou(p$metodo, "classica")), c("classica", "welch", "auto"))
+trilha_anova <- function(dados, p) {
+  metodo <- match.arg(as.character(trilha_ou(p$metodo, "classica")), c("classica", "welch", "auto"))
   resposta <- p$resposta
   fator <- p$fator
-  conf <- as.numeric(catalyser_ou(p$nivel_confianca, 0.95))
+  conf <- as.numeric(trilha_ou(p$nivel_confianca, 0.95))
   if (length(conf) != 1L || !is.finite(conf) || conf <= 0 || conf >= 1)
     stop("O nível de confiança precisa estar entre zero e um.", call. = FALSE)
   alfa <- 1 - conf
   texto_ou <- function(x, padrao) {
-    x <- as.character(catalyser_ou(x, ""))
+    x <- as.character(trilha_ou(x, ""))
     if (!length(x) || !nzchar(trimws(x[[1]]))) padrao else x[[1]]
   }
-  catalyser_colunas(dados, c(resposta, fator))
+  trilha_colunas(dados, c(resposta, fator))
   if (!is.numeric(dados[[resposta]]))
     stop(sprintf("A resposta '%s' precisa ser numérica para a ANOVA.", resposta), call. = FALSE)
   if (identical(resposta, fator))
     stop("A resposta e o fator precisam ser variáveis diferentes.", call. = FALSE)
 
-  preparo <- catalyser_completos(dados, c(resposta, fator))
+  preparo <- trilha_completos(dados, c(resposta, fator))
   d <- preparo$dados[c(resposta, fator)]
   names(d) <- c("resposta", "fator")
   d$fator <- droplevels(as.factor(d$fator))
@@ -1459,7 +1459,7 @@ catalyser_anova <- function(dados, p) {
       "Levene não apresentou evidência para rejeitar a igualdade das variâncias"
   texto_metodo <- paste0(if (metodo == "auto") "Escolha automática: " else "Escolha explícita: ",
     if (metodo_usado == "welch") "ANOVA de Welch" else "ANOVA clássica", " com ", post_teste,
-    ". ", motivo, "; alfa = ", catalyser_num(alfa, 3L), ". ",
+    ". ", motivo, "; alfa = ", trilha_num(alfa, 3L), ". ",
     if (metodo != "auto" && metodo != recomendado)
       "A escolha explícita difere da recomendação do diagnóstico. " else "",
     "Não rejeitar H0 no Levene não comprova igualdade das variâncias. ")
@@ -1528,7 +1528,7 @@ catalyser_anova <- function(dados, p) {
   letras <- if (!is.null(comparacoes) && length(niveis) > 1L) {
     combos <- utils::combn(niveis, 2L)
     posicao <- match(paste0(combos[2, ], "-", combos[1, ]), comparacoes[["Par comparado"]])
-    catalyser_letras_tukey(
+    trilha_letras_tukey(
       pares = combos[c(2L, 1L), , drop = FALSE],
       p_ajustado = comparacoes[["p ajustado"]][posicao],
       medias = medias_por_grupo, alfa = alfa
@@ -1675,10 +1675,10 @@ catalyser_anova <- function(dados, p) {
       "Rejeitou-se H0 de igualdade das médias: "
     else
       "Não houve evidência suficiente para rejeitar H0 de igualdade das médias: ",
-    sprintf("F(%s; %s) = %s, %s. ", catalyser_num(df_entre, if (metodo_usado == "welch") 2L else 0L), catalyser_num(df_dentro, if (metodo_usado == "welch") 2L else 0L), catalyser_num(f_anova), catalyser_p(p_anova)),
-    if (metodo_usado == "welch") paste0("Ômega quadrado aproximado = ", catalyser_num(omega2, 3L), ". ", efeito_aviso, " ") else sprintf(
+    sprintf("F(%s; %s) = %s, %s. ", trilha_num(df_entre, if (metodo_usado == "welch") 2L else 0L), trilha_num(df_dentro, if (metodo_usado == "welch") 2L else 0L), trilha_num(f_anova), trilha_p(p_anova)),
+    if (metodo_usado == "welch") paste0("Ômega quadrado aproximado = ", trilha_num(omega2, 3L), ". ", efeito_aviso, " ") else sprintf(
       "O fator explicou %s%% da variação da resposta (η² = %s; ω² = %s), efeito %s pela convenção de Cohen. ",
-      catalyser_num(100 * eta2, 1L), catalyser_num(eta2), catalyser_num(omega2), leitura_efeito
+      trilha_num(100 * eta2, 1L), trilha_num(eta2), trilha_num(omega2), leitura_efeito
     ),
     if (!is.na(p_anova) && p_anova < alfa) {
       if (length(pares))
@@ -1746,7 +1746,7 @@ anova2_paleta_ocean <- function(n, nomes = NULL) {
 
 anova2_tema_ocean <- function(tema = "minimal", base_size = 12) {
   tema_base <- switch(
-    as.character(catalyser_ou(tema, "minimal")),
+    as.character(trilha_ou(tema, "minimal")),
     classic = ggplot2::theme_classic(base_size = base_size),
     bw = ggplot2::theme_bw(base_size = base_size),
     gray = ggplot2::theme_gray(base_size = base_size),
@@ -1874,21 +1874,21 @@ anova2_grafico_combinacoes_celulas <- function(
 #'   efeito, Tukey da interação, gráfico de perfis, gráfico das combinações,
 #'   pressupostos, diagnósticos, console e o objeto `aov` em `objeto`.
 #' @export
-catalyser_anova_dois_fatores <- function(dados, p) {
-  resposta <- as.character(catalyser_ou(p$resposta, ""))[[1]]
-  fator_a <- as.character(catalyser_ou(p$fator_a, ""))[[1]]
-  fator_b <- as.character(catalyser_ou(p$fator_b, ""))[[1]]
+trilha_anova_dois_fatores <- function(dados, p) {
+  resposta <- as.character(trilha_ou(p$resposta, ""))[[1]]
+  fator_a <- as.character(trilha_ou(p$fator_a, ""))[[1]]
+  fator_b <- as.character(trilha_ou(p$fator_b, ""))[[1]]
   if (!nzchar(resposta) || !nzchar(fator_a) || !nzchar(fator_b))
     stop("A ANOVA de dois fatores precisa de resposta, fator_a e fator_b.", call. = FALSE)
-  catalyser_colunas(dados, c(resposta, fator_a, fator_b))
+  trilha_colunas(dados, c(resposta, fator_a, fator_b))
   if (!is.numeric(dados[[resposta]]))
     stop(sprintf("A resposta '%s' precisa ser numérica para a ANOVA.", resposta), call. = FALSE)
   if (length(unique(c(resposta, fator_a, fator_b))) < 3L)
     stop("A resposta e os dois fatores precisam ser variáveis diferentes.", call. = FALSE)
 
-  conf <- suppressWarnings(as.numeric(catalyser_ou(p$nivel_confianca, 0.95))[[1]])
+  conf <- suppressWarnings(as.numeric(trilha_ou(p$nivel_confianca, 0.95))[[1]])
   if (!is.finite(conf) || conf <= 0 || conf >= 1) conf <- 0.95
-  preparo <- catalyser_completos(dados, c(resposta, fator_a, fator_b))
+  preparo <- trilha_completos(dados, c(resposta, fator_a, fator_b))
   d <- data.frame(
     resposta = as.numeric(preparo$dados[[resposta]]),
     fator_a = droplevels(as.factor(preparo$dados[[fator_a]])),
@@ -2005,7 +2005,7 @@ catalyser_anova_dois_fatores <- function(dados, p) {
   }, error = function(e) NULL)
 
   texto_ou <- function(x, padrao) {
-    x <- as.character(catalyser_ou(x, ""))
+    x <- as.character(trilha_ou(x, ""))
     if (!length(x) || !nzchar(trimws(x[[1]]))) padrao else x[[1]]
   }
   grafico <- NULL
@@ -2047,7 +2047,7 @@ catalyser_anova_dois_fatores <- function(dados, p) {
       sprintf("O delineamento é desequilibrado (n por célula: %s). ",
               paste(names(tamanhos_celula), tamanhos_celula, sep = " = ", collapse = "; ")),
     sprintf("O modelo fatorial encontrou %s (F = %s; %s). ", leitura,
-            catalyser_num(f_efeitos[[3]]), catalyser_p(p_int)),
+            trilha_num(f_efeitos[[3]]), trilha_p(p_int)),
     sprintf("Os efeitos principais devem ser interpretados junto com a interação: quando ela é relevante, o efeito de '%s' depende de '%s'. ", fator_a, fator_b),
     "As médias por célula, os testes de pressupostos e o gráfico de interação completam a leitura."
   )
@@ -2085,7 +2085,7 @@ catalyser_anova_dois_fatores <- function(dados, p) {
 #'   e quantas foram descartadas).
 #' @examples
 #' \dontrun{
-#' resultado <- catalyser_linhas(
+#' resultado <- trilha_linhas(
 #'   dados_analise,
 #'   list(x = "id", y = "comprimento_cm", grupo = "none", mostrar_pontos = TRUE)
 #' )
@@ -2093,16 +2093,16 @@ catalyser_anova_dois_fatores <- function(dados, p) {
 #' resultado$observacoes
 #' }
 #' @export
-catalyser_linhas <- function(dados, p) {
+trilha_linhas <- function(dados, p) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) stop("O pacote ggplot2 é necessário para o gráfico.", call. = FALSE)
   texto_ou <- function(x, padrao) {
-    x <- as.character(catalyser_ou(x, ""))
+    x <- as.character(trilha_ou(x, ""))
     if (!length(x) || !nzchar(trimws(x[[1]]))) padrao else x[[1]]
   }
-  grupo <- catalyser_ou(p$grupo, "none")
+  grupo <- trilha_ou(p$grupo, "none")
   # O ggplot2 descartaria as linhas incompletas com um aviso discreto. Aqui a
   # exclusão é explícita e contada, como na ANOVA.
-  preparo <- catalyser_completos(dados, c(p$x, p$y, if (!identical(grupo, "none")) grupo))
+  preparo <- trilha_completos(dados, c(p$x, p$y, if (!identical(grupo, "none")) grupo))
   dados <- preparo$dados
   if (!nrow(dados))
     stop("Nenhuma observação tem os dois eixos preenchidos; o gráfico ficaria vazio.", call. = FALSE)
@@ -2113,10 +2113,10 @@ catalyser_linhas <- function(dados, p) {
   }
   camada_linha <- if (identical(grupo, "none")) {
     ggplot2::geom_line(
-      linewidth = as.numeric(catalyser_ou(p$espessura_linha, 1)), color = "#0F3B5F"
+      linewidth = as.numeric(trilha_ou(p$espessura_linha, 1)), color = "#0F3B5F"
     )
   } else {
-    ggplot2::geom_line(linewidth = as.numeric(catalyser_ou(p$espessura_linha, 1)))
+    ggplot2::geom_line(linewidth = as.numeric(trilha_ou(p$espessura_linha, 1)))
   }
   grafico <- ggplot2::ggplot(dados, aes) +
     camada_linha
@@ -2174,11 +2174,11 @@ catalyser_linhas <- function(dados, p) {
 #' @return Lista com `narrativa`, `tabela`, `grafico`, `diagnosticos`, `console`
 #'   e `objeto`.
 #' @export
-catalyser_qui_quadrado <- function(dados, p) {
+trilha_qui_quadrado <- function(dados, p) {
   if (!is.null(p$tabela)) {
     tab <- as.table(p$tabela)
   } else {
-    catalyser_colunas(dados, c(p$var_row, p$var_col))
+    trilha_colunas(dados, c(p$var_row, p$var_col))
     tab <- table(dados[[p$var_row]], dados[[p$var_col]], useNA = "no")
   }
   teste <- suppressWarnings(stats::chisq.test(tab, correct = isTRUE(p$yates)))
@@ -2198,7 +2198,7 @@ catalyser_qui_quadrado <- function(dados, p) {
   list(
     narrativa = sprintf(
       "O teste qui-quadrado resultou em χ² = %s, gl = %s e %s.",
-      catalyser_num(teste$statistic), catalyser_num(teste$parameter, 0L), catalyser_p(teste$p.value)
+      trilha_num(teste$statistic), trilha_num(teste$parameter, 0L), trilha_p(teste$p.value)
     ),
     tabela = tabela, grafico = grafico, diagnosticos = residuos,
     console = utils::capture.output(print(teste)), objeto = teste
@@ -2211,10 +2211,10 @@ catalyser_qui_quadrado <- function(dados, p) {
 #' @param p Lista com `variavel`, `sucesso`, `referencia`, `confianca`,
 #'   `alternativa` e `desenho`.
 #' @return Lista com narrativa, tabela, grafico, diagnosticos, console e objeto.
-catalyser_proporcao_uma <- function(dados, p) {
+trilha_proporcao_uma <- function(dados, p) {
   if (!identical(p$desenho, "independente"))
     stop("Esta análise atende somente unidades independentes; pares, blocos e agrupamentos precisam de outro caminho.", call. = FALSE)
-  catalyser_colunas(dados, p$variavel)
+  trilha_colunas(dados, p$variavel)
   x <- dados[[p$variavel]]
   x <- as.character(x[!is.na(x)])
   niveis <- unique(x)
@@ -2231,7 +2231,7 @@ catalyser_proporcao_uma <- function(dados, p) {
   if (!is.finite(confianca) || confianca <= 0 || confianca >= 1)
     stop("O nível de confiança deve estar entre 0 e 1.", call. = FALSE)
   teste <- stats::binom.test(sucessos, n, p = referencia,
-                             alternative = catalyser_ou(p$alternativa, "two.sided"),
+                             alternative = trilha_ou(p$alternativa, "two.sided"),
                              conf.level = confianca)
   proporcao <- sucessos / n
   tabela <- data.frame(
@@ -2257,9 +2257,9 @@ catalyser_proporcao_uma <- function(dados, p) {
   }
   list(
     narrativa = sprintf("Entre %d unidades independentes válidas, %d foram classificadas como %s (%s%%; IC de %d%%: %s a %s). Contra a referência de %s, o teste binomial exato %s.",
-      n, sucessos, p$sucesso, catalyser_num(100 * proporcao, 1L), round(100 * confianca),
-      catalyser_num(100 * teste$conf.int[1], 1L), catalyser_num(100 * teste$conf.int[2], 1L),
-      catalyser_num(referencia, 3L), catalyser_p(teste$p.value)),
+      n, sucessos, p$sucesso, trilha_num(100 * proporcao, 1L), round(100 * confianca),
+      trilha_num(100 * teste$conf.int[1], 1L), trilha_num(100 * teste$conf.int[2], 1L),
+      trilha_num(referencia, 3L), trilha_p(teste$p.value)),
     tabela = tabela, grafico = grafico, diagnosticos = diagnosticos,
     console = utils::capture.output(print(teste)), objeto = teste
   )
@@ -2271,10 +2271,10 @@ catalyser_proporcao_uma <- function(dados, p) {
 #' @param p Lista com `resposta`, `grupo`, `sucesso`, `confianca`, `correcao` e
 #'   `desenho`.
 #' @return Lista com narrativa, tabela, grafico, diagnosticos, console e objeto.
-catalyser_proporcao_duas <- function(dados, p) {
+trilha_proporcao_duas <- function(dados, p) {
   if (!identical(p$desenho, "independente"))
     stop("Esta análise atende dois grupos independentes; pares, blocos e agrupamentos precisam de outro caminho.", call. = FALSE)
-  catalyser_colunas(dados, c(p$resposta, p$grupo))
+  trilha_colunas(dados, c(p$resposta, p$grupo))
   d <- dados[stats::complete.cases(dados[c(p$resposta, p$grupo)]), c(p$resposta, p$grupo), drop = FALSE]
   resposta <- as.character(d[[p$resposta]])
   grupo <- as.character(d[[p$grupo]])
@@ -2319,12 +2319,12 @@ catalyser_proporcao_duas <- function(dados, p) {
       ggplot2::theme_minimal(base_size = 12) +
       ggplot2::labs(x = NULL, y = "Proporção de sucesso", title = "Comparação entre duas proporções")
   }
-  alerta <- if (usar_fisher) sprintf(" Como há frequência esperada menor que 5, o p do teste exato de Fisher (%s) é a referência para a decisão; o intervalo da diferença continua sendo apresentado como aproximação.", catalyser_p(fisher$p.value)) else ""
+  alerta <- if (usar_fisher) sprintf(" Como há frequência esperada menor que 5, o p do teste exato de Fisher (%s) é a referência para a decisão; o intervalo da diferença continua sendo apresentado como aproximação.", trilha_p(fisher$p.value)) else ""
   list(
     narrativa = sprintf("A proporção de %s foi %s%% em %s e %s%% em %s; a diferença estimada (primeiro − segundo) foi %s ponto(s) percentual(is) (IC de %d%%: %s a %s). O teste de duas proporções %s.%s",
-      p$sucesso, catalyser_num(100 * proporcoes[1], 1L), niveis_grupo[1], catalyser_num(100 * proporcoes[2], 1L), niveis_grupo[2],
-      catalyser_num(100 * (proporcoes[1] - proporcoes[2]), 1L), round(100 * confianca),
-      catalyser_num(100 * teste$conf.int[1], 1L), catalyser_num(100 * teste$conf.int[2], 1L), catalyser_p(teste$p.value), alerta),
+      p$sucesso, trilha_num(100 * proporcoes[1], 1L), niveis_grupo[1], trilha_num(100 * proporcoes[2], 1L), niveis_grupo[2],
+      trilha_num(100 * (proporcoes[1] - proporcoes[2]), 1L), round(100 * confianca),
+      trilha_num(100 * teste$conf.int[1], 1L), trilha_num(100 * teste$conf.int[2], 1L), trilha_p(teste$p.value), alerta),
     tabela = tabela, grafico = grafico, diagnosticos = diagnosticos,
     console = c(utils::capture.output(print(teste)), "", "Teste exato de Fisher:", utils::capture.output(print(fisher))),
     objeto = list(teste_proporcoes = teste, fisher = fisher)
@@ -2336,10 +2336,10 @@ catalyser_proporcao_duas <- function(dados, p) {
 #' @param dados Um data.frame com uma variável categórica.
 #' @param p Lista com `variavel`, `esperadas` e `desenho`.
 #' @return Lista com narrativa, tabela, grafico, diagnosticos, console e objeto.
-catalyser_aderencia <- function(dados, p) {
+trilha_aderencia <- function(dados, p) {
   if (!identical(p$desenho, "independente"))
     stop("Esta análise atende unidades independentes; pares, blocos e agrupamentos precisam de outro caminho.", call. = FALSE)
-  catalyser_colunas(dados, p$variavel)
+  trilha_colunas(dados, p$variavel)
   x <- as.character(dados[[p$variavel]])
   x <- x[!is.na(x)]
   categorias <- unique(x)
@@ -2377,7 +2377,7 @@ catalyser_aderencia <- function(dados, p) {
   alerta <- if (min(esperadas_n) < 5) " Atenção: há frequência esperada menor que 5; interprete a aproximação com cautela." else ""
   list(
     narrativa = sprintf("O qui-quadrado de aderência comparou %d unidades independentes às proporções esperadas definidas pela pergunta: χ² = %s, gl = %d e %s.%s",
-      sum(observadas), catalyser_num(teste$statistic), as.integer(teste$parameter), catalyser_p(teste$p.value), alerta),
+      sum(observadas), trilha_num(teste$statistic), as.integer(teste$parameter), trilha_p(teste$p.value), alerta),
     tabela = tabela, grafico = grafico, diagnosticos = diagnosticos,
     console = utils::capture.output(print(teste)), objeto = teste
   )
@@ -2390,9 +2390,9 @@ catalyser_aderencia <- function(dados, p) {
 #' @return Lista com `narrativa`, `tabela`, `grafico`, `diagnosticos`, `console`
 #'   e `objeto`.
 #' @export
-catalyser_pca <- function(dados, p) {
+trilha_pca <- function(dados, p) {
   variaveis <- unique(as.character(p$variaveis))
-  catalyser_colunas(dados, variaveis)
+  trilha_colunas(dados, variaveis)
   x <- dados[variaveis]
   x <- x[stats::complete.cases(x), , drop = FALSE]
   x[] <- lapply(x, as.numeric)
@@ -2409,7 +2409,7 @@ catalyser_pca <- function(dados, p) {
   diagnosticos <- as.data.frame(ajuste$rotation, check.names = FALSE)
   diagnosticos <- cbind(Variável = rownames(diagnosticos), diagnosticos, row.names = NULL)
   list(
-    narrativa = sprintf("Os dois primeiros componentes explicaram %s%% da variância total.", catalyser_num(sum(utils::head(variancia, 2L)), 1L)),
+    narrativa = sprintf("Os dois primeiros componentes explicaram %s%% da variância total.", trilha_num(sum(utils::head(variancia, 2L)), 1L)),
     tabela = tabela, grafico = grafico, diagnosticos = diagnosticos,
     console = utils::capture.output(summary(ajuste)), objeto = ajuste
   )
@@ -2423,11 +2423,11 @@ catalyser_pca <- function(dados, p) {
 #' @return Lista com `narrativa`, `tabela`, `grafico`, `diagnosticos`, `console`
 #'   e `objeto`.
 #' @export
-catalyser_hca <- function(dados, p) {
+trilha_hca <- function(dados, p) {
   variaveis <- unique(as.character(p$variaveis))
-  coluna_rotulo <- catalyser_ou(p$variavel_rotulo, "none")
+  coluna_rotulo <- trilha_ou(p$variavel_rotulo, "none")
   usar_rotulos <- isTRUE(p$mostrar_rotulos) && !identical(coluna_rotulo, "none")
-  catalyser_colunas(dados, c(variaveis, if (usar_rotulos) coluna_rotulo))
+  trilha_colunas(dados, c(variaveis, if (usar_rotulos) coluna_rotulo))
   x <- dados[variaveis]
   completos <- stats::complete.cases(x)
   x <- x[completos, , drop = FALSE]
@@ -2439,9 +2439,9 @@ catalyser_hca <- function(dados, p) {
   }
   rownames(x) <- rotulos
   if (isTRUE(p$padronizar)) x <- as.data.frame(scale(x))
-  distancia <- stats::dist(x, method = catalyser_ou(p$distancia, "euclidean"))
-  ajuste <- stats::hclust(distancia, method = catalyser_ou(p$ligacao, "complete"))
-  k <- min(max(2L, as.integer(catalyser_ou(p$numero_grupos, 2L))), nrow(x))
+  distancia <- stats::dist(x, method = trilha_ou(p$distancia, "euclidean"))
+  ajuste <- stats::hclust(distancia, method = trilha_ou(p$ligacao, "complete"))
+  k <- min(max(2L, as.integer(trilha_ou(p$numero_grupos, 2L))), nrow(x))
   grupos <- stats::cutree(ajuste, k = k)
   tabela <- data.frame(Observação = rownames(x), Grupo = grupos, row.names = NULL)
   diagnosticos <- as.data.frame(table(Grupo = grupos), stringsAsFactors = FALSE)
@@ -2480,12 +2480,12 @@ catalyser_hca <- function(dados, p) {
 #' @examples
 #' \dontrun{
 #' analises <- readRDS(file.path("metadados", "registro_execucoes.rds"))
-#' resultado <- catalyser_executar(analises[["execucao_0001"]], dados)
+#' resultado <- trilha_executar(analises[["execucao_0001"]], dados)
 #' resultado$grafico
 #' resultado$tabela
 #' }
 #' @export
-catalyser_executar <- function(execucao, dados = NULL) {
+trilha_executar <- function(execucao, dados = NULL) {
   p <- execucao$parametros
   tipo <- execucao$tipo
   if (identical(tipo, "grafico_linhas") &&
@@ -2494,30 +2494,30 @@ catalyser_executar <- function(execucao, dados = NULL) {
   }
   resultado <- switch(
     tipo,
-    descricao_exploratoria = catalyser_descricao(dados, p),
-    estatistica_descritiva = catalyser_resumo_descritivo(dados, p),
-    regressao_linear = catalyser_regressao(dados, p, logistica = FALSE),
-    regressao_logistica = catalyser_regressao(dados, p, logistica = TRUE),
-    regressao_poisson = catalyser_regressao_contagem(dados, p, familia = "poisson"),
-    regressao_binomial_negativa = catalyser_regressao_contagem(dados, p, familia = "binomial_negativa"),
-    teste_t_one_val = catalyser_teste_t(dados, p),
-    teste_t_two_ind = catalyser_teste_t(dados, p),
-    teste_t_paired = catalyser_teste_t(dados, p),
-    anova_um_fator = catalyser_anova(dados, p),
-    anova_mista_subamostras = catalyser_anova_mista(dados, p),
-    anova_medidas_repetidas = catalyser_anova_medidas_repetidas(dados, p),
-    friedman = catalyser_friedman(dados, p),
-    anova_dois_fatores = catalyser_anova_dois_fatores(dados, p),
-    qui_quadrado_variancia = catalyser_variancia_uma(dados, p),
-    teste_f_variancias = catalyser_variancias_duas(dados, p),
-    grafico_linhas = catalyser_linhas(dados, p),
-    qui_quadrado = catalyser_qui_quadrado(dados, p),
-    proporcao_uma = catalyser_proporcao_uma(dados, p),
-    proporcao_duas = catalyser_proporcao_duas(dados, p),
-    qui_quadrado_aderencia = catalyser_aderencia(dados, p),
-    mcnemar = catalyser_mcnemar(dados, p),
-    pca = catalyser_pca(dados, p),
-    hca = catalyser_hca(dados, p),
+    descricao_exploratoria = trilha_descricao(dados, p),
+    estatistica_descritiva = trilha_resumo_descritivo(dados, p),
+    regressao_linear = trilha_regressao(dados, p, logistica = FALSE),
+    regressao_logistica = trilha_regressao(dados, p, logistica = TRUE),
+    regressao_poisson = trilha_regressao_contagem(dados, p, familia = "poisson"),
+    regressao_binomial_negativa = trilha_regressao_contagem(dados, p, familia = "binomial_negativa"),
+    teste_t_one_val = trilha_teste_t(dados, p),
+    teste_t_two_ind = trilha_teste_t(dados, p),
+    teste_t_paired = trilha_teste_t(dados, p),
+    anova_um_fator = trilha_anova(dados, p),
+    anova_mista_subamostras = trilha_anova_mista(dados, p),
+    anova_medidas_repetidas = trilha_anova_medidas_repetidas(dados, p),
+    friedman = trilha_friedman(dados, p),
+    anova_dois_fatores = trilha_anova_dois_fatores(dados, p),
+    qui_quadrado_variancia = trilha_variancia_uma(dados, p),
+    teste_f_variancias = trilha_variancias_duas(dados, p),
+    grafico_linhas = trilha_linhas(dados, p),
+    qui_quadrado = trilha_qui_quadrado(dados, p),
+    proporcao_uma = trilha_proporcao_uma(dados, p),
+    proporcao_duas = trilha_proporcao_duas(dados, p),
+    qui_quadrado_aderencia = trilha_aderencia(dados, p),
+    mcnemar = trilha_mcnemar(dados, p),
+    pca = trilha_pca(dados, p),
+    hca = trilha_hca(dados, p),
     stop(sprintf("O tipo de execução '%s' ainda não possui replay no exportador integrado.", tipo), call. = FALSE)
   )
   resultado$execucao <- execucao

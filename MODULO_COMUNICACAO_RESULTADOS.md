@@ -295,11 +295,11 @@ Cada análise aparece em três chunks, todos `echo: false`:
   tipos com código validado (`exportacao_tipos_com_codigo_vivo`: ANOVA de um e dois
   fatores, gráfico de linhas) roda com `output: false`; para os demais fica
   `eval: false`, só leitura, até ganharem o mesmo tratamento;
-- `<raiz>-resultado` — `catalyser_executar()` com `tipo`, `titulo` e `parametros`
+- `<raiz>-resultado` — `trilha_executar()` com `tipo`, `titulo` e `parametros`
   **escritos por extenso** (`exportacao_lista_r()`), sem ler
   `metadados/registro_execucoes.rds`. O objeto leva o nome da análise
   (`anova_profundidade_m`, `linhas_captura`), e os chunks de componente chamam
-  `catalyser_mostrar(anova_profundidade_m[["tabela"]])`, cada um com uma linha de
+  `trilha_mostrar(anova_profundidade_m[["tabela"]])`, cada um com uma linha de
   comentário dizendo o que mostra (`[[ ]]` e não `$`, para o R não completar
   `grafico` como `grafico_combinacoes`).
 
@@ -327,7 +327,7 @@ No `relatorio.qmd`, a seção "Preparação dos dados" tem dois chunks gerados p
 `exportacao_chunk_importar()` e `exportacao_chunk_tratar()` (ambos
 `output: false`): `importar` lê a planilha com `readxl` e deixa `dados_brutos`;
 `tratar` aplica `exportacao_bloco_estrutural()` + `exportacao_bloco_trilha()`
-e confere com `catalyser_conferir_base()`. É a Seção 0 do relatório, a Trilha
+e confere com `trilha_conferir_base()`. É a Seção 0 do relatório, a Trilha
 de Preparo virando texto e código. Cada análise abre com **Pergunta:**
 (`exportacao_pergunta()`), a base e a execução.
 

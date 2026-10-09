@@ -271,7 +271,7 @@ sem aliases da interface. Operações com lógica própria conservam a receita
 executável original. Moda só é chamada quando a imputação realmente a utiliza.
 
 A ANOVA acompanhada agora usa os mesmos trechos didáticos do modelo isolado,
-com nomes de chunks únicos por execução, sem `catalyser_executar()` para a ANOVA.
+com nomes de chunks únicos por execução, sem `trilha_executar()` para a ANOVA.
 Preservados o RDS como entrada do relatório, os quatro chunks analíticos,
 os ajudantes de apresentação, média ± DP e a atualização script–relatório.
 
