@@ -3,8 +3,7 @@
 **Situação:** nome decidido em 8 de outubro de 2026. A IDE passa a se chamar
 **Trilha**, e o pacote R, **`trilha`**. O renome no código ainda não foi
 feito: o plano está em [../../PLANO_TRILHA.md](../../PLANO_TRILHA.md). O
-repositório continua em `astuciasnor/catalyser` e depois vai para a conta do
-Clube do Código no GitHub.
+repositório é `cluberufpa/trilha`, na conta do Clube do Código no GitHub.
 
 **Nome:** Trilha. Antes se estudou TrilhaR (lido como o verbo *trilhar*, com
 o R do software no fim); os arquivos `trilhar_hex_*` abaixo são dessa fase.

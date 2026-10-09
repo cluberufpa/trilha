@@ -1938,7 +1938,7 @@ install.packages(\"knitr\")</code></pre>
         <ul>
           <li><b>Como funciona:</b> O usuário instala o pacote uma vez e, depois, abre a IDE com um comando:
             <pre style='background: #f1f3f5; padding: 8px; border-radius: 6px; font-size: 0.85rem;'>install.packages(\"pak\")
-pak::pkg_install(\"astuciasnor/catalyser\", upgrade = FALSE)
+pak::pkg_install(\"cluberufpa/trilha\", upgrade = FALSE)
 trilha::run_app(launch.browser = TRUE)</pre>
           </li>
           <li><b>Vantagem pedagógica:</b> Serve como um excelente passo intermediário de transição, onde o aluno executa um comando simples para abrir a interface em sua própria máquina, offline, familiarizando-se com o terminal do RStudio.</li>

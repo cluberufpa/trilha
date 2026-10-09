@@ -30,7 +30,7 @@ install.packages(
 {{PACOTES_INSTALAR}}
 )
 remotes::install_github("astuciasnor/EAPADados")
-remotes::install_github("astuciasnor/catalyser")
+remotes::install_github("cluberufpa/trilha")
 ```
 
 Nenhum pacote é instalado automaticamente. Os dois pacotes do ecossistema

@@ -61,7 +61,7 @@ library(EAPADados)
 if (!requireNamespace("trilha", quietly = TRUE)) {
   stop(
     "Este projeto usa o pacote trilha, que não está instalado.",
-    " Instale uma vez, no console: remotes::install_github('astuciasnor/catalyser')",
+    " Instale uma vez, no console: remotes::install_github('cluberufpa/trilha')",
     call. = FALSE
   )
 }

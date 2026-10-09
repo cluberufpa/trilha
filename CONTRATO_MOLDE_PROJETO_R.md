@@ -66,7 +66,7 @@ Regras da árvore:
   `catalyser` e `EAPADados`**, instalados do GitHub. A seção 1 confere cada um
   com `requireNamespace()` e, quando falta, interrompe com mensagem curta e o
   comando `remotes::install_github(...)` exato (repositórios
-  `astuciasnor/catalyser` e `astuciasnor/EAPADados`); o README traz os mesmos
+  `cluberufpa/trilha` e `astuciasnor/EAPADados`); o README traz os mesmos
   dois comandos. As funções de apoio que viajam (`moda()`, `converter_datas()`)
   vão em `R/funcoes.R`; a conferência das bases usa
   `catalyser::catalyser_conferir_base()`. O exportador aplica a regra num ponto

@@ -192,7 +192,7 @@ exportacao_trecho_instalar <- function() {
     "}",
     "if (!\"trilha\" %in% rownames(installed.packages()) ||",
     "    packageVersion(\"trilha\") < package_version(\"0.1.18\")) {",
-    "  remotes::install_github(\"astuciasnor/catalyser\", upgrade = \"never\")",
+    "  remotes::install_github(\"cluberufpa/trilha\", upgrade = \"never\")",
     "}",
     "# Depois de instalar ou atualizar, reinicie o R antes de executar a análise.",
     ""
@@ -228,7 +228,7 @@ exportacao_trecho_pacotes <- function() {
     "if (!requireNamespace(\"trilha\", quietly = TRUE) ||",
     "    getNamespaceVersion(\"trilha\") < package_version(\"0.1.18\")) {",
     "  stop(\"Este projeto requer trilha >= 0.1.18. Atualize e reinicie o R: \",",
-    "       \"remotes::install_github('astuciasnor/catalyser')\", call. = FALSE)",
+    "       \"remotes::install_github('cluberufpa/trilha')\", call. = FALSE)",
     "}",
     "library(trilha)",
     "",

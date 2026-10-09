@@ -65,7 +65,7 @@ Depois, os dois pacotes do ecossistema, que não estão no CRAN e são
 instalados do GitHub:
 
 ```r
-remotes::install_github("astuciasnor/catalyser")
+remotes::install_github("cluberufpa/trilha")
 remotes::install_github("astuciasnor/EAPADados")
 ```
 

@@ -97,7 +97,7 @@ instalar_trilha <- function(iniciar = FALSE) {
     # A IDE é sempre atualizada: assim executar novamente este instalador
     # realmente traz o conteúdo mais recente da branch main.
     ok_ide <- garante(
-      "trilha", github = "astuciasnor/catalyser",
+      "trilha", github = "cluberufpa/trilha",
       versao_minima = "0.1.5", atualizar = TRUE
     )
   }

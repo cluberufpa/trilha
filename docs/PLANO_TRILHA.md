@@ -8,9 +8,9 @@ escrita, sem precisar de "Studio" no nome. Slogan: *Da pergunta ao
 relatório, uma só trilha de análise.* Logo e cores: ver
 [identidade_visual/Trilha/LEIA-ME.md](identidade_visual/Trilha/LEIA-ME.md).
 
-**O repositório fica onde está por enquanto** (`astuciasnor/catalyser`). A
-transferência para a conta do Clube do Código no GitHub foi decidida, mas
-fica para depois (etapa 8).
+**Repositório:** desde 9 de outubro de 2026, a Trilha vive em
+`cluberufpa/trilha` (público), na conta do Clube do Código no GitHub. O
+`astuciasnor/catalyser` continua com o pacote `catalyser` dos alunos.
 
 ## Andamento
 

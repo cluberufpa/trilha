@@ -55,7 +55,7 @@ stopifnot(!any(grepl("{{", linhas_script, fixed = TRUE)),
   sum(grepl("library(EAPADados)", linhas_script, fixed = TRUE)) == 1L,
   any(grepl('!requireNamespace("trilha", quietly = TRUE)', linhas_script, fixed = TRUE)),
   any(grepl('!requireNamespace("EAPADados", quietly = TRUE)', linhas_script, fixed = TRUE)),
-  any(grepl("remotes::install_github('astuciasnor/catalyser')", linhas_script, fixed = TRUE)),
+  any(grepl("remotes::install_github('cluberufpa/trilha')", linhas_script, fixed = TRUE)),
   any(grepl("remotes::install_github('astuciasnor/EAPADados')", linhas_script, fixed = TRUE)))
 objetos_contrato <- c("n_total", "n_utilizado", "n_excluido", "texto_amostra",
   "texto_sintese_estatistica", "alerta_modelo", "registro_ambiente",
@@ -103,7 +103,7 @@ readme <- readLines(file.path(projeto, "README.md"), encoding = "UTF-8")
 stopifnot(any(grepl("Preparar o computador", readme, fixed = TRUE)),
   any(grepl("install.packages(", readme, fixed = TRUE)),
   any(grepl("Nenhum pacote é instalado automaticamente", readme, fixed = TRUE)),
-  any(grepl('remotes::install_github("astuciasnor/catalyser")', readme, fixed = TRUE)),
+  any(grepl('remotes::install_github("cluberufpa/trilha")', readme, fixed = TRUE)),
   any(grepl('remotes::install_github("astuciasnor/EAPADados")', readme, fixed = TRUE)),
   # Padrão do barbo (C10): tabela de três colunas, seção de reprodutibilidade
   # e origem dos dados com guia.

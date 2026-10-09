@@ -35,7 +35,7 @@ arquivos no computador; uma sessão aberta pode continuar com o pacote antigo na
 A forma **recomendada para os alunos** instala os dados (EAPADados) e a CatalyseR diretamente do código R, com dependências CRAN em **binário no Windows**, sem precisar de Rtools. O instalador apenas instala e mostra o comando de abertura. No console do R/RStudio, rode:
 
 ```r
-source("https://raw.githubusercontent.com/astuciasnor/catalyser/main/instalar_trilha.R")
+source("https://raw.githubusercontent.com/cluberufpa/trilha/main/instalar_trilha.R")
 ```
 
 Ou, pela interface do RStudio: baixe o arquivo `instalar_trilha.R`, abra-o e clique em **Source** (canto superior direito do editor). Pode rodar novamente quando quiser: o instalador atualiza a CatalyseR pela branch `main` e preserva os pacotes CRAN compatíveis. A instalação fica no computador. Para abrir a IDE quando quiser, execute:
@@ -53,7 +53,7 @@ No Windows, use `build = FALSE` para instalar diretamente do código R, sem a et
 ```r
 install.packages("remotes", type = "binary")
 remotes::install_github(
-  "astuciasnor/catalyser",
+  "cluberufpa/trilha",
   build = FALSE,
   upgrade = "never",
   type = "binary"
