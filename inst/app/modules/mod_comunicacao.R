@@ -186,9 +186,10 @@ mod_comunicacao_ui <- function(id) {
                   class = "small text-muted",
                   "Baixe o projeto reproduzível e continue no RStudio: o Word e o caderno HTML nascem lá, no Render."
                 ),
-                # Opção experimental: o roteiro e os relatórios escritos em ClaRa.
-                checkboxInput(ns("codigo_clara"), "Escrever o código em ClaRa (experimental)", value = FALSE),
-                helpText("Por enquanto, só para a ANOVA de um fator com o método clássico. Nas demais análises, o projeto sai como antes."),
+                # Opção experimental, marcada por padrão na Trilha: o roteiro e
+                # o relatório escritos em ClaRa.
+                checkboxInput(ns("codigo_clara"), "Escrever o código em ClaRa (experimental)", value = TRUE),
+                helpText("Por enquanto, só para a ANOVA de um fator (clássica, Welch ou automático). Nas demais análises, o projeto sai como antes, sem ClaRa."),
                 uiOutput(ns("acoes_exportacao"))
               )
             )
