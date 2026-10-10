@@ -188,6 +188,44 @@ exportados ficaram para depois (dados só nos testes, decisão I).
 - Um teste da Trilha que, para cada análise com rota ClaRa, gera o projeto,
   roda o `analise.R` e renderiza o `relatorio.qmd` numa sessão limpa.
 
+**Andamento (9/10/2026):** feito, menos a tela.
+
+- `DESCRIPTION` com `clara (>= 0.10.0)` em `Imports` e `cluberufpa/ClaRa`
+  em `Remotes`; o `instalar_trilha.R` instala a `clara` do GitHub antes da
+  IDE.
+- O projeto da rota ClaRa (ANOVA de um fator, clássica, Welch e automático)
+  carrega `library(clara)` no `analise.R` e no `relatorio.qmd`; saíram
+  `R/clara/`, `R/funcoes.R` e `inst/app/templates/clara/`. As tabelas do
+  relatório são `resultado |> exibir_teste()` e `resultado |>
+  exibir_resumo(casas = casas, nota = textos$nota_tabela)`. Quando a receita
+  de preparo usa `moda()` ou `converter_datas()`, a definição delas fica no
+  próprio roteiro e no relatório, antes da receita. O README diz a versão da
+  `clara` da exportação e como instalá-la.
+- `test_clara_projeto_render.R`, na suíte: para cada entrada do registro
+  com rota ClaRa, gera o projeto, roda o `analise.R` com `Rscript --vanilla`
+  e o `quarto render`, e confere as tabelas da ClaRa no Word. Uma rota nova
+  sem caso no teste faz o teste parar.
+- **A tela ainda não chama a ClaRa.** O risco 2 se confirmou em parte, e a
+  troca espera a decisão do professor. Comparação com as bases de
+  `ClaRa/dados_treino` (rds e csv, confiança de 95% e 90%, os três métodos):
+  F, p, GL, SQ, QM, médias, DP, EP, IC das médias, os pares (diferença,
+  intervalo e p ajustado), o Shapiro dos resíduos e o Levene são
+  **idênticos**. Mudam:
+  1. **Intervalo do η² e do ω² (clássica):** a tela usa o padrão do
+     `effectsize`, unilateral (limite superior 1; bagres: η² de 0,649 a 1);
+     a ClaRa, bilateral (0,597 a 0,906). As estimativas são as mesmas.
+  2. **Pressupostos na ANOVA de Welch:** a tela mostra o Shapiro dos
+     resíduos, o Levene e o Bartlett; a ClaRa, o Shapiro em cada grupo.
+  3. **Letras:** com os mesmos p, a tela e a ClaRa (`multcompView`) podem
+     dar nomes diferentes aos mesmos grupos (`sint_dez_tanques`, Welch a
+     95%: o "b" de uma é o "c" da outra).
+  4. **Bartlett:** a ClaRa não calcula.
+  5. **Dois grupos:** a tela faz a ANOVA; a ClaRa, o teste t.
+- Achado no caminho, anterior a esta fase: com empate (nenhum valor
+  repetido), o `trat_moda()` da tela pega o primeiro valor que aparece e o
+  `moda()` / `trilha_moda()` do código exportado, o menor; a conferência do
+  exportador barra a exportação nesse caso.
+
 ### Fase 3 · Uma rota só de exportação
 
 - Cada análise que ganha a rota ClaRa perde o molde antigo no mesmo
