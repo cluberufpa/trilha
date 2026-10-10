@@ -1663,17 +1663,17 @@ server <- function(input, output, session) {
     ),
     export = list(
       title = "7. Exportação de Projetos",
-      keywords = "exportar zip consolidado nome dataset projeto scripts rproj quarto qmd download individual unica",
+      keywords = "exportar zip comunicacao resultados nome dataset projeto rproj quarto qmd download individual unica",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Tipos de Exportação de Projetos</h4>
         <p>Na IDE CatalyseR, você encontrará dois tipos de exportadores de código, com objetivos didáticos distintos:</p>
-        
-        <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>1. Exportação Consolidada (No menu \"Preparando Dados\")</h5>
-        <p>Ideal para quando você conclui sua sessão de estudos ou para a entrega de relatórios e trabalhos práticos completos. Ela une todas as análises realizadas:</p>
+
+        <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>1. Projeto R da Comunicação de Resultados</h5>
+        <p>Ideal para quando você conclui sua sessão de estudos ou para a entrega de relatórios e trabalhos práticos completos. No menu <b>Comunicação de Resultados</b>, o botão <b>Baixar Projeto R (.zip)</b> reúne as análises da sessão:</p>
         <ul>
-          <li><b>Nome do Projeto Baseado no Dataset:</b> O arquivo compactado (.zip) gerado recebe automaticamente o nome do conjunto de dados que está ativo na sua sessão (ex: <i>projeto_artemia_2026-06-09.zip</i>).</li>
-          <li><b>Rastreamento de Abas:</b> Apenas as análises que você visitou e trabalhou na sessão atual estarão habilitadas para seleção na lista. As demais ficam bloqueadas.</li>
-          <li><b>Multidisciplinar:</b> Gera scripts R numerados sequencialmente na pasta <i>scripts/</i> (ex: <i>1_estatistica_descritiva.R</i>, <i>2_regressao_linear.R</i>) e cria um único <b>relatório Quarto (.qmd) consolidado</b> contendo todas as análises combinadas no mesmo documento.</li>
+          <li><b>Execuções registradas:</b> O Projeto R preserva todas as execuções que você registrou; o relatório segue a seleção editorial que você fez na tela.</li>
+          <li><b>Dependências em dia:</b> A tela avisa quando alguma execução precisa ser atualizada antes da exportação.</li>
+          <li><b>Relatório no RStudio:</b> O projeto traz o script de análise e o relatório Quarto (.qmd) na pasta <i>relatorios/</i>; o Word nasce no seu RStudio, quando você clica em Render.</li>
         </ul>
 
         <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>2. Exportação de Análise Única (Dentro de cada aba/análise específica)</h5>
@@ -1682,7 +1682,7 @@ server <- function(input, output, session) {
           <li><b>Foco Total:</b> Gera um pacote contendo apenas o script específico daquela análise (ex: <i>boxplot.R</i> ou <i>regressao.R</i>) e um relatório Quarto exclusivo daquele gráfico ou modelo.</li>
           <li><b>Facilidade de Estudo:</b> Excelente para entender a lógica e depurar os andaimes visuais de código passo a passo, sem misturar múltiplos tópicos de estudo.</li>
         </ul>
-        <p>Ambos os formatos geram a pasta <i>dados/</i> com o seu dataset limpo/tipado e o arquivo <i>projeto_analise.Rproj</i> para abrir todo o ambiente de forma automática localmente no RStudio.</p>
+        <p>Ambos os formatos geram a pasta <i>dados/</i> com os seus dados e um arquivo <i>.Rproj</i> para abrir todo o ambiente de forma automática localmente no RStudio.</p>
       ")
     ),
     packages = list(
@@ -1862,7 +1862,7 @@ install.packages(\"knitr\")</code></pre>
         <ol>
           <li><b>Passo 1: Exploração Visual.</b> O estudante carrega os dados e ajusta modelos estatísticos e gráficos de forma imediata na tela, validando suas hipóteses visualmente e sem erros de código.</li>
           <li><b>Passo 2: Geração de Código Limpo.</b> A IDE gera de forma automática e transparente os scripts correspondentes a cada decisão tomada em tela.</li>
-          <li><b>Passo 3: Engenharia Reversa e Consolidação.</b> O estudante baixa o projeto consolidado (.zip) e abre no RStudio local, executando linha a linha os scripts estruturados e modificando os códigos já prontos para observar os resultados correspondentes.</li>
+          <li><b>Passo 3: Engenharia Reversa e Consolidação.</b> O estudante baixa o Projeto R (.zip) e abre no RStudio local, executando linha a linha o código estruturado e modificando os códigos já prontos para observar os resultados correspondentes.</li>
         </ol>
       ")
     ),
@@ -1972,12 +1972,12 @@ trilha::run_app(launch.browser = TRUE)</pre>
             <br>Utilizando a IDE, o estudante realiza explorações visuais interativas, obtendo como resultado um projeto R completo contendo scripts R limpos e comentados. O aluno abre esse projeto localmente no RStudio e executa os scripts linha a linha, testando os pressupostos do modelo estatístico (ex: normalidade, resíduos, homocedasticidade) de forma rigorosa e reprodutível.
           </li>
           <li style='margin-top: 10px;'><b>Pilar 3: Comunicação Científica de Resultados (Divulgação)</b>
-            <br>A ciência só está completa quando comunicada de forma clara. Utilizando o arquivo <b>Quarto Markdown (.qmd) consolidado</b> gerado pela IDE, o estudante produz um <b>Relatório Científico Final</b> elegante no formato de um artigo, contendo a contextualização, a metodologia de amostragem/experimento, o código R com a análise de dados e a interpretação científica dos principais resultados.
+            <br>A ciência só está completa quando comunicada de forma clara. Utilizando o relatório Quarto (.qmd) que acompanha o Projeto R exportado, o estudante produz um <b>Relatório Científico Final</b> elegante no formato de um artigo, contendo a contextualização, a metodologia de amostragem/experimento, o código R com a análise de dados e a interpretação científica dos principais resultados.
           </li>
         </ol>
         
         <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 20px;'>Fechando o Ciclo Pedagógico e Científico</h5>
-        <p>A produção do <b>Projeto R</b> exportado integra-se de forma direta com a <b>Comunicação de Resultados</b>. Ao abrir o arquivo <code>relatorio_consolidado.qmd</code> no RStudio local, o estudante é encorajado a preencher as seções de Metodologia (detalhando o Planejamento Amostral/Experimental do Pilar 1) e Introdução ao lado das saídas automáticas do Pilar 2. Isso simula com fidelidade o fluxo real de redação de um artigo científico em revistas de alto impacto, consolidando a ponte entre o planejamento rigoroso, a análise de dados e a comunicação acadêmica.</p>
+        <p>A produção do <b>Projeto R</b> exportado integra-se de forma direta com a <b>Comunicação de Resultados</b>. Ao abrir o relatório Quarto da pasta <code>relatorios/</code> no RStudio local, o estudante é encorajado a preencher as seções de Metodologia (detalhando o Planejamento Amostral/Experimental do Pilar 1) e Introdução ao lado das saídas automáticas do Pilar 2. Isso simula com fidelidade o fluxo real de redação de um artigo científico em revistas de alto impacto, consolidando a ponte entre o planejamento rigoroso, a análise de dados e a comunicação acadêmica.</p>
       ")
     ),
     t_dist_visual = list(
