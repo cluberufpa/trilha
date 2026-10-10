@@ -12,13 +12,13 @@ library(here)
 here::i_am("R/analise.R")
 {{BIBLIOTECAS_PREPARO}}
 # Dois pacotes do ecossistema EAPA, hospedados no GitHub (não estão no CRAN).
-# EAPADados: pacote complementar do ecossistema CatalyseR, com dados de
+# EAPADados: pacote complementar do ecossistema EAPA, com dados de
 # contexto da pesca e da aquicultura. Este projeto não o chama diretamente
 # (os dados vêm da planilha em dados/brutos/), mas ele é carregado por
 # compatibilidade com o ecossistema e exigido na instalação.
 if (!requireNamespace("EAPADados", quietly = TRUE)) {
   stop(
-    "Este projeto faz parte do ecossistema CatalyseR e pede o pacote ",
+    "Este projeto faz parte do ecossistema EAPA e pede o pacote ",
     "complementar EAPADados para compatibilidade, mas ele não está instalado.",
     " Instale uma vez, no console: remotes::install_github('astuciasnor/EAPADados')",
     call. = FALSE
@@ -102,7 +102,7 @@ tabela_descritiva_exibir <- data.frame(n = n_utilizado, Média = fmt(media),
     fmt(media - margem_media), "; ", fmt(media + margem_media), "]"), check.names = FALSE)
 
 # 5. Aplicar o teste t ------------------------------------------------------
-# Mantemos a alternativa, a referência e a confiança registradas na CatalyseR.
+# Mantemos a alternativa, a referência e a confiança registradas na Trilha.
 teste_t <- stats::t.test(base_t$medida_1, base_t$medida_2, paired = TRUE,
   alternative = alternativa, conf.level = nivel_confianca)
 # A saída crua aparece no console para estudo, uma vez; não entra nos QMDs.

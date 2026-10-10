@@ -1,7 +1,7 @@
 # =============================================================================
 # funcoes_nonparametric.R
 # -----------------------------------------------------------------------------
-# Funções canônicas dos testes NÃO PARAMÉTRICOS da CatalyseR (ecossistema EAPA):
+# Funções canônicas dos testes NÃO PARAMÉTRICOS da Trilha (ecossistema EAPA):
 #   - Qui-quadrado de independência  (a partir de uma matriz de contagens)
 #   - Teste exato de Fisher          (alternativa para tabelas esparsas)
 #   - Mann-Whitney                   (duas amostras independentes)

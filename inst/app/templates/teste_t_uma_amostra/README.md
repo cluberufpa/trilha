@@ -57,7 +57,7 @@ não é uma segunda amostra com variância ou tamanho próprios.
 ## Origem dos dados
 
 Registre aqui a origem da planilha, a licença e o período de coleta.
-A CatalyseR não declara a proveniência no lugar do pesquisador.
+A Trilha não declara a proveniência no lugar do pesquisador.
 Entrada preservada: `dados/brutos/{{ARQUIVO_BRUTO}}`.
 
 ## Ambiente computacional

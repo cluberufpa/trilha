@@ -2,7 +2,7 @@
 title: "Relatório de Análise: ANOVA Unifatorial e Comparações Múltiplas"
 subtitle: "Delineamento Inteiramente Casualizado e Relato Científico"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

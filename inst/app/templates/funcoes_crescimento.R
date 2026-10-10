@@ -1,7 +1,7 @@
 # =============================================================================
 # funcoes_crescimento.R
 # -----------------------------------------------------------------------------
-# Funcoes de apoio para REGRESSAO NAO-LINEAR na CatalyseR:
+# Funcoes de apoio para REGRESSAO NAO-LINEAR na Trilha:
 #   - Modelo de potencia (relacao peso-comprimento):  W = a * L^b
 #   - Von Bertalanffy:  L(t) = Linf * (1 - exp(-k * (t - t0)))
 #   - Logistico:        L(t) = Linf / (1 + exp(-k * (t - tm)))

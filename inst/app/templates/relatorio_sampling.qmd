@@ -2,7 +2,7 @@
 title: "Relatório de Análise: Métodos de Amostragem"
 subtitle: "Estatísticas Estruturadas e Projeções Populacionais"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

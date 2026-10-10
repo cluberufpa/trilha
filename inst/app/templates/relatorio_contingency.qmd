@@ -2,7 +2,7 @@
 title: "Relatório de Análise: Tabela de Contingência e Associação"
 subtitle: "Análise de Frequências Cruzadas e Teste Qui-Quadrado"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

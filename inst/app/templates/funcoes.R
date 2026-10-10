@@ -18,7 +18,7 @@
 #    5. Manutenção do relatório .. atualizar_codigo(), conferir_codigo()
 #
 #  As funções das seções 3 e 4 têm o mesmo nome e o mesmo comportamento das
-#  que o EAPADados e a CatalyseR usam. Quem vier de lá reconhece; quem sair
+#  que o EAPADados e a Trilha usam. Quem vier de lá reconhece; quem sair
 #  daqui para lá também.
 #
 #  Convenção: dentro das funções usamos pacote::funcao() (ex.: dplyr::mutate)
@@ -102,7 +102,7 @@ tema_projeto <- function(tamanho_base = 12) {
 # cores_tratamento --------------------------------------------------------
 #
 # Paleta fixa para os níveis do tratamento, na identidade visual do
-# ecossistema EAPA (Ocean Gradient): as mesmas cores da CatalyseR e do livro,
+# ecossistema EAPA (Ocean Gradient): as mesmas cores da Trilha e do livro,
 # para que uma figura feita aqui pareça da mesma família. A ordem é sempre a
 # mesma, para que o nível "50" tenha a mesma cor em todas as figuras.
 #
@@ -197,7 +197,7 @@ formatar_p <- function(p, digitos = 3, no_texto = FALSE) {
 # O que faz: transforma um data.frame numa tabela pronta para o Word, no
 #            tema Ocean do ecossistema EAPA: cabeçalho azul-marinho com
 #            letras brancas, sem grade interna, primeira coluna à esquerda.
-#            É a mesma tabela que a CatalyseR põe no relatório dela. A
+#            É a mesma tabela que a Trilha põe no relatório dela. A
 #            função foi copiada do EAPADados para este projeto não depender
 #            de nada fora do CRAN (o flextable está no CRAN).
 #

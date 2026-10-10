@@ -44,13 +44,13 @@ here::i_am("R/analise.R")
 {{BIBLIOTECAS_PREPARO}}
 library(stringr)    # str_glue monta as frases dos relatórios
 # Dois pacotes do ecossistema EAPA, hospedados no GitHub (não estão no CRAN).
-# EAPADados: pacote complementar do ecossistema CatalyseR, com dados de
+# EAPADados: pacote complementar do ecossistema EAPA, com dados de
 # contexto da pesca e da aquicultura. Este projeto não o chama diretamente
 # (os dados vêm da planilha em dados/brutos/), mas ele é carregado por
 # compatibilidade com o ecossistema e exigido na instalação.
 if (!requireNamespace("EAPADados", quietly = TRUE)) {
   stop(
-    "Este projeto faz parte do ecossistema CatalyseR e pede o pacote ",
+    "Este projeto faz parte do ecossistema EAPA e pede o pacote ",
     "complementar EAPADados para compatibilidade, mas ele não está instalado.",
     " Instale uma vez, no console: remotes::install_github('astuciasnor/EAPADados')",
     call. = FALSE
@@ -78,7 +78,7 @@ rotulo_resposta <- {{ROTULO_RESPOSTA_R}}
 rotulo_grupo <- {{ROTULO_GRUPO_R}}
 nivel_confianca <- {{CONFIANCA}}
 alfa <- 1 - nivel_confianca
-# Mantemos a hipótese e a escolha Student/Welch registradas na CatalyseR.
+# Mantemos a hipótese e a escolha Student/Welch registradas na Trilha.
 alternativa <- {{ALTERNATIVA_R}}
 variancias_iguais <- {{VARIANCIAS_IGUAIS}}
 titulo_grafico <- {{TITULO_R}}

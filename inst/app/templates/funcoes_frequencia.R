@@ -1,7 +1,7 @@
 # =============================================================================
 # funcoes_frequencia.R
 # -----------------------------------------------------------------------------
-# Tabela de Distribuição de Frequência (dados discretos e contínuos) da CatalyseR.
+# Tabela de Distribuição de Frequência (dados discretos e contínuos) da Trilha.
 #
 # Arquitetura (fonte canônica única):
 #   calcular_freq()        -> executa a tabulação e devolve UMA lista canônica.

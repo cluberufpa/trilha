@@ -43,7 +43,7 @@ library(stringr)
 # EAPADados: dados de contexto da pesca e da aquicultura do curso.
 if (!requireNamespace("EAPADados", quietly = TRUE)) {
   stop(
-    "Este projeto faz parte do ecossistema CatalyseR e pede o pacote complementar EAPADados para compatibilidade, mas ele não está instalado.",
+    "Este projeto faz parte do ecossistema EAPA e pede o pacote complementar EAPADados para compatibilidade, mas ele não está instalado.",
     " Instale uma vez, no console: remotes::install_github('astuciasnor/EAPADados')",
     call. = FALSE
   )
@@ -223,7 +223,7 @@ tabela_descritiva_exibir <- tabela_descritiva |>
   mutate(across(c(Média, DP, Mínimo, Máximo), fmt))
 
 # 5. Ajustar a reta e extrair os resultados --------------------------------
-# lm ajusta Y ~ X por mínimos quadrados ordinários, como na CatalyseR.
+# lm ajusta Y ~ X por mínimos quadrados ordinários, como na Trilha.
 # reformulate() monta resposta ~ preditor a partir dos nomes definidos na
 # seção 2. Digite formula_modelo no console para ver a fórmula resultante.
 formula_modelo <- reformulate(variavel_preditor, response = variavel_resposta)

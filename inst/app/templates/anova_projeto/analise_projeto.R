@@ -45,7 +45,7 @@ library(pwr)
 # EAPADados: dados de contexto da pesca e da aquicultura do curso.
 if (!requireNamespace("EAPADados", quietly = TRUE)) {
   stop(
-    "Este projeto faz parte do ecossistema CatalyseR e pede o pacote complementar EAPADados para compatibilidade, mas ele não está instalado.",
+    "Este projeto faz parte do ecossistema EAPA e pede o pacote complementar EAPADados para compatibilidade, mas ele não está instalado.",
     " Instale uma vez, no console: remotes::install_github('astuciasnor/EAPADados')",
     call. = FALSE
   )
@@ -160,7 +160,7 @@ cores_grupos <- if (n_grupos <= length(cores_tratamento)) {
 # 4. Explorar os grupos -----------------------------------------------------
 # Compare tamanho, centro e dispersão da resposta entre os grupos.
 # group_by() separa a tabela em grupos; summarise() calcula uma linha por grupo.
-# O IC da média usa o t crítico com n - 1 graus de liberdade, como na CatalyseR.
+# O IC da média usa o t crítico com n - 1 graus de liberdade, como na Trilha.
 tabela_resumo <- base_anova |>
   group_by(grupo) |>
   summarise(
@@ -178,7 +178,7 @@ tabela_resumo <- base_anova |>
 # dispersões (dp) são parecidas: grupos muito diferentes pedem atenção.
 
 # 5. Ajustar a ANOVA e extrair os resultados --------------------------------
-# aov() ajusta o modelo resposta ~ grupo, como na CatalyseR. A ANOVA responde à
+# aov() ajusta o modelo resposta ~ grupo, como na Trilha. A ANOVA responde à
 # pergunta global: a média difere entre os grupos? Ainda não diz quais diferem.
 modelo_anova <- aov(resposta ~ grupo, data = base_anova)
 resumo_console <- summary(modelo_anova)

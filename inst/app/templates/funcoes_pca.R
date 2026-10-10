@@ -1,7 +1,7 @@
 # =============================================================================
 # funcoes_pca.R
 # -----------------------------------------------------------------------------
-# Motor da Análise de Componentes Principais (PCA / ACP) da CatalyseR.
+# Motor da Análise de Componentes Principais (PCA / ACP) da Trilha.
 # Adaptado do roteiro didático da curadoria (Multivariada_02_PCA), seguindo o
 # fluxo: correlações -> PCA padronizada (FactoMineR) -> retenção por três
 # critérios (Kaiser apenas como referência; bastão quebrado; permutação em

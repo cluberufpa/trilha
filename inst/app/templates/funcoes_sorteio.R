@@ -422,7 +422,7 @@ codigo_sorteio <- function(registro, arquivo_marco = "dados/marco_amostral.xlsx"
                       if (identical(registro$estagios, "dois")) c("estagios = \"dois\"", sprintf("m = %d", registro$m)))
   )
   c(
-    sprintf("# Sorteio feito na CatalyseR em %s. Rodar de novo devolve as mesmas unidades.", registro$data),
+    sprintf("# Sorteio feito na Trilha em %s. Rodar de novo devolve as mesmas unidades.", registro$data),
     "library(readxl)",
     "source(\"R/funcoes_sorteio.R\")",
     "",

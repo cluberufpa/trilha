@@ -2,7 +2,7 @@
 
 Uma planilha entra, um documento reúne a análise e dois formatos saem: o Word
 para o leitor e o caderno HTML para o pesquisador. Este projeto foi exportado
-pela CatalyseR e roda no RStudio com R, Quarto, `catalyser`, `EAPADados` e os
+pela Trilha e roda no RStudio com R, Quarto, `catalyser`, `EAPADados` e os
 pacotes de leitura, preparo e análise indicados no trecho `instalar` do script.
 
 ## Por onde começar
@@ -58,7 +58,7 @@ projeto/
 `{{ARQUIVO_ORIGEM}}`, em um Excel com uma aba. O arquivo original com todas
 as abas permanece com você. Preserve a entrada exportada como veio; o
 preparo fica registrado no código. **`dados/processados/`** guarda a base
-tratada exportada pela CatalyseR, em RDS e Excel. Esses arquivos são cópias da
+tratada exportada pela Trilha, em RDS e Excel. Esses arquivos são cópias da
 base no momento da exportação; editar o código não os atualiza automaticamente.
 O RDS preserva os tipos do R e fornece os dados ao relatório. Cada derivada
 utilizada também recebe seu RDS, identificado por `base_0001.rds`, por exemplo.
@@ -110,7 +110,7 @@ guarde-a nessa pasta e acrescente ao `.qmd`, por exemplo:
 ## O que conferir antes de compartilhar
 
 Compare o número de observações e os resultados com a análise registrada na
-CatalyseR. Os filtros, a tipagem e os tratamentos aparecem como código no
+Trilha. Os filtros, a tipagem e os tratamentos aparecem como código no
 preparo. O nível de confiança escolhido é exportado para os intervalos das
 médias e do Tukey; o critério dos testes e das letras permanece em 5%.
 

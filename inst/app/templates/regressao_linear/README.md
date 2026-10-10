@@ -1,6 +1,6 @@
 # {{TITULO}}
 
-Este Projeto R foi gerado pela CatalyseR para estudar e comunicar uma regressão
+Este Projeto R foi gerado pela Trilha para estudar e comunicar uma regressão
 linear simples. Abra **{{PROJETO_RPROJ}}** no RStudio. O projeto funciona com a
 base local, pacotes do CRAN e dois pacotes do ecossistema instalados do GitHub.
 
@@ -10,7 +10,7 @@ O arquivo `R/analise.R` mostra como a base preparada se transforma em modelo,
 diagnósticos, tabelas, gráficos e textos estatísticos. Os comentários explicam
 as decisões e as operações menos familiares. Execute as seções em ordem e
 examine os objetos indicados no começo do script. É o caminho do mouse ao código:
-quem começa pela CatalyseR encontra aqui a chance de entender o que a ferramenta
+quem começa pela Trilha encontra aqui a chance de entender o que a ferramenta
 faz e de modificar a análise com autonomia.
 
 ## O que você encontra
@@ -102,7 +102,7 @@ executar; se mover o arquivo para outra subpasta, atualize a declaração
 
 ## Dados e preparo
 
-A entrada preservada é `dados/brutos/{{ARQUIVO_BRUTO}}`. A CatalyseR exportou
+A entrada preservada é `dados/brutos/{{ARQUIVO_BRUTO}}`. A Trilha exportou
 a receita de preparo e a fotografia da base adotada. O script reconstrói o
 percurso e confere essa fotografia antes da análise. Alterar a receita não
 substitui silenciosamente a base adotada.
@@ -137,9 +137,9 @@ CSL correspondente em `relatorios/` e altere o caminho em `_quarto.yml`.
 ## Origem dos dados
 
 Registre aqui a origem da planilha, a licença e o período de coleta — a
-CatalyseR não conhece a proveniência dos seus dados e não a declara no lugar
+Trilha não conhece a proveniência dos seus dados e não a declara no lugar
 do pesquisador. A base preparada foi adotada a partir da importação e dos
-tratamentos registrados na CatalyseR. A planilha original fica em
+tratamentos registrados na Trilha. A planilha original fica em
 `dados/brutos/{{ARQUIVO_BRUTO}}` e não é alterada. O registro
 `saida/sessionInfo.txt` identifica o ambiente da execução.
 

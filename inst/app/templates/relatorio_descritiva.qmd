@@ -2,7 +2,7 @@
 title: "Relatório de análise: Estatística Descritiva"
 subtitle: "Resumo numérico e relato descritivo automatizado"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

@@ -1,10 +1,10 @@
 # {{TITULO}}
 
-Este Projeto R foi gerado pela CatalyseR para estudar e comunicar uma ANOVA de
+Este Projeto R foi gerado pela Trilha para estudar e comunicar uma ANOVA de
 um fator, escrita em **ClaRa**, o R escrito com clareza. Abra
 **{{PROJETO_RPROJ}}** no RStudio. O projeto funciona com a base local,
 pacotes do CRAN e o pacote `clara` (a ClaRa, versão {{VERSAO_CLARA}} na
-exportação); não precisa da CatalyseR instalada.
+exportação); não precisa da Trilha instalada.
 
 ## Um convite a aprender programação
 
@@ -97,11 +97,11 @@ Abra o `.Rproj` antes de executar.
 ## Dados e preparo
 
 A entrada preservada é `dados/{{ARQUIVO_BRUTO}}`, a única coisa na pasta
-`dados/`: com uma planilha só, não há subpastas. A CatalyseR exportou
+`dados/`: com uma planilha só, não há subpastas. A Trilha exportou
 a receita de preparo: a seção 3 do script a aplica à planilha, com pipe e
 dplyr, e o script e o relatório partem da base que ela produz. No lugar de
 uma cópia da base, o script traz um **carimbo**: o número de linhas, a
-contagem e a média por grupo que a CatalyseR mostrou na tela. Confira a
+contagem e a média por grupo que a Trilha mostrou na tela. Confira a
 tabela do R com o carimbo; se a receita mudar o número de linhas, o
 `stopifnot()` para o script e o Render. Para abrir a base fora do R, o
 script grava uma cópia em `saida/tabelas/base.csv`, refeita a cada execução:
@@ -116,7 +116,7 @@ A análise usa:
 ## Origem dos dados
 
 Registre aqui a origem da planilha, a licença e o período de coleta. A
-CatalyseR não conhece a proveniência dos seus dados e não a declara no lugar
+Trilha não conhece a proveniência dos seus dados e não a declara no lugar
 do pesquisador. A planilha original fica em `dados/{{ARQUIVO_BRUTO}}` e
 não é alterada.
 

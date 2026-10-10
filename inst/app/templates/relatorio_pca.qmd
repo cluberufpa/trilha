@@ -2,7 +2,7 @@
 title: "Relatório de Análise de Componentes Principais (PCA / ACP)"
 subtitle: "Redução de dimensionalidade e padrões multivariados"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

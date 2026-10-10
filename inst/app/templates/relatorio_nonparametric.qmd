@@ -2,7 +2,7 @@
 title: "Relatório de análise: testes não paramétricos"
 subtitle: "Qui-quadrado, Mann-Whitney, Wilcoxon e Kruskal-Wallis"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

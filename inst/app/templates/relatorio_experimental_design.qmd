@@ -2,7 +2,7 @@
 title: "Relatório de Planejamento Experimental"
 subtitle: "Geração de Croqui e Randomização de Tratamentos"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

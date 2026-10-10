@@ -11,7 +11,7 @@ Este projeto foi organizado para você acompanhar como a análise funciona: de
 onde vêm os dados, quais pressupostos são checados e como os resultados chegam
 ao relatório. Os comentários do script explicam cada decisão; os objetos com
 nomes claros permitem examinar etapa por etapa. É o caminho do mouse ao código:
-quem começa pela CatalyseR encontra aqui a chance de entender o que a ferramenta
+quem começa pela Trilha encontra aqui a chance de entender o que a ferramenta
 faz e de modificar a análise com autonomia.
 
 ## O que você encontra
@@ -136,9 +136,9 @@ CSL correspondente em `relatorios/` e altere o caminho em `_quarto.yml`.
 ## Origem dos dados
 
 Registre aqui a origem da planilha, a licença e o período de coleta — a
-CatalyseR não conhece a proveniência dos seus dados e não a declara no lugar
+Trilha não conhece a proveniência dos seus dados e não a declara no lugar
 do pesquisador. A base preparada foi adotada a partir da importação e dos
-tratamentos registrados na CatalyseR. A planilha original fica em
+tratamentos registrados na Trilha. A planilha original fica em
 `dados/brutos/{{ARQUIVO_BRUTO}}` e não é alterada. O registro
 `saida/sessionInfo.txt` identifica o ambiente da execução.
 

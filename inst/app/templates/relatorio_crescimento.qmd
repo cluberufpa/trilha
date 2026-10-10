@@ -2,7 +2,7 @@
 title: "Relatório de análise: Regressão Não Linear (Modelo de Crescimento)"
 subtitle: "Modelagem estatística e relato científico automatizado"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

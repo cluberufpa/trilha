@@ -2,7 +2,7 @@
 title: "Relatório de Análise: Agrupamento Hierárquico (AAH / HCA)"
 subtitle: "Classificação Multivariada e Perfis de Grupos"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt

@@ -1,7 +1,7 @@
 # =============================================================================
 # funcoes_anova.R
 # -----------------------------------------------------------------------------
-# Fonte canônica única da ANOVA de um fator na CatalyseR (V16).
+# Fonte canônica única da ANOVA de um fator na Trilha (V16).
 #
 # Arquitetura:
 #   anova_validar_entrada()        -> mensagem orientadora ou NULL.

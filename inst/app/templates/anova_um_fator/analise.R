@@ -72,7 +72,7 @@ arquivo <- here("dados", "brutos", {{PLANILHA_R}})
 
 excel_sheets(arquivo)
 
-# --- 2. Ler a aba escolhida na CatalyseR --------------------
+# --- 2. Ler a aba escolhida na Trilha --------------------
 dados_brutos <- read_excel(arquivo, sheet = {{ABA_R}})
 
 # ----------------------------------------------------------------------------|
@@ -92,7 +92,7 @@ glimpse(dados_brutos)
 # Casos sem resposta ou grupo preenchidos serão excluídos no preparo da
 # ANOVA. A planilha original nunca é alterada.
 
-# --- 1. Reproduzir as etapas salvas na CatalyseR -------------
+# --- 1. Reproduzir as etapas salvas na Trilha -------------
 
 {{PREPARO}}
 
@@ -331,7 +331,7 @@ eta2    <- fmt(eta_val)                # eta² formatado para o texto
 omega2  <- fmt(efeito_omega$Omega2[1])  # omega² formatado para o texto
 
 # --- 5. Classificar o efeito (convenção de Cohen para η²) ---
-# Referência estatística, não biológica, igual à tela da CatalyseR:
+# Referência estatística, não biológica, igual à tela da Trilha:
 # < 0,01 muito pequeno; < 0,06 pequeno; < 0,14 médio; daí em diante grande.
 classe_efeito <- dplyr::case_when(
   is.na(eta_val) ~ "indeterminado",
@@ -425,7 +425,7 @@ tabela_anova |>
 ## ---- fig-barras ----
 
 # Figura de barras: a média de cada grupo, com barra de erro (IC {{IC_PERCENTUAL}} %) e as
-# letras do teste de Tukey, no mesmo estilo da tela da CatalyseR.
+# letras do teste de Tukey, no mesmo estilo da tela da Trilha.
 
 ggplot(resumo, aes(x = {{FATOR_R}}, y = media, fill = {{FATOR_R}})) +
   # Barras: altura igual à média de cada grupo.
@@ -443,7 +443,7 @@ ggplot(resumo, aes(x = {{FATOR_R}}, y = media, fill = {{FATOR_R}})) +
   scale_x_discrete(expand = expansion(add = c(0.6, 0.9))) +
   scale_fill_manual(values = cores_grupos, guide = "none") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.12))) +
-  # Nomes dos eixos e título escolhidos na CatalyseR.
+  # Nomes dos eixos e título escolhidos na Trilha.
   labs(
     x = {{ROTULO_X_R}},
     y = {{ROTULO_Y_R}},

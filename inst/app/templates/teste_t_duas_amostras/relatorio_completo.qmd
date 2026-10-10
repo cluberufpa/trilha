@@ -52,7 +52,7 @@ delineamento da pesquisa.
 
 ## Dados e preparo
 
-A entrada preservada está em `dados/brutos/{{ARQUIVO_BRUTO}}`. A CatalyseR
+A entrada preservada está em `dados/brutos/{{ARQUIVO_BRUTO}}`. A Trilha
 registrou o preparo no início de `R/analise.R` e guardou a base adotada em
 `dados/processados/{{ARQUIVO_BASE}}`. O script reconstrói o percurso e usa a
 base adotada, impedindo mudanças silenciosas no Render.

@@ -73,7 +73,7 @@ if (any(vapply(base_regressao, function(x) length(unique(x)) < 2, logical(1)))) 
 # 3. Ajustar a reta ---------------------------------------------------------
 # Y ~ X diz: explicar a resposta a partir do preditor.
 modelo_lm <- lm({{FORMULA}}, data = base_regressao)
-# Veja o console cru uma vez para reconhecer a saída fora da CatalyseR.
+# Veja o console cru uma vez para reconhecer a saída fora da Trilha.
 summary(modelo_lm)
 # tidy: uma linha por coeficiente. glance: uma linha para o modelo inteiro.
 tabela_coeficientes <- broom::tidy(modelo_lm, conf.int = TRUE, conf.level = nivel_confianca)

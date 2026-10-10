@@ -2,7 +2,7 @@
 title: "Relatório de análise: teste *t* de Student"
 subtitle: "Comparação de médias e relato científico automatizado"
 author:
-  - "IDE CatalyseR"
+  - "Trilha"
 date: today
 date-format: "DD/MM/YYYY"
 lang: pt
