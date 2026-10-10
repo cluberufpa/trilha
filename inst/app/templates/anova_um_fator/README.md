@@ -2,7 +2,7 @@
 
 Uma planilha entra, um documento reúne a análise e dois formatos saem: o Word
 para o leitor e o caderno HTML para o pesquisador. Este projeto foi exportado
-pela Trilha e roda no RStudio com R, Quarto, `catalyser`, `EAPADados` e os
+pela Trilha e roda no RStudio com R, Quarto, `trilha`, `EAPADados` e os
 pacotes de leitura, preparo e análise indicados no trecho `instalar` do script.
 
 ## Por onde começar
