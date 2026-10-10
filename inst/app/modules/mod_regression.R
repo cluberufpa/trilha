@@ -1110,7 +1110,7 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
 
       # 1. Carregamento de Pacotes
       code <- c(
-        "# --- Código de Reprodutibilidade da IDE_R ---",
+        "# --- Código de Reprodutibilidade da Trilha ---",
         "library(ggplot2)",
         "library(readxl)",
         ""
@@ -1119,10 +1119,8 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
       # 2. Carregamento de Dados
       if (info$source == "package") {
         code <- c(code,
-          "# Carregar pacote e dataset",
-          "if (!requireNamespace('EAPADados', quietly = TRUE)) {",
-          "  install.packages('https://github.com/astuciasnor/EAPADados/releases/download/v0.1.1/EAPADados_0.1.1.zip', repos = NULL, type = 'win.binary')",
-          "}",
+          "# Carregar pacote e dataset. Se o EAPADados faltar, instale uma vez:",
+          "# remotes::install_github('astuciasnor/EAPADados')",
           "library(EAPADados)",
           sprintf("dados <- as.data.frame(%s)", info$package_dataset),
           ""

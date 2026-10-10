@@ -69,10 +69,11 @@ candidata, identificador obrigatório, demais colunas como atributos).
 - **Fica para depois:** sortear pontos dentro de uma área; sorteio embutido no
   Plano amostral de cada delineamento; validação da faixa dentro do Excel;
   leitura automática do dicionário ao importar a planilha de coleta.
-- **Legado a decidir:** `templates/funcoes_sampling.R` e
+- **Legado removido (10/10/2026):** `templates/funcoes_sampling.R` e
   `relatorio_sampling.qmd` (estimadores de média e total a partir de dados já
-  medidos) só são chamados pela exportação consolidada antiga, cujas abas
-  "Amostrando uma AAS/AE/AS" não existem mais no menu.
+  medidos) só eram chamados pela exportação consolidada antiga, cujas abas
+  "Amostrando uma AAS/AE/AS" não existiam mais no menu. Saíram junto com ela;
+  se os estimadores voltarem, o histórico do git guarda os dois arquivos.
 
 ## Delineamentos observacionais — primeiro recorte
 
