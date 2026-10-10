@@ -31,8 +31,7 @@ here::i_am("relatorios/relatorio.qmd")
 library(dplyr)
 library(ggplot2)
 library(readxl)
-source(here("R", "funcoes.R"), encoding = "UTF-8")
-source(here("R", "clara", "clara.R"), encoding = "UTF-8")
+library(clara)
 ```
 
 ```{r}
@@ -92,7 +91,8 @@ Para tirá-la, apague o chunk e o tabela_anova de escrever_resultados(). -->
 ```{r}
 #| label: tbl-anova
 #| tbl-cap: "{{TBL_ANOVA_CAP}}"
-{{TABELA_ANOVA}}
+resultado |>
+  exibir_teste()
 ```
 
 <!-- Tabela de médias ou figura: num artigo, fique com uma só (apague o
@@ -103,20 +103,11 @@ A @tbl-medias resume as médias e o desvio padrão de cada grupo. `r textos$comp
 ```{r}
 #| label: tbl-medias
 #| tbl-cap: "Média ± desvio padrão (DP) e intervalo de confiança (IC) da média em cada grupo."
-resultado$resumo |>
-  transmute({{ROTULO_FATOR_COL}} = {{FATOR_CLARA}},
-            n,
-            `Média ± DP` = paste(fmt(media, casas), "±", fmt(dp, casas)),
-            {{IC_COL}} = paste(fmt(ic_inf, casas), "a", fmt(ic_sup, casas))) |>
-  flextable_ocean() |>
-  # A letra do {{POS_TESTE}} sobrescrita à média, como nas revistas: 86,2 ± 3,1ᶜ.
-  flextable::compose(j = "Média ± DP",
-                     value = flextable::as_paragraph(
-                       `Média ± DP`, flextable::as_sup(resultado$resumo$letra))) |>
-  # A nota de rodapé, com o teste e o nível de significância.
-  flextable::add_footer_lines(textos$nota_tabela) |>
-  flextable::font(fontname = "Times New Roman", part = "footer") |>
-  flextable::fontsize(size = 9, part = "footer")
+# A letra do {{POS_TESTE}} sai sobrescrita à média, como nas revistas
+# (86,2 ± 3,1ᶜ), e a nota de rodapé diz o teste e o nível de significância.
+resultado |>
+  exibir_resumo(casas = casas,
+                nota  = textos$nota_tabela)
 ```
 
 A @fig-barras apresenta as médias dos grupos com seus intervalos e as letras

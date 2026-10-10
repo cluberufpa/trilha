@@ -2116,7 +2116,8 @@ exportacao_molde_projeto_script <- function(entrada, manifesto, nome_projeto,
          TRECHO_IMPORTAR = blocos$importar,
          TRECHO_PREPARO = blocos$preparo)
   )))
-  funcoes <- readLines(
+  # A rota ClaRa não leva R/funcoes.R: só o corpo do script conta.
+  funcoes <- if (isTRUE(entrada$clara)) character() else readLines(
     file.path(templates_dir, entrada$apoio %||% "regressao_linear", "funcoes.R"),
     encoding = "UTF-8", warn = FALSE
   )
@@ -2130,8 +2131,9 @@ exportacao_molde_projeto_script <- function(entrada, manifesto, nome_projeto,
   linhas
 }
 
-# Rota ClaRa: as bibliotecas que R/funcoes.R já chama com pacote:: saem da
-# seção 1 do roteiro, e a planilha é lida direto de dados/, sem subpasta.
+# Rota ClaRa: as bibliotecas que só aparecem como pacote:: (flextable,
+# lubridate) saem da seção 1 do roteiro, e a planilha é lida direto de
+# dados/, sem subpasta.
 exportacao_clara_ajustar_script <- function(linhas) {
   linhas <- gsub('here("dados", "brutos", ', 'here("dados", ', linhas, fixed = TRUE)
   linhas <- gsub("# Entrada: dados/brutos/", "# Entrada: dados/", linhas, fixed = TRUE)
@@ -2197,34 +2199,35 @@ exportacao_molde_pacotes_texto <- function(pacotes) {
   paste0("  ", saida)
 }
 
-# Versão da ClaRa que viaja no projeto, lida da porta de entrada (clara.R).
-exportacao_versao_clara <- function(templates_dir = "templates") {
-  linhas <- readLines(file.path(templates_dir, "clara", "clara.R"), encoding = "UTF-8", warn = FALSE)
-  versao <- sub('^versao_clara <- "([^"]+)".*$', "\\1", grep("^versao_clara <- ", linhas, value = TRUE))
-  if (length(versao)) versao[1] else "não registrada"
+# Versão da ClaRa com que a tela rodou e o projeto foi exportado: a do pacote
+# clara instalado, a mesma que o README pede ao pesquisador.
+exportacao_versao_clara <- function() {
+  as.character(utils::packageVersion("clara"))
 }
 
 # Metadados da máquina exportadora; o script registra novamente no Render.
 # A revisão só aparece quando é um commit do GitHub; um pacote do CRAN
-# aparece como CRAN. Na rota ClaRa, a ClaRa entra na tabela, logo abaixo do R.
-exportacao_ambiente_computacional <- function(pacotes, clara = NULL) {
+# aparece como CRAN. Na rota ClaRa, o pacote clara entra na tabela, logo
+# abaixo do R.
+exportacao_ambiente_computacional <- function(pacotes, clara = FALSE) {
   nomes <- sort(unique(c("trilha", "EAPADados", pacotes)))
-  linhas <- vapply(nomes, function(nome) {
+  linha_pacote <- function(nome, rotulo = nome) {
     descricao <- suppressWarnings(utils::packageDescription(nome))
-    if (!is.list(descricao)) return(paste("|", nome, "| não instalado | não registrado |"))
+    if (!is.list(descricao)) return(paste("|", rotulo, "| não instalado | não registrado |"))
     revisao <- descricao$RemoteSha %||% ""
     if (!grepl("^[0-9a-f]{7,40}$", revisao)) {
       revisao <- if (identical(descricao$Repository, "CRAN")) "CRAN" else "não registrada"
     }
-    paste("|", nome, "|", descricao$Version, "|", revisao, "|")
-  }, character(1))
+    paste("|", rotulo, "|", descricao$Version, "|", revisao, "|")
+  }
+  linhas <- vapply(setdiff(nomes, "clara"), linha_pacote, character(1))
   quarto <- Sys.getenv("QUARTO_PATH", unname(Sys.which("quarto")))
   versao <- if (nzchar(quarto) && file.exists(quarto)) {
     paste(system2(quarto, "--version", stdout = TRUE), collapse = " ")
   } else "não encontrado na exportação"
   c("| Componente | Versão | Origem ou revisão GitHub |", "|---|---|---|",
     paste("| R |", getRversion(), "| |"),
-    if (!is.null(clara)) paste("| ClaRa |", clara, "| cópia em `R/clara/` |"),
+    if (isTRUE(clara)) linha_pacote("clara", "ClaRa (pacote `clara`)"),
     paste("| Quarto |", versao, "| |"), linhas)
 }
 
@@ -2241,7 +2244,7 @@ exportacao_molde_projeto_readme <- function(entrada, manifesto, nome_projeto,
     entrada$marcadores_readme(item, nome_projeto, import_info),
     list(PACOTES_INSTALAR = exportacao_molde_pacotes_texto(pacotes),
          AMBIENTE_COMPUTACIONAL = exportacao_ambiente_computacional(pacotes,
-           clara = if (isTRUE(entrada$clara)) exportacao_versao_clara(templates_dir)))
+           clara = isTRUE(entrada$clara)))
   ))
 }
 
@@ -2379,8 +2382,9 @@ exportacao_anova_marcadores_readme <- function(item, nome_projeto, import_info) 
 
 # ---- ANOVA em ClaRa (opção experimental) ------------------------------------
 # A rota ClaRa escreve R/analise.R e o relatório com as funções da ClaRa
-# (templates/clara/), em vez do roteiro passo a passo. Vale para a ANOVA de
-# um fator nos três métodos da tela: clássica, Welch e automático. As outras
+# (o pacote clara, carregado com library(clara)), em vez do roteiro passo a
+# passo. Vale para a ANOVA de um fator nos três métodos da tela: clássica,
+# Welch e automático. As outras
 # situações continuam no molde da ANOVA, sem mudança.
 exportacao_anova_clara_aceita <- function(manifesto) {
   if (!isTRUE(manifesto$codigo_clara) || !isTRUE(exportacao_anova_simples(manifesto))) {
@@ -2467,21 +2471,12 @@ exportacao_anova_clara_marcadores <- function(item) {
   base <- exportacao_anova_marcadores_script(item)
   titulo_tela <- trimws(as.character(p$titulo_grafico %||% ""))
   base$TITULO_COMENTARIO <- toupper(if (nzchar(titulo_tela)) titulo_tela else "ANOVA de um fator")
-  rotulo_fator <- as.character(p$rotulo_x %||% "")
-  if (!nzchar(trimws(rotulo_fator))) rotulo_fator <- as.character(p$fator %||% "grupo")
   titulo <- as.character(p$titulo_grafico %||% "")
-  ic <- format(100 * (p$nivel_confianca %||% .95), trim = TRUE, decimal.mark = ",")
   larguras <- nchar(c(base$ROTULO_RESPOSTA_R, base$ROTULO_FATOR_R))
   alinhar <- strrep(" ", max(larguras) - larguras + 2L)
   c(base, list(
     RESPOSTA_CLARA = exportacao_nome_clara(p$resposta %||% "resposta"),
     FATOR_CLARA = exportacao_nome_clara(p$fator %||% "grupo"),
-    # Crases só quando o rótulo não é um nome simples do R: com espaço,
-    # símbolo ou acento ("Ração"), que depende da codificação da sessão.
-    ROTULO_FATOR_COL = if (identical(make.names(rotulo_fator), rotulo_fator) &&
-                           !grepl("[^A-Za-z0-9._]", rotulo_fator)) rotulo_fator else
-      paste0("`", gsub("`", "", rotulo_fator, fixed = TRUE), "`"),
-    IC_COL = paste0("`IC ", ic, "%`"),
     TITULO_CLARA = if (nzchar(trimws(titulo))) encodeString(titulo, quote = '"') else "NULL",
     # Espaços que alinham os dois comentários dos rótulos na mesma coluna.
     ESPACO_ROTULO_RESPOSTA = alinhar[1],
@@ -2532,36 +2527,19 @@ exportacao_anova_clara_marcadores_qmd <- function(item, manifesto, import_info) 
     marcadores,
     list(TRECHO_PREPARO_QMD = manifesto$clara$qmd,
          TITULO_RELATORIO = exportacao_anova_clara_titulo(item)),
-    exportacao_anova_clara_tabela_anova(marcadores$welch, marcadores$ROTULO_FATOR_R))
+    list(TBL_ANOVA_CAP = exportacao_anova_clara_legenda_anova(marcadores$welch)))
 }
 
-# A tabela da ANOVA no relatório. A de Welch não tem SQ nem QM, e o GL do
-# denominador tem casas decimais, por causa da correção de Welch.
-exportacao_anova_clara_tabela_anova <- function(welch, rotulo_fator) {
+# A legenda da tabela da ANOVA no relatório; a tabela sai de exibir_teste(),
+# da ClaRa. A de Welch não tem SQ nem QM, e o GL do denominador tem casas
+# decimais, por causa da correção de Welch.
+exportacao_anova_clara_legenda_anova <- function(welch) {
   if (isTRUE(welch)) {
-    return(list(
-      TBL_ANOVA_CAP = paste("ANOVA de Welch, que não supõe variâncias iguais.",
-                            "GL: graus de liberdade, com a correção de Welch no denominador."),
-      TABELA_ANOVA = c(
-        "resultado$anova |>",
-        sprintf('  transmute(Fonte = c(%s, "Resíduo"),', rotulo_fator),
-        "            GL    = c(fmt(gl[1], 0), fmt(gl[2], 2)),",
-        '            F     = ifelse(is.na(f), "", fmt(f)),',
-        '            p     = ifelse(is.na(p), "", formatar_p(p))) |>',
-        "  flextable_ocean()")))
+    return(paste("ANOVA de Welch, que não supõe variâncias iguais.",
+                 "GL: graus de liberdade, com a correção de Welch no denominador."))
   }
-  list(
-    TBL_ANOVA_CAP = paste("Análise de variância de um fator. GL: graus de liberdade;",
-                          "SQ: soma de quadrados; QM: quadrado médio."),
-    TABELA_ANOVA = c(
-      "resultado$anova |>",
-      sprintf('  transmute(Fonte = c(%s, "Resíduo"),', rotulo_fator),
-      "            GL    = gl,",
-      "            SQ    = fmt(sq),",
-      "            QM    = fmt(qm),",
-      '            F     = ifelse(is.na(f), "", fmt(f)),',
-      '            p     = ifelse(is.na(p), "", formatar_p(p))) |>',
-      "  flextable_ocean()"))
+  paste("Análise de variância de um fator. GL: graus de liberdade;",
+        "SQ: soma de quadrados; QM: quadrado médio.")
 }
 
 exportacao_anova_clara_marcadores_readme <- function(item, nome_projeto, import_info) {
@@ -2572,14 +2550,16 @@ exportacao_anova_clara_marcadores_readme <- function(item, nome_projeto, import_
   valores$ARQUIVO_BRUTO_ARVORE <- formatC(valores$ARQUIVO_BRUTO,
     width = -max(27L, nchar(valores$ARQUIVO_BRUTO) + 2L))
   metodo <- exportacao_anova_clara_textos_metodo(item)
-  c(valores, metodo[c("POS_TESTE", "ARQUIVO_PARES_CSV", "METODO_README")])
+  c(valores, metodo[c("POS_TESTE", "ARQUIVO_PARES_CSV", "METODO_README")],
+    list(VERSAO_CLARA = exportacao_versao_clara()))
 }
 
-# R/funcoes.R da rota ClaRa: só as funções que o script e o relatório chamam
-# (e as que elas usam, como fmt() dentro de formatar_p()). Cada função sai do
-# arquivo de apoio com os comentários logo acima dela; moda() e
-# converter_datas() só entram quando a receita de preparo as usa.
-exportacao_clara_funcoes <- function(funcoes, codigo) {
+# Funções auxiliares da receita, na rota ClaRa. O projeto não leva R/funcoes.R:
+# quando a receita de preparo usa moda() (imputar a moda) ou converter_datas(),
+# a definição delas entra no próprio roteiro, logo antes da receita, copiada
+# do arquivo de apoio com os comentários de cima. Sem essas chamadas, não
+# entra nada.
+exportacao_clara_auxiliares <- function(funcoes, codigo) {
   expressoes <- parse(text = funcoes, keep.source = TRUE)
   posicoes <- attr(expressoes, "srcref")
   blocos <- list()
@@ -2587,52 +2567,23 @@ exportacao_clara_funcoes <- function(funcoes, codigo) {
     x <- expressoes[[i]]
     if (!is.call(x) || !identical(x[[1]], as.name("<-")) || !is.symbol(x[[2]]) ||
         !is.call(x[[3]]) || !identical(x[[3]][[1]], as.name("function"))) next
+    nome <- as.character(x[[2]])
+    if (!is.element(nome, c("moda", "converter_datas"))) next
     inicio <- posicoes[[i]][1]
     fim <- posicoes[[i]][3]
     # Os comentários colados acima da função (até a linha em branco) vão junto.
     while (inicio > 1L && grepl("^#", funcoes[inicio - 1L]) &&
            !grepl("^# ([0-9]+[.] |=)", funcoes[inicio - 1L])) inicio <- inicio - 1L
-    blocos[[as.character(x[[2]])]] <- funcoes[inicio:fim]
+    blocos[[nome]] <- funcoes[inicio:fim]
   }
-  chamadas <- function(texto) {
-    names(blocos)[vapply(names(blocos), function(nome)
-      any(grepl(paste0("(^|[^A-Za-z0-9._])", nome, "\\("), texto)), logical(1))]
-  }
-  manter <- chamadas(codigo)
-  repeat {
-    novas <- setdiff(chamadas(unlist(blocos[manter], use.names = FALSE)), manter)
-    if (!length(novas)) break
-    manter <- c(manter, novas)
-  }
-  manter <- intersect(names(blocos), manter)
-  apresentacao <- intersect(manter, c("fmt", "formatar_p", "tema_projeto", "flextable_ocean"))
-  preparo <- setdiff(manter, apresentacao)
-  lista <- function(nomes) paste0(paste0(nomes, "()"), collapse = ", ")
-  secao <- function(titulo, nomes) {
-    if (!length(nomes)) return(character())
-    c("", "", sprintf("# %s %s", titulo, strrep("-", 75L - nchar(titulo))), "",
-      unlist(lapply(nomes, function(nome) c(blocos[[nome]], "")), use.names = FALSE))
-  }
-  c("# =============================================================================",
-    "#  FUNÇÕES PRÓPRIAS DO PROJETO",
-    "# =============================================================================",
-    "#",
-    "#  Este arquivo só DEFINE funções; ele não executa nada sozinho. O script",
-    "#  (R/analise.R) e o relatório (relatorios/relatorio.qmd) o carregam com:",
-    "#",
-    "#      source(here(\"R\", \"funcoes.R\"), encoding = \"UTF-8\")",
-    "#",
-    "#  Seções deste arquivo (Ctrl+Shift+O no RStudio mostra o sumário):",
-    if (length(apresentacao)) sprintf("#    1. Apresentação ...... %s", lista(apresentacao)),
-    if (length(preparo)) sprintf("#    %d. Preparo ........... %s",
-                                 1L + as.integer(length(apresentacao) > 0L), lista(preparo)),
-    "#",
-    "#  Só estão aqui as funções que este projeto usa. Dentro delas usamos",
-    "#  pacote::funcao() (ex.: flextable::flextable) em vez de library(): assim",
-    "#  a função funciona mesmo que o pacote não tenha sido carregado.",
-    "# =============================================================================",
-    secao("1. Apresentação", apresentacao),
-    secao(sprintf("%d. Preparo", 1L + as.integer(length(apresentacao) > 0L)), preparo))
+  codigo <- sub("#.*$", "", codigo)
+  usadas <- names(blocos)[vapply(names(blocos), function(nome)
+    any(grepl(paste0("(^|[^A-Za-z0-9._])", nome, "[(]"), codigo)), logical(1))]
+  if (!length(usadas)) return(character())
+  c(sprintf("# A receita usa %s, que não vem de pacote: a definição fica aqui.",
+            paste0(paste0(usadas, "()"), collapse = " e ")),
+    "",
+    unlist(lapply(usadas, function(nome) c(blocos[[nome]], "")), use.names = FALSE))
 }
 
 # Seção 2 do roteiro em ClaRa: a planilha fica como o read_excel() a entrega,
@@ -3869,6 +3820,18 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
   if (isTRUE(molde$clara)) {
     manifesto$clara <- exportacao_clara_receita(manifesto, import_info, pipeline,
       registro_bases, base_externa, dados_analise, cache_bases)
+    # Sem R/funcoes.R no projeto, moda() e converter_datas(), quando a
+    # receita as usa, ficam definidas no roteiro e no relatório.
+    auxiliares <- exportacao_clara_auxiliares(
+      readLines(file.path(templates_dir, molde$apoio %||% "regressao_linear", "funcoes.R"),
+                encoding = "UTF-8", warn = FALSE),
+      exportacao_sanitizar_molde(manifesto$clara$script))
+    if (length(auxiliares)) {
+      manifesto$clara$script <- c(auxiliares, manifesto$clara$script)
+      qmd <- manifesto$clara$qmd
+      manifesto$clara$qmd <- c(qmd[1],
+        auxiliares[nzchar(trimws(auxiliares)) & !grepl("^\\s*#", auxiliares)], qmd[-1])
+    }
   }
   anova_nova <- !is.null(molde) && identical(molde$tipo, "anova_um_fator")
 
@@ -4007,12 +3970,16 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
   if (!is.null(molde)) {
     # Os arquivos de apoio (funções de apresentação, estilo APA e _quarto.yml
     # que renderiza os dois QMDs) são os da pasta de apoio da entrada do
-    # registro; as três análises migradas compartilham os da regressão.
+    # registro; as três análises migradas compartilham os da regressão. A
+    # rota ClaRa não leva R/funcoes.R: as tabelas e os números vêm da ClaRa
+    # (library(clara)).
     apoio <- file.path(templates_dir, molde$apoio %||% "regressao_linear")
-    file.copy(
-      file.path(apoio, "funcoes.R"),
-      file.path(projeto, "R", "funcoes.R"), overwrite = TRUE
-    )
+    if (!isTRUE(molde$clara)) {
+      file.copy(
+        file.path(apoio, "funcoes.R"),
+        file.path(projeto, "R", "funcoes.R"), overwrite = TRUE
+      )
+    }
     file.copy(
       file.path(apoio, "apa.csl"),
       file.path(projeto, "relatorios", "apa.csl"), overwrite = TRUE
@@ -4025,17 +3992,6 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
     proprio <- file.path(templates_dir, molde$pasta, "_quarto.yml")
     if (file.exists(proprio)) file.copy(proprio, file.path(projeto, "_quarto.yml"), overwrite = TRUE)
   }
-  # Rota ClaRa: o projeto leva a sua cópia da ClaRa em R/, ao lado do script.
-  if (isTRUE(molde$clara)) {
-    arquivos_clara <- list.files(file.path(templates_dir, "clara"),
-                                 pattern = "^clara.*[.]R$", full.names = TRUE)
-    if (!length(arquivos_clara)) stop("Os arquivos da ClaRa não foram encontrados.", call. = FALSE)
-    # A ClaRa fica numa pasta própria, R/clara/: em R/ o aluno vê só o seu
-    # roteiro (analise.R) e as funções de apresentação (funcoes.R).
-    dir.create(file.path(projeto, "R", "clara"), showWarnings = FALSE)
-    file.copy(arquivos_clara, file.path(projeto, "R", "clara"), overwrite = TRUE)
-  }
-
   if (exportacao_anova_simples(manifesto) && !anova_nova) {
     # A ANOVA mantém seus ajudantes de apresentação e recebe a mesma ligação
     # script -> relatório do exportador geral, sem uma segunda implementação.
@@ -4070,36 +4026,19 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
         file.path(projeto, "relatorios", documentos[[arquivo]]), useBytes = TRUE
       )
     }
-    funcoes_molde <- file.path(templates_dir, molde$apoio %||% "regressao_linear", "funcoes.R")
-    # Rota ClaRa: R/funcoes.R só com o que o script e o relatório chamam.
-    if (isTRUE(molde$clara)) {
-      codigo_projeto <- c(linhas_script, unlist(lapply(
-        file.path(projeto, "relatorios", documentos),
-        readLines, encoding = "UTF-8", warn = FALSE), use.names = FALSE))
-      funcoes_molde <- file.path(projeto, "R", "funcoes.R")
-      writeLines(exportacao_clara_funcoes(
-        readLines(funcoes_molde, encoding = "UTF-8", warn = FALSE), codigo_projeto),
-        funcoes_molde, useBytes = TRUE)
-    }
     # A lista exata de pacotes do projeto (script + funções) alimenta o
     # install.packages() do README, para bater com o que o Render vai usar.
-    # trilha e EAPADados ficam de fora: são instalados do GitHub, nas
-    # linhas seguintes do README, com remotes.
+    # trilha, EAPADados e clara ficam de fora: são instalados do GitHub, nas
+    # linhas seguintes do README, com remotes. Na rota ClaRa não há
+    # R/funcoes.R, e os pacotes de que a ClaRa precisa vêm com ela.
+    funcoes_molde <- if (isTRUE(molde$clara)) character() else
+      readLines(file.path(templates_dir, molde$apoio %||% "regressao_linear", "funcoes.R"),
+                encoding = "UTF-8", warn = FALSE)
     pacotes_projeto <- setdiff(
-      exportacao_molde_pacotes(c(
-        linhas_script,
-        readLines(funcoes_molde, encoding = "UTF-8", warn = FALSE)
-      )),
-      c("trilha", "EAPADados", "remotes")
+      exportacao_molde_pacotes(c(linhas_script, funcoes_molde)),
+      c("trilha", "EAPADados", "clara", "remotes")
     )
-    # A ClaRa carrega os seus pacotes ao rodar cada análise; eles entram na
-    # lista de instalação do README. Só do CRAN: a rota ClaRa dispensa remotes.
-    if (isTRUE(molde$clara)) {
-      pacotes_projeto <- sort(union(pacotes_projeto, c("dplyr", "ggplot2", "broom", "car",
-        "multcompView", "effectsize", "rlang", "stringr", "pwr")))
-    } else {
-      pacotes_projeto <- sort(c(pacotes_projeto, "remotes"))
-    }
+    pacotes_projeto <- sort(c(pacotes_projeto, "remotes"))
   } else {
     writeLines(
       exportacao_gerar_script(

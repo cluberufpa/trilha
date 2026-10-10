@@ -1,8 +1,7 @@
 # Execute de inst/app. Confere a opção experimental "código em ClaRa" do
-# Projeto R da ANOVA de um fator: a árvore leva a ClaRa em R/clara/, o script
-# e o relatório (um só QMD, o Word) usam as funções da ClaRa, cada um roda em
-# sessão nova e reproduz
-# os números da ANOVA. Confere também que, sem a opção, o projeto continua
+# Projeto R da ANOVA de um fator: o script e o relatório (um só QMD, o Word)
+# carregam o pacote clara com library(clara), sem cópia da ClaRa nem
+# R/funcoes.R; cada um roda em sessão nova e reproduz os números da ANOVA. Confere também que, sem a opção, o projeto continua
 # saindo pelo molde atual, e que Welch e automático também saem em ClaRa,
 # com variancias_iguais escrito no script.
 grDevices::pdf(NULL)
@@ -55,14 +54,12 @@ projeto <- exportacao_criar_projeto(destino = destino, nome_projeto = "anova_cla
   import_info = list(source = "package", package_dataset = "isoproteica_bagre"),
   templates_dir = "templates")
 
-# Árvore: a ClaRa inteira em R/, ao lado do script e das funções de apresentação.
+# Árvore: em R/, só o roteiro. A ClaRa é o pacote instalado, e as tabelas e os
+# números vêm dela: nem R/clara/ nem R/funcoes.R.
 script <- file.path(projeto, "R", "analise.R")
 documentos <- "relatorio.qmd"
-arquivos_clara <- c("clara.R", "clara_medias.R", "clara_medianas.R",
-                    "clara_qualquer_analise.R", "clara_motor.R")
 stopifnot(file.exists(script),
-  file.exists(file.path(projeto, "R", "funcoes.R")),
-  all(file.exists(file.path(projeto, "R", "clara", arquivos_clara))),
+  identical(list.files(file.path(projeto, "R"), all.files = TRUE, no.. = TRUE), "analise.R"),
   file.exists(file.path(projeto, "_quarto.yml")),
   all(file.exists(file.path(projeto, "relatorios", documentos))))
 
@@ -71,17 +68,25 @@ stopifnot(file.exists(script),
 linhas_script <- readLines(script, encoding = "UTF-8")
 readme <- readLines(file.path(projeto, "README.md"), encoding = "UTF-8")
 stopifnot(!any(grepl("{{", c(linhas_script, readme), fixed = TRUE)),
-  sum(grepl('source(here("R", "clara", "clara.R"), encoding = "UTF-8")', linhas_script, fixed = TRUE)) == 1L,
+  sum(grepl("^library[(]clara[)]", linhas_script)) == 1L,
+  !any(grepl("source(", linhas_script, fixed = TRUE)),
   any(grepl("resposta          = peso_g,", linhas_script, fixed = TRUE)),
   any(grepl("variancias_iguais = TRUE)  # TRUE: ANOVA clássica; FALSE: ANOVA de Welch", linhas_script, fixed = TRUE)),
   any(grepl("grupos            = racao,", linhas_script, fixed = TRUE)),
   any(grepl("grafico_medias(titulo           = NULL,", linhas_script, fixed = TRUE)),
   any(grepl("escrever_resultados(casas    = 1,", linhas_script, fixed = TRUE)),
-  any(grepl('"multcompView"', readme, fixed = TRUE)),
-  any(grepl('"effectsize"', readme, fixed = TRUE)),
-  # Só CRAN: sem trilha, EAPADados nem instalação pelo GitHub.
+  # Os pacotes da ClaRa vêm com ela: o install.packages() do README leva só
+  # os do script, mais o remotes, que instala a ClaRa do GitHub.
+  !any(grepl('"multcompView"|"effectsize"', readme)),
+  any(grepl('"readxl"', readme, fixed = TRUE)),
+  any(grepl('"remotes"', readme, fixed = TRUE)),
+  # Só CRAN e a clara: sem trilha nem EAPADados.
   !any(grepl("catalyser|trilha|EAPADados", linhas_script)),
-  !any(grepl("install_github|\"remotes\"", readme)),
+  identical(grep("install_github", readme, value = TRUE),
+            'remotes::install_github("cluberufpa/ClaRa")'),
+  # O README diz a versão da clara usada na exportação.
+  sum(grepl(paste0("ClaRa ", as.character(packageVersion("clara")), "[.]"), readme)) == 1L,
+  !any(grepl("R/clara|funcoes[.]R", readme)),
   # Receita e carimbo no lugar da fotografia: nada de .rds no projeto.
   !any(grepl("readRDS|all.equal", linhas_script)),
   # dados/ guarda só a planilha, sem subpastas.
@@ -101,7 +106,12 @@ for (documento in documentos) {
     any(grepl("read_excel(here(\"dados\", \"isoproteica_bagre.xlsx\")", qmd, fixed = TRUE)),
     any(grepl("stopifnot(nrow(base) == 19L)", qmd, fixed = TRUE)),
     any(grepl("comparar_medias(resposta          = peso_g,", qmd, fixed = TRUE)),
-    any(grepl("transmute(`Ração` = racao,", qmd, fixed = TRUE)),
+    # library(clara), e as duas tabelas pelas funções exibir_* da ClaRa.
+    sum(qmd == "library(clara)") == 1L,
+    !any(grepl("source[(]|fmt[(]|formatar_p[(]|flextable", qmd)),
+    any(qmd == "  exibir_teste()"),
+    any(qmd == "  exibir_resumo(casas = casas,"),
+    any(qmd == "                nota  = textos$nota_tabela)"),
     any(grepl("`r textos$teste`", qmd, fixed = TRUE)))
 }
 
@@ -198,24 +208,22 @@ stopifnot(identical(list.files(file.path(projeto, "relatorios"), pattern = "[.]q
   !any(grepl("^# Entrada: ", linhas_script)),
   !any(!nzchar(head(linhas_script, -1)) & !nzchar(linhas_script[-1])),
   # README: a ClaRa na tabela do ambiente e o install.packages recuado.
-  any(grepl("^\\| ClaRa \\| [0-9.]+ \\|", readme)),
-  any(grepl('^  c\\("broom"', readme)))
+  any(grepl("^\\| ClaRa \\(pacote `clara`\\) \\| [0-9.]+ \\|", readme)),
+  any(grepl('^  c\\("dplyr"', readme)))
 
-# R/funcoes.R só com o que o projeto chama: sem moda(), converter_datas()
-# nem tema_projeto(), que este projeto não usa.
-funcoes <- readLines(file.path(projeto, "R", "funcoes.R"), encoding = "UTF-8")
-definidas <- sub(" <- function.*$", "", grep("^[a-z_]+ <- function", funcoes, value = TRUE))
-stopifnot(identical(sort(definidas), c("flextable_ocean", "fmt", "formatar_p")),
-  !any(grepl("lubridate", c(funcoes, readme), fixed = TRUE)),
-  any(grepl("1. Apresentação ...... fmt(), formatar_p(), flextable_ocean()", funcoes, fixed = TRUE)))
-# Com moda() na receita, ela entra numa seção de preparo.
-com_moda <- exportacao_clara_funcoes(
-  readLines(file.path("templates", "regressao_linear", "funcoes.R"), encoding = "UTF-8"),
-  c("base <- dados_brutos |>", "  mutate(peso_g = coalesce(peso_g, moda(peso_g)))",
-    "fmt(1)"))
-stopifnot(identical(sort(sub(" <- function.*$", "", grep("^[a-z_]+ <- function", com_moda, value = TRUE))),
-                    c("fmt", "moda")),
-  any(grepl("^# 2[.] Preparo -+$", com_moda)))
+# Sem moda() nem converter_datas() na receita, o roteiro não define função
+# nenhuma, e o lubridate não entra.
+stopifnot(!any(grepl("<- function", c(linhas_script, relatorio), fixed = TRUE)),
+  !any(grepl("lubridate", c(linhas_script, readme), fixed = TRUE)))
+# Com moda() na receita, só ela é definida, antes da receita; fmt() não vem.
+apoio <- readLines(file.path("templates", "regressao_linear", "funcoes.R"), encoding = "UTF-8")
+com_moda <- exportacao_clara_auxiliares(apoio,
+  c("base <- dados_brutos |>", "  mutate(peso_g = replace(peso_g, is.na(peso_g), moda(peso_g)))",
+    "# fmt(1) e converter_datas() num comentário não contam"))
+stopifnot(identical(sub(" <- function.*$", "", grep("^[a-z_]+ <- function", com_moda, value = TRUE)),
+                    "moda"),
+  grepl("moda()", com_moda[1], fixed = TRUE),
+  identical(exportacao_clara_auxiliares(apoio, "base <- dados_brutos"), character()))
 
 # Render, quando houver Quarto: só o Word, sem as mensagens de carga dos
 # pacotes.
@@ -254,7 +262,7 @@ stopifnot(file.exists(file.path(projeto, "saida", "tabelas", "resumo_grupos.csv"
   any(grepl("^salvar_tabelas[(]base += base,", linhas_script)),
   any(grepl("^salvar_figuras[(]barras += grafico_barras,", linhas_script)),
   !any(grepl("^for [(]|dir.create|write.csv2|ggsave", linhas_script)),
-  any(grepl(paste("ClaRa", exportacao_versao_clara("templates")),
+  any(grepl(paste("ClaRa", exportacao_versao_clara()),
              readLines(file.path(projeto, "saida", "sessionInfo.txt"), n = 1))))
 
 # Segundo caso: operação estrutural (renomear), trilha (reescalar) e um ramo
@@ -368,6 +376,51 @@ for (i in seq_along(entradas_welch)) {
     grepl("Games-Howell", obtido$textos$comparacoes, fixed = TRUE))
 }
 
+# Quarto caso: a trilha imputa a moda no peso que falta. Sem R/funcoes.R, a
+# definição de moda() vai para o roteiro e para o relatório, e o roteiro roda
+# em sessão nova com as 19 linhas.
+trilha_moda <- list(list(tipo = "tratar_na", ativa = TRUE,
+                         params = list(coluna = "peso_g", metodo = "moda")))
+# Uma moda clara (112 duas vezes): com empate, trat_moda() e moda() escolhem
+# valores diferentes, e a conferência do exportador para a exportação.
+brutos_moda <- brutos
+brutos_moda$peso_g[4] <- 112
+com_moda_base <- replay_pipeline(brutos_moda, trilha_moda)$df
+item_moda <- list(id = "execucao_0001", tipo = "anova_um_fator", titulo = "Peso de tilápias",
+  incluir_word = TRUE, estado_dependencia = "Atualizada", base_tipo = "compartilhada",
+  base_id = "dados_analise", base_objeto = "dados_analise",
+  parametros = list(resposta = "peso_g", fator = "tratamento", nivel_confianca = .95, metodo = "classica"))
+manifesto_moda <- list(execucoes = list(execucao_0001 = item_moda), secoes_globais = list(),
+                       codigo_clara = TRUE)
+projeto_moda <- exportacao_criar_projeto(destino = destino, nome_projeto = "tilapias_moda",
+  dados_brutos = brutos_moda, base_resolvida = brutos_moda, dados_analise = com_moda_base,
+  pipeline = trilha_moda, base_externa = NULL, registro_bases = list(), cache_bases = list(),
+  registro_execucoes = manifesto_moda$execucoes, manifesto = manifesto_moda, revisao_origem = 1L,
+  import_info = list(source = "package", package_dataset = "tilapias_teste"),
+  templates_dir = "templates")
+script_moda <- readLines(file.path(projeto_moda, "R", "analise.R"), encoding = "UTF-8")
+relatorio_moda <- readLines(file.path(projeto_moda, "relatorios", "relatorio.qmd"), encoding = "UTF-8")
+stopifnot(!file.exists(file.path(projeto_moda, "R", "funcoes.R")),
+  sum(grepl("^moda <- function", script_moda)) == 1L,
+  sum(grepl("^moda <- function", relatorio_moda)) == 1L,
+  which(grepl("^moda <- function", script_moda)) < which(script_moda == "base <- dados_brutos |>"),
+  any(grepl("moda(peso_g)", script_moda, fixed = TRUE)))
+verificador <- file.path(destino, "validar_moda.R")
+saida_rds <- file.path(destino, "resultado_moda.rds")
+log <- file.path(destino, "execucao_moda.log")
+writeLines(c(
+  sprintf("setwd(%s)", literal(projeto_moda)),
+  "grDevices::pdf(NULL)",
+  sprintf("source(%s, encoding = 'UTF-8')", literal(file.path(projeto_moda, "R", "analise.R"))),
+  sprintf("saveRDS(list(n = nrow(base), medias = resultado$resumo$media), %s)", literal(saida_rds))
+), verificador, useBytes = TRUE)
+status <- system2(file.path(R.home("bin"), if (.Platform$OS.type == "windows") "Rscript.exe" else "Rscript"),
+  shQuote(verificador), stdout = log, stderr = log)
+if (status != 0L) stop(paste(readLines(log, warn = FALSE), collapse = "\n"))
+obtido <- readRDS(saida_rds)
+stopifnot(obtido$n == 19L, isTRUE(all.equal(obtido$medias,
+  as.numeric(tapply(com_moda_base$peso_g, factor(com_moda_base$tratamento), mean)))))
+
 # Sem %in% na rota ClaRa: is.element() e um comentário que diz o que fica.
 sem_in <- exportacao_clara_sem_in(c(
   "base_compartilhada <- dados_brutos |>",
@@ -384,5 +437,5 @@ sem_in_solta <- exportacao_clara_sem_in(c("# Níveis escolhidos na importação"
 stopifnot(length(sem_in_solta) == 3L, sem_in_solta[1] == "# Níveis escolhidos na importação",
   sem_in_solta[2] == "# Ficam só as linhas em que especie é \"tambaqui\"; as demais saem.")
 
-cat("OK: rota ClaRa escolhida com a opção, na clássica, no Welch e no automático; ClaRa copiada em R/clara/; script e o relatório Word em ClaRa, sem marcadores, cada um em sessão nova, com a ANOVA e o Tukey reproduzidos.\n")
+cat("OK: rota ClaRa escolhida com a opção, na clássica, no Welch e no automático; library(clara), sem R/clara/ nem R/funcoes.R; script e o relatório Word em ClaRa, sem marcadores, cada um em sessão nova, com a ANOVA e o Tukey reproduzidos.\n")
 cat("PROJETO:", projeto, "\n")

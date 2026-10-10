@@ -2,8 +2,9 @@
 
 Este Projeto R foi gerado pela CatalyseR para estudar e comunicar uma ANOVA de
 um fator, escrita em **ClaRa**, o R escrito com clareza. Abra
-**{{PROJETO_RPROJ}}** no RStudio. O projeto funciona com a base local e
-pacotes do CRAN; não precisa da CatalyseR instalada.
+**{{PROJETO_RPROJ}}** no RStudio. O projeto funciona com a base local,
+pacotes do CRAN e o pacote `clara` (a ClaRa, versão {{VERSAO_CLARA}} na
+exportação); não precisa da CatalyseR instalada.
 
 ## Um convite a aprender programação
 
@@ -24,10 +25,7 @@ código mostrado é exatamente o que rodou. Para entender uma função, digite
 ├── dados/
 │   └── {{ARQUIVO_BRUTO_ARVORE}}a planilha, entrada preservada
 ├── R/
-│   ├── analise.R                  o roteiro da análise, em ClaRa
-│   ├── funcoes.R                  apresentação de números e tabelas
-│   └── clara/                     a ClaRa: clara.R, a porta de entrada, e um
-│                                  arquivo clara_*.R por pergunta
+│   └── analise.R                  o roteiro da análise, em ClaRa
 ├── imagens/                       fotos e esquemas fornecidos pelo pesquisador
 ├── relatorios/
 │   ├── relatorio.qmd              o relatório, que vira Word
@@ -67,6 +65,17 @@ install.packages(
 {{PACOTES_INSTALAR}}
 )
 ```
+
+Depois, instale a ClaRa. Enquanto ela não estiver no CRAN, vem do GitHub
+(os pacotes de que ela precisa vêm junto, todos do CRAN):
+
+```r
+remotes::install_github("cluberufpa/ClaRa")
+```
+
+Este projeto foi exportado com a ClaRa {{VERSAO_CLARA}}. Para conferir a sua,
+rode `packageVersion("clara")`; se for mais antiga, repita a linha acima.
+Quando a ClaRa entrar no CRAN, bastará `install.packages("clara")`.
 
 Nenhum pacote é instalado automaticamente durante a análise.
 
@@ -139,6 +148,6 @@ Ambiente registrado automaticamente na exportação:
 {{AMBIENTE_COMPUTACIONAL}}
 
 Ao executar, o script registra o ambiente efetivo em `saida/sessionInfo.txt`,
-com a versão da ClaRa. Este projeto leva a sua própria cópia da ClaRa em
-`R/clara/`; projetos exportados em datas diferentes podem ter versões
-diferentes dela.
+com a versão da ClaRa que rodou. A ClaRa é um pacote instalado uma vez no
+computador, como os do CRAN: todos os projetos usam a mesma versão, e uma
+atualização vale para todos.
