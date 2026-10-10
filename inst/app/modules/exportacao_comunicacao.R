@@ -2391,6 +2391,12 @@ exportacao_anova_clara_aceita <- function(manifesto) {
     return(FALSE)
   }
   item <- exportacao_execucoes_incluidas(manifesto)[[1]]
+  # Com dois grupos, comparar_medias() faz o teste t, e o molde da rota ClaRa
+  # é o da ANOVA (tabela da ANOVA, letras, figura dos pares). Até o teste t
+  # ganhar a sua rota ClaRa, esse caso sai pelo molde da ANOVA, que dá o
+  # mesmo p. Execuções sem a contagem registrada seguem na rota ClaRa.
+  grupos <- suppressWarnings(as.integer(item$resultado_resumo$grupos %||% NA_integer_))
+  if (length(grupos) == 1L && !is.na(grupos) && grupos < 3L) return(FALSE)
   !is.na(exportacao_anova_clara_metodo(item))
 }
 
@@ -2490,6 +2496,43 @@ exportacao_anova_clara_marcadores <- function(item) {
   ), exportacao_anova_clara_textos_metodo(item))
 }
 
+# A chamada da ClaRa que a tela roda e o projeto escreve, numa fonte só. As
+# três formas têm os mesmos argumentos, com os mesmos valores; mudam só os
+# comentários:
+#   "tela"      sem comentários: a tela da ANOVA avalia este texto;
+#   "script"    R/analise.R, com o que cada rótulo faz ao lado do argumento;
+#   "relatorio" relatorio.qmd, com o comentário na linha de cima.
+# test_clara_projeto_render.R confere que as três dão a mesma expressão.
+exportacao_anova_clara_chamada <- function(item, forma = c("tela", "script", "relatorio")) {
+  forma <- match.arg(forma)
+  m <- exportacao_anova_clara_marcadores(item)
+  recuo <- strrep(" ", nchar("  comparar_medias("))
+  argumento <- function(nome, valor) sprintf("%-17s = %s", nome, valor)
+  rotulo_resposta <- argumento("rotulo_resposta", m$ROTULO_RESPOSTA_R)
+  rotulo_grupos <- argumento("rotulo_grupos", m$ROTULO_FATOR_R)
+  variancias <- paste0(argumento("variancias_iguais", m$VARIANCIAS_IGUAIS_CLARA), ")")
+  linhas <- switch(forma,
+    tela = c(rotulo_resposta = paste0(rotulo_resposta, ","),
+             rotulo_grupos = paste0(rotulo_grupos, ","),
+             confianca = paste0(argumento("confianca", m$CONFIANCA), ","),
+             variancias = variancias),
+    script = c(paste0(rotulo_resposta, ",", m$ESPACO_ROTULO_RESPOSTA, "# ", m$NOTA_ROTULO_RESPOSTA),
+               paste0(rotulo_grupos, ",", m$ESPACO_ROTULO_FATOR, "# ", m$NOTA_ROTULO_FATOR),
+               paste0(argumento("confianca", m$CONFIANCA), ","),
+               paste0(variancias, "  ", m$NOTA_VARIANCIAS)),
+    relatorio = c(paste0("# ", m$NOTA_ROTULO_RESPOSTA, ":"),
+                  paste0(rotulo_resposta, ","),
+                  paste0("# ", m$NOTA_ROTULO_FATOR, ":"),
+                  paste0(rotulo_grupos, ","),
+                  paste0(argumento("confianca", m$CONFIANCA), ","),
+                  paste0(m$NOTA_VARIANCIAS, ":"),
+                  variancias))
+  c("resultado <- base |>",
+    paste0("  comparar_medias(", argumento("resposta", m$RESPOSTA_CLARA), ","),
+    paste0(recuo, argumento("grupos", m$FATOR_CLARA), ","),
+    paste0(recuo, unname(linhas)))
+}
+
 # Material e métodos da rota ClaRa: só o método que o script usa (clássica
 # com Tukey ou Welch com Games-Howell), e os gráficos de resíduos ficam no
 # roteiro, não no Word. O texto comum da ANOVA fala dos dois e não serve aqui.
@@ -2526,6 +2569,7 @@ exportacao_anova_clara_marcadores_qmd <- function(item, manifesto, import_info) 
   c(valores,
     marcadores,
     list(TRECHO_PREPARO_QMD = manifesto$clara$qmd,
+         CHAMADA_COMPARAR = exportacao_anova_clara_chamada(item, "relatorio"),
          TITULO_RELATORIO = exportacao_anova_clara_titulo(item)),
     list(TBL_ANOVA_CAP = exportacao_anova_clara_legenda_anova(marcadores$welch)))
 }
@@ -2957,7 +3001,8 @@ molde_projeto_registro <- list(
       list(importar = exportacao_clara_importar(import_info),
            preparo = manifesto$clara$script)
     },
-    marcadores_script = exportacao_anova_clara_marcadores,
+    marcadores_script = function(item) c(exportacao_anova_clara_marcadores(item),
+      list(CHAMADA_COMPARAR = exportacao_anova_clara_chamada(item, "script"))),
     marcadores_qmd = exportacao_anova_clara_marcadores_qmd,
     marcadores_readme = exportacao_anova_clara_marcadores_readme
   ),

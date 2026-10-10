@@ -325,6 +325,19 @@ testServer(mod_anova_server, args = list(data_rv = dados_rv, import_info = info_
   # Todas as saídas declaradas são aceitas pelo registro central.
   stopifnot(isTRUE(execucoes_validar_estado(estado)))
 
+  # A tela rodou a chamada da ClaRa que o Projeto R vai escrever, a partir
+  # do estado registrado; o método automático ficou escrito na chamada.
+  stopifnot(
+    identical(result_rv()$chamada,
+              exportacao_anova_clara_chamada(list(parametros = estado$parametros), "tela")),
+    is.element(estado$parametros$metodo_usado, c("classica", "welch")),
+    inherits(result_rv()$resultado, "clara_medias")
+  )
+  # As quatro abas se montam sem erro.
+  for (aba in c("principal_ui", "tukey_ui", "pressupostos_ui", "codigo_ui")) {
+    stopifnot(nzchar(as.character(output[[aba]]$html)))
+  }
+
   # Mudar Y deixa pendente.
   session$setInputs(var_y = "cpue")
   stopifnot(identical(exec_ctrl$estado(), "pendente"))

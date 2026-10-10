@@ -11,6 +11,9 @@ for (arquivo in c("registro_tratamentos.R", "registro_bases.R", "registro_execuc
                   "registro_comunicacao.R", "exportacao_comunicacao.R")) {
   source(file.path("modules", arquivo), encoding = "UTF-8")
 }
+# A tela da ANOVA (anova_clara_rodar), para conferir que ela roda a chamada
+# que o projeto escreve.
+suppressPackageStartupMessages(source(file.path("modules", "mod_anova.R"), encoding = "UTF-8"))
 
 # O Quarto é a peça que gera o Word. Sem ele, a verificação não acontece, e
 # isso é dito em voz alta, como manda a regra da suíte.
@@ -72,6 +75,26 @@ for (entrada in rotas) for (nome_caso in names(casos[[entrada$tipo]])) {
     import_info = list(source = "package", package_dataset = "isoproteica_bagre"),
     templates_dir = "templates")
 
+  # 0. A chamada que a tela roda é a que o projeto escreve: as três formas
+  #    (tela, script e relatório) dão a mesma expressão, e o script e o
+  #    relatório trazem o bloco gerado, linha a linha.
+  chamada_tela <- exportacao_anova_clara_chamada(caso$item, "tela")
+  expressao <- function(linhas) parse(text = linhas, encoding = "UTF-8", keep.source = FALSE)[[1]]
+  script <- readLines(file.path(projeto, "R", "analise.R"), encoding = "UTF-8")
+  relatorio <- readLines(file.path(projeto, "relatorios", "relatorio.qmd"), encoding = "UTF-8")
+  contem <- function(texto, bloco) {
+    inicio <- which(texto == bloco[1])
+    any(vapply(inicio, function(i) identical(texto[i:(i + length(bloco) - 1L)], bloco), logical(1)))
+  }
+  stopifnot(identical(expressao(exportacao_anova_clara_chamada(caso$item, "script")), expressao(chamada_tela)),
+    identical(expressao(exportacao_anova_clara_chamada(caso$item, "relatorio")), expressao(chamada_tela)),
+    contem(script, exportacao_anova_clara_chamada(caso$item, "script")),
+    contem(relatorio, exportacao_anova_clara_chamada(caso$item, "relatorio")))
+  # E a tela, com essa chamada, chega ao F esperado.
+  tela <- anova_clara_rodar(caso$dados, caso$item$parametros)
+  stopifnot(identical(tela$chamada, chamada_tela),
+            isTRUE(all.equal(unname(tela$resultado$anova$f[1]), caso$esperado())))
+
   # 1. O roteiro, do começo ao fim, numa sessão limpa, de dentro do projeto,
   #    como o aluno faria. O F calculado volta num .rds para conferência.
   saida_rds <- file.path(destino, paste0(nome_caso, ".rds"))
@@ -121,6 +144,21 @@ for (entrada in rotas) for (nome_caso in names(casos[[entrada$tipo]])) {
   cat(sprintf("[ok] %s: analise.R em sessão limpa e Word renderizado (F = %s).\n",
               rotulo, f_texto))
 }
+
+# Dois grupos: a tela faz o teste t da ClaRa, e o projeto sai pelo molde da
+# ANOVA (o teste t ainda não tem rota ClaRa), com o mesmo p.
+artemia <- data.frame(racao = rep(c("A", "B"), each = 6),
+                      taxa = c(2.1, 2.4, 2.2, 2.6, 2.3, 2.5, 1.8, 1.9, 2.0, 1.7, 2.1, 1.9))
+item_t <- list(parametros = list(resposta = "taxa", fator = "racao", nivel_confianca = .95,
+  metodo = "classica", metodo_usado = "classica", titulo_grafico = "", rotulo_x = "", rotulo_y = ""))
+tela_t <- anova_clara_rodar(artemia, item_t$parametros)
+resumo_t <- anova_clara_resumo(tela_t)
+item_t$resultado_resumo <- resumo_t
+item_t$tipo <- "anova_um_fator"
+item_t$incluir_word <- TRUE
+stopifnot(identical(tela_t$analise, "teste_t"), resumo_t$grupos == 2L,
+  isTRUE(all.equal(resumo_t$p, summary(aov(taxa ~ racao, data = artemia))[[1]]$`Pr(>F)`[1])),
+  !isTRUE(exportacao_anova_clara_aceita(list(execucoes = list(e = item_t), codigo_clara = TRUE))))
 
 cat("OK: projeto da rota ClaRa gerado, rodado em sessão limpa e renderizado em Word:",
     paste(verificados, collapse = "; "), "\n")

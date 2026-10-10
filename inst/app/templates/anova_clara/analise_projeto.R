@@ -29,13 +29,7 @@ glimpse(base)
 
 # 4. Comparar as médias ----------------------------------------------------
 {{COMENTARIO_COMPARAR}}
-resultado <- base |>
-  comparar_medias(resposta          = {{RESPOSTA_CLARA}},
-                  grupos            = {{FATOR_CLARA}},
-                  rotulo_resposta   = {{ROTULO_RESPOSTA_R}},{{ESPACO_ROTULO_RESPOSTA}}# {{NOTA_ROTULO_RESPOSTA}}
-                  rotulo_grupos     = {{ROTULO_FATOR_R}},{{ESPACO_ROTULO_FATOR}}# {{NOTA_ROTULO_FATOR}}
-                  confianca         = {{CONFIANCA}},
-                  variancias_iguais = {{VARIANCIAS_IGUAIS_CLARA}})  {{NOTA_VARIANCIAS}}
+{{CHAMADA_COMPARAR}}
 
 resultado                     # um pequeno relatório no console
 

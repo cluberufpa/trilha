@@ -188,7 +188,7 @@ exportados ficaram para depois (dados só nos testes, decisão I).
 - Um teste da Trilha que, para cada análise com rota ClaRa, gera o projeto,
   roda o `analise.R` e renderiza o `relatorio.qmd` numa sessão limpa.
 
-**Andamento (9/10/2026):** feito, menos a tela.
+**Andamento:** feita (9 e 10/10/2026).
 
 - `DESCRIPTION` com `clara (>= 0.10.0)` em `Imports` e `cluberufpa/ClaRa`
   em `Remotes`; o `instalar_trilha.R` instala a `clara` do GitHub antes da
@@ -205,12 +205,25 @@ exportados ficaram para depois (dados só nos testes, decisão I).
   com rota ClaRa, gera o projeto, roda o `analise.R` com `Rscript --vanilla`
   e o `quarto render`, e confere as tabelas da ClaRa no Word. Uma rota nova
   sem caso no teste faz o teste parar.
-- **A tela ainda não chama a ClaRa.** O risco 2 se confirmou em parte, e a
-  troca espera a decisão do professor. Comparação com as bases de
-  `ClaRa/dados_treino` (rds e csv, confiança de 95% e 90%, os três métodos):
-  F, p, GL, SQ, QM, médias, DP, EP, IC das médias, os pares (diferença,
-  intervalo e p ajustado), o Shapiro dos resíduos e o Levene são
-  **idênticos**. Mudam:
+- **A tela da ANOVA de um fator roda a ClaRa** (10/10/2026). A chamada
+  `comparar_medias(...)` nasce numa fonte só,
+  `exportacao_anova_clara_chamada()`, em três formas com os mesmos
+  argumentos: a da tela, sem comentários, que a tela avalia com o pacote
+  `clara`; a do `analise.R` e a do relatório, com os comentários de cada um.
+  As tabelas da tela são as da ClaRa no tema cinza, as figuras são as da
+  ClaRa, e a aba "Código e console" mostra a chamada, o que a ClaRa imprime
+  e o R comum por trás (`mostrar_codigo = TRUE`). No automático, a tela
+  escolhe pelo Levene e a escolha entra em `variancias_iguais`. Saiu o
+  seletor de tema do gráfico (a figura é a da ClaRa). Com dois grupos, a
+  tela faz o teste t da ClaRa, e o projeto, até o teste t ganhar a sua rota
+  ClaRa, sai pelo molde da ANOVA, com o mesmo p. Os testes conferem que as
+  três formas dão a mesma expressão e que a chamada da tela é a que o
+  estado registrado produz.
+- O risco 2 se confirmou em parte. Comparação feita antes da troca, com as
+  bases de `ClaRa/dados_treino` (rds e csv, confiança de 95% e 90%, os três
+  métodos): F, p, GL, SQ, QM, médias, DP, EP, IC das médias, os pares
+  (diferença, intervalo e p ajustado), o Shapiro dos resíduos e o Levene
+  são **idênticos**. Mudaram, e o professor aceitou a forma da ClaRa:
   1. **Intervalo do η² e do ω² (clássica):** a tela usa o padrão do
      `effectsize`, unilateral (limite superior 1; bagres: η² de 0,649 a 1);
      a ClaRa, bilateral (0,597 a 0,906). As estimativas são as mesmas.
@@ -229,13 +242,17 @@ exportados ficaram para depois (dados só nos testes, decisão I).
   "most_frequent" do scikit-learn; numa coluna numérica sem nenhum valor
   repetido, a etapa entra com um aviso que recomenda a mediana.
 
-**Decisões do professor sobre as diferenças (10/10/2026):** pressupostos do
-Welch como na ClaRa (Shapiro em cada grupo); letras como na ClaRa, que segue
-a regra pedida (o grupo de maior média recebe "a", e as letras novas
-aparecem em ordem alfabética, descendo pelas médias; conferido em todas as
-bases de treino); com dois grupos, o teste t da ClaRa (a ANOVA de dois
-fatores é outra tela e não muda). Em aberto: o intervalo do tamanho de
-efeito e o Bartlett.
+
+**Decisões do professor sobre as diferenças (10/10/2026):** em todas, a
+forma da ClaRa. Intervalo do tamanho de efeito bilateral, o que se relata
+em artigo. Pressupostos do Welch com o Shapiro em cada grupo: com variâncias
+diferentes, juntar os resíduos mistura dispersões diferentes. Letras como na
+ClaRa, que segue a regra pedida (o grupo de maior média recebe "a", e as
+letras novas aparecem em ordem alfabética, descendo pelas médias; conferido
+em todas as bases de treino; era a tela antiga que fugia dela em
+`sint_dez_tanques`). Sem o Bartlett: ele confunde falta de normalidade com
+variâncias diferentes, e o Levene já está lá. Com dois grupos, o teste t (a
+ANOVA de dois fatores é outra tela e não muda).
 
 ### Fase 3 · Uma rota só de exportação
 

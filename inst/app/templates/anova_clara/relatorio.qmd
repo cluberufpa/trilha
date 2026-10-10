@@ -40,16 +40,7 @@ library(clara)
 {{TRECHO_PREPARO_QMD}}
 
 # Resumo, {{NOME_ANOVA}}, pressupostos, {{POS_TESTE}} e letras, numa função só.
-resultado <- base |>
-  comparar_medias(resposta          = {{RESPOSTA_CLARA}},
-                  grupos            = {{FATOR_CLARA}},
-                  # {{NOTA_ROTULO_RESPOSTA}}:
-                  rotulo_resposta   = {{ROTULO_RESPOSTA_R}},
-                  # {{NOTA_ROTULO_FATOR}}:
-                  rotulo_grupos     = {{ROTULO_FATOR_R}},
-                  confianca         = {{CONFIANCA}},
-                  {{NOTA_VARIANCIAS}}:
-                  variancias_iguais = {{VARIANCIAS_IGUAIS_CLARA}})
+{{CHAMADA_COMPARAR}}
 ```
 
 ```{r}
