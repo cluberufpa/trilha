@@ -3967,6 +3967,18 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
   }
   # A árvore nova (R/analise.R como fonte da verdade, dois QMDs) é escolhida
   # pela entrada do registro do molde cujo seletor aceita este manifesto.
+  # A rota da ANOVA depende do número de grupos (com dois, a ClaRa faz o teste
+  # t). Ele é contado na base que a análise usa, e não lido do registro:
+  # registros antigos não o guardam.
+  manifesto$execucoes <- lapply(manifesto$execucoes %||% list(), function(item) {
+    if (!identical(item$tipo, "anova_um_fator")) return(item)
+    base <- if (identical(item$base_tipo, "derivada")) cache_bases[[item$base_id]]$df else dados_analise
+    p <- item$parametros %||% list()
+    if (is.null(base) || !all(is.element(c(p$resposta, p$fator), names(base)))) return(item)
+    completos <- stats::complete.cases(base[c(p$resposta, p$fator)])
+    item$resultado_resumo$grupos <- length(unique(as.character(base[[p$fator]][completos])))
+    item
+  })
   molde <- exportacao_molde_projeto_entrada(manifesto)
   if (isTRUE(molde$clara)) {
     manifesto$clara <- exportacao_clara_receita(manifesto, import_info, pipeline,

@@ -106,10 +106,12 @@ for (caso in casos) {
 
   bases <- bases_adicionar(bases_vazio(), bases_novo_registro("base_0001", "Pesos maiores", "base_pesos"))
   bases <- bases_adicionar_etapa(bases, "base_0001", "filtrar",
-    list(coluna = "peso_g", origem = "numerica", operador = ">", valor = 100), compartilhada)
+    list(coluna = "peso_g", origem = "numerica", operador = ">", valor = 95), compartilhada)
   caches <- list(base_0001 = bases_recalcular_cache(compartilhada, bases[[1]], 1L))
   bases <- bases_finalizar(bases, "base_0001", caches, 1L)
-  stopifnot(nrow(caches$base_0001$df) == 5)
+  # Acima de 95 g ficam 3 coletas por estação: a ClaRa pede pelo menos 3
+  # observações por grupo.
+  stopifnot(nrow(caches$base_0001$df) == 6)
   # Teste t com a base compartilhada e ANOVA com o ramo derivado: os dois
   # caminhos do molde (apelido e receita própria na etapa 3.4).
   for (anova in c(FALSE, TRUE)) {
@@ -139,48 +141,36 @@ for (caso in casos) {
       manifesto = manifesto, revisao_origem = 1L, import_info = info, templates_dir = "templates")
     utils::unzip(zip_saida, exdir = destino)
     projeto <- file.path(destino, "coletas")
-    # A árvore do molde: o relatório sincronizado legado saiu; entraram os
-    # dois QMDs que executam o script. As funções de preparo (moda e
-    # converter_datas) moram uma única vez no funcoes.R, e o script usa a
-    # conversão canônica sem redefini-la.
-    stopifnot(!file.exists(file.path(projeto, "relatorios", "relatorio.qmd")))
-    auxiliares <- readLines(file.path(projeto, "R", "funcoes.R"), encoding = "UTF-8")
-    stopifnot(sum(grepl("^converter_datas <- function", auxiliares)) == 1L,
-      sum(grepl("^moda <- function", auxiliares)) == 1L)
+    # A árvore da rota ClaRa: um só relatório, sem R/funcoes.R. A conversão
+    # de datas (converter_datas) que a receita usa fica definida uma vez no
+    # roteiro e uma vez no relatório, antes da receita.
+    stopifnot(file.exists(file.path(projeto, "relatorios", "relatorio.qmd")),
+      !file.exists(file.path(projeto, "R", "funcoes.R")))
     script <- file.path(projeto, "R", "analise.R")
     linhas <- readLines(script, encoding = "UTF-8")
-    stopifnot(!any(grepl("^converter_datas? <- function", linhas)),
+    qmd <- readLines(file.path(projeto, "relatorios", "relatorio.qmd"), encoding = "UTF-8")
+    stopifnot(sum(grepl("^converter_datas <- function", linhas)) == 1L,
+      sum(grepl("^converter_datas <- function", qmd)) == 1L,
       any(grepl("converter_datas(", linhas, fixed = TRUE)),
-      !any(grepl("{{", linhas, fixed = TRUE)),
-      !any(grepl("^## ---- ", linhas)))
-    for (documento in c("relatorio_completo.qmd", "relatorio_artigo.qmd")) {
-      qmd <- readLines(file.path(projeto, "relatorios", documento), encoding = "UTF-8")
-      stopifnot(any(grepl('source(here::here("R", "analise.R"), encoding = "UTF-8")', qmd, fixed = TRUE)),
-        !any(grepl("read.csv|readRDS", qmd)))
-    }
-    # O script inteiro roda de uma vez, como no Render. O here::i_am() procura
-    # a raiz a partir da pasta de trabalho; executar com o projeto aberto
-    # reproduz o aluno. As fotografias RDS preservam as datas; o Excel é a
-    # entrega para uso fora do R.
+      !any(grepl("{{", c(linhas, qmd), fixed = TRUE)),
+      any(grepl("^library\\(clara\\)", linhas)),
+      !any(grepl("readRDS", c(linhas, qmd))))
+    # O roteiro inteiro roda de uma vez, de dentro do projeto, como o aluno
+    # faria. A base da análise sai da receita, com as datas como Date.
     env <- new.env(parent = globalenv())
+    grDevices::pdf(NULL)
     withr::with_dir(projeto, invisible(capture.output(sys.source(script, envir = env))))
-    referencia <- if (anova) caches$base_0001$df else compartilhada
-    obtida <- if (anova) env$dados_da_analise else env$dados_analise
-    stopifnot(isTRUE(all.equal(env$dados_analise, compartilhada, check.attributes = FALSE)),
-      isTRUE(all.equal(obtida, referencia, check.attributes = FALSE)),
+    grDevices::dev.off()
+    referencia <- as.data.frame(if (anova) caches$base_0001$df else compartilhada)
+    obtida <- as.data.frame(env$base)
+    obtida$local <- as.character(obtida$local)
+    referencia$local <- as.character(referencia$local)
+    stopifnot(isTRUE(all.equal(obtida, referencia, check.attributes = FALSE)),
       all(vapply(obtida[datas], inherits, logical(1), "Date")),
       all(vapply(datas, function(coluna) iguais(obtida[[coluna]], referencia[[coluna]]), logical(1))))
-    fotografia <- readRDS(file.path(projeto, "dados/processados/base_compartilhada.rds"))
-    stopifnot(isTRUE(all.equal(fotografia, compartilhada, check.attributes = FALSE)),
-      all(vapply(fotografia[datas], inherits, logical(1), "Date")))
-    if (anova) {
-      foto_ramo <- readRDS(file.path(projeto, "dados/processados/base_0001.rds"))
-      stopifnot(isTRUE(all.equal(foto_ramo, caches$base_0001$df, check.attributes = FALSE)),
-        all(vapply(foto_ramo[datas], inherits, logical(1), "Date")))
-    }
-    baixada <- as.data.frame(readxl::read_excel(file.path(projeto, "dados/processados/base_compartilhada.xlsx")))
-    for (coluna in datas) stopifnot(iguais(preparo_converter_data(baixada[[coluna]]), esperadas))
+    # A cópia da base para o Excel é gravada pelo roteiro em saida/tabelas/.
+    stopifnot(file.exists(file.path(projeto, "saida", "tabelas", "base.csv")))
   }
-  cat("PASSOU:", caso$nome, "— leitura, compartilhada, derivada, fotografias RDS, Excel e script completo dos projetos teste t e ANOVA.\n")
+  cat("PASSOU:", caso$nome, "— leitura, compartilhada, derivada e roteiro completo dos projetos teste t e ANOVA em ClaRa.\n")
 }
 cat("CONCLUIDO: revisão CSV e datas no molde.\n")
