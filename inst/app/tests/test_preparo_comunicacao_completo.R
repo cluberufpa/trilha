@@ -89,15 +89,21 @@ for (manter in c(FALSE, TRUE)) {
     utils::unzip(zip_saida, exdir = destino)
     projeto <- file.path(destino, "pesca_teste")
     # O teste executa os arquivos retirados do ZIP, sem fotografia estrutural.
+    # Na ANOVA (rota ClaRa), a planilha fica direto em dados/.
+    planilha <- file.path(projeto, if (anova) "dados/pesca.xlsx" else "dados/brutos/pesca.xlsx")
     stopifnot(!file.exists(file.path(projeto, "dados/processados/base_resolvida.rds")),
-      identical(readxl::excel_sheets(file.path(projeto, "dados/brutos/pesca.xlsx")), "pesca"),
+      identical(readxl::excel_sheets(planilha), "pesca"),
       identical(readxl::excel_sheets(info$datapath), c("pesca", "notas")),
-      isTRUE(all.equal(as.data.frame(readxl::read_excel(file.path(projeto, "dados/brutos/pesca.xlsx"))), brutos)))
+      isTRUE(all.equal(as.data.frame(readxl::read_excel(planilha)), brutos)))
     if (anova) {
+      # A receita encadeia a importação, a estrutura, a trilha e o ramo até
+      # a base da análise; os grupos viram fator na ordem da tela.
       env <- executar_preparo_molde(projeto)
-      stopifnot(iguais(env$base_reconstruida, compartilhada),
-        iguais(env$dados_analise, compartilhada),
-        iguais(env$dados_da_analise, caches$base_0001$df), nrow(env$dados_da_analise) == 5)
+      obtida <- as.data.frame(env$base)
+      obtida$especie <- as.character(obtida$especie)
+      esperada <- as.data.frame(caches$base_0001$df)
+      esperada$especie <- as.character(esperada$especie)
+      stopifnot(iguais(obtida, esperada), nrow(obtida) == 5)
     } else {
     for (script in c(TRUE, FALSE)) {
       arquivo <- if (script) "R/analise.R" else "relatorios/relatorio_completo.qmd"

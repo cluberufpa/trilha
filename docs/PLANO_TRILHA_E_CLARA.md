@@ -262,6 +262,36 @@ ANOVA de dois fatores é outra tela e não muda).
 - O exportador fica com um contrato por análise: chamada da análise,
   chamadas de apresentação (tabela, figura, textos) e trecho de métodos.
 
+**Andamento (10/10/2026): feita para a ANOVA de um fator e o teste t de
+duas amostras**, depois do teste t em ClaRa (decisão do professor).
+
+- Saiu a caixa "Escrever o código em ClaRa (experimental)" de Comunicação
+  de Resultados: as duas análises saem sempre em ClaRa. O campo
+  `codigo_clara` do manifesto ficou só para o exportador desligar a ClaRa
+  (`FALSE`) nos registros antigos que dependem da fotografia da base; esses,
+  e a ANOVA automática sem a escolha registrada, saem pelo exportador geral
+  (o mesmo do projeto com várias análises, que ficou para depois).
+- Saíram os moldes `templates/anova_projeto/` e
+  `templates/teste_t_duas_amostras/`, as entradas deles no registro, as
+  funções que só eles usavam e os testes que só os conferiam
+  (`test_anova_molde_projeto`, `test_welch_molde`,
+  `test_teste_t_molde_projeto`, `test_parametros_t_molde` e
+  `test_figuras_molde`). `test_exportacao_preparo`,
+  `test_preparo_comunicacao_completo` e `test_anova_preparo_projeto` passaram
+  a conferir a receita da rota ClaRa (inclusive separar, empilhar e alargar).
+- Contrato por análise: começou com a chamada
+  (`exportacao_anova_clara_chamada()` e `exportacao_teste_t_clara_chamada()`,
+  em três formas: tela, script e relatório); as apresentações e os métodos
+  ainda moram nos moldes e nas funções de marcadores de cada rota.
+- Fica para uma limpeza à parte: o painel antigo de exportação consolidada
+  em `app.R` (`export_project_options_ui`, `download_consolidated_zip`),
+  que nunca é posto na tela e cobre todas as análises.
+- **Em aberto:** a ClaRa recusa grupos com hífen no nome ("ele atrapalha as
+  letras das comparações"), e o molde antigo aceitava. Como a tela da ANOVA
+  e a do teste t rodam a ClaRa, quem tem grupos assim precisa renomeá-los na
+  Trilha antes. Decidir se a ClaRa passa a aceitar (letras sem
+  `multcompView`, ou trocando o hífen por dentro).
+
 ### Fase 4 · As análises, em ondas
 
 A ordem segue o que a ClaRa já sabe fazer e o que é mais frequente no

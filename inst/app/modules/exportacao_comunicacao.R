@@ -2384,10 +2384,11 @@ exportacao_anova_marcadores_readme <- function(item, nome_projeto, import_info) 
 # A rota ClaRa escreve R/analise.R e o relatório com as funções da ClaRa
 # (o pacote clara, carregado com library(clara)), em vez do roteiro passo a
 # passo. Vale para a ANOVA de um fator nos três métodos da tela: clássica,
-# Welch e automático. As outras
-# situações continuam no molde da ANOVA, sem mudança.
+# Welch e automático. É a rota padrão desde a Fase 3 (10/10/2026); só os
+# registros antigos que dependem da fotografia da base (codigo_clara = FALSE,
+# posto pelo exportador) saem pelo exportador geral.
 exportacao_anova_clara_aceita <- function(manifesto) {
-  if (!isTRUE(manifesto$codigo_clara) || !isTRUE(exportacao_anova_simples(manifesto))) {
+  if (isFALSE(manifesto$codigo_clara) || !isTRUE(exportacao_anova_simples(manifesto))) {
     return(FALSE)
   }
   item <- exportacao_execucoes_incluidas(manifesto)[[1]]
@@ -2638,7 +2639,7 @@ exportacao_teste_t_clara_parametros <- function(item) {
 # A rota ClaRa do teste t vale para um projeto com uma execução só: um teste
 # t de duas amostras, ou uma ANOVA de um fator com dois grupos.
 exportacao_teste_t_clara_aceita <- function(manifesto) {
-  if (!isTRUE(manifesto$codigo_clara)) return(FALSE)
+  if (isFALSE(manifesto$codigo_clara)) return(FALSE)
   itens <- manifesto$execucoes %||% list()
   incluidos <- exportacao_execucoes_incluidas(manifesto)
   if (length(itens) != 1L || length(incluidos) != 1L) return(FALSE)
@@ -3039,68 +3040,6 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
   list(script = script, qmd = exportacao_sanitizar_molde(qmd))
 }
 
-exportacao_teste_t_marcadores_script <- function(item) {
-  p <- item$parametros
-  rotulo <- function(x, padrao) {
-    x <- as.character(x %||% "")
-    if (nzchar(trimws(x))) x else padrao
-  }
-  resposta <- as.character(p$resposta %||% "resposta")
-  grupo <- as.character(p$grupo %||% "grupo")
-  rotulo_resposta <- rotulo(p$rotulo_y, resposta)
-  rotulo_grupo <- rotulo(p$rotulo_x, grupo)
-  list(
-    TITULO_COMENTARIO = toupper(as.character(item$titulo %||% "TESTE T DE DUAS AMOSTRAS")),
-    PERGUNTA_COMENTARIO = sprintf("a média de %s difere entre os dois grupos de %s?", rotulo_resposta, rotulo_grupo),
-    RESPOSTA_R = encodeString(resposta, quote = '"'),
-    GRUPO_R = encodeString(grupo, quote = '"'),
-    ROTULO_RESPOSTA_R = encodeString(rotulo_resposta, quote = '"'),
-    ROTULO_GRUPO_R = encodeString(rotulo_grupo, quote = '"'),
-    CONFIANCA = format(p$nivel_confianca %||% .95, digits = 15, decimal.mark = "."),
-    ALTERNATIVA_R = encodeString(p$alternativa %||% "two.sided", quote = '"'),
-    VARIANCIAS_IGUAIS = if (isTRUE(p$variancias_iguais)) "TRUE" else "FALSE",
-    TITULO_R = encodeString(as.character(p$titulo_grafico %||% ""), quote = '"')
-  )
-}
-
-exportacao_teste_t_marcadores_qmd <- function(item, manifesto, import_info) {
-  globais <- manifesto$secoes_globais %||% list()
-  sugestoes <- exportacao_textos_teste_t(item)
-  secao <- function(nome, padrao) {
-    texto <- paste(as.character(globais[[nome]] %||% ""), collapse = "\n")
-    if (nzchar(trimws(texto))) texto else padrao
-  }
-  list(
-    INTRODUCAO = secao("introducao", sugestoes$introducao),
-    METODOS = secao("metodos", sugestoes$metodos),
-    DISCUSSAO = secao("discussao", sugestoes$discussao),
-    CONCLUSAO = secao("conclusao", sugestoes$conclusao)
-  )
-}
-
-exportacao_teste_t_marcadores_readme <- function(item, nome_projeto, import_info) {
-  p <- item$parametros
-  rotulo <- function(x, padrao) {
-    x <- as.character(x %||% "")
-    if (nzchar(trimws(x))) x else padrao
-  }
-  list(
-    TITULO = as.character(item$titulo %||% nome_projeto),
-    PROJETO_RPROJ = paste0(nome_projeto, ".Rproj"),
-    ARQUIVO_BRUTO = exportacao_nome_planilha(import_info),
-    RESPOSTA = rotulo(p$rotulo_y, p$resposta),
-    GRUPO = rotulo(p$rotulo_x, p$grupo),
-    IC = format(100 * (p$nivel_confianca %||% .95), trim = TRUE, decimal.mark = ",")
-  )
-}
-
-# Um teste t de duas amostras independentes usa a árvore nova quando está
-# sozinho no projeto. Testes t acompanhados de outras análises continuam no
-# exportador geral.
-exportacao_teste_t_simples <- function(item) {
-  identical(item$tipo, "teste_t_two_ind")
-}
-
 # ---- Registro do molde ------------------------------------------------------
 # Uma entrada por análise migrada: seletor (quando o manifesto usa a árvore
 # nova), pasta de templates, pasta dos arquivos de apoio, prefixo do script e
@@ -3235,41 +3174,6 @@ molde_projeto_registro <- list(
       list(CHAMADA_COMPARAR = exportacao_anova_clara_chamada(item, "script"))),
     marcadores_qmd = exportacao_anova_clara_marcadores_qmd,
     marcadores_readme = exportacao_anova_clara_marcadores_readme
-  ),
-  anova_um_fator = list(
-    tipo = "anova_um_fator",
-    pasta = "anova_projeto",
-    apoio = "regressao_linear",
-    seleciona = exportacao_anova_simples,
-    prefixo = function(manifesto, nome_projeto, registro_bases, pipeline,
-                       base_externa, import_info, templates_dir) {
-      exportacao_molde_projeto_prefixo_preparo(manifesto, nome_projeto,
-        "# ANOVA DE UM FATOR — ", registro_bases, pipeline, base_externa,
-        import_info)
-    },
-    marcadores_script = exportacao_anova_marcadores_script,
-    marcadores_qmd = exportacao_anova_marcadores_qmd,
-    marcadores_readme = exportacao_anova_marcadores_readme
-  ),
-  teste_t_two_ind = list(
-    tipo = "teste_t_two_ind",
-    pasta = "teste_t_duas_amostras",
-    apoio = "regressao_linear",
-    seleciona = function(manifesto) {
-      itens <- manifesto$execucoes %||% list()
-      length(itens) == 1L &&
-        isTRUE(itens[[1]]$incluir_word) &&
-        exportacao_teste_t_simples(itens[[1]])
-    },
-    prefixo = function(manifesto, nome_projeto, registro_bases, pipeline,
-                       base_externa, import_info, templates_dir) {
-      exportacao_molde_projeto_prefixo_preparo(manifesto, nome_projeto,
-        "# TESTE T DE DUAS AMOSTRAS — ", registro_bases, pipeline, base_externa,
-        import_info)
-    },
-    marcadores_script = exportacao_teste_t_marcadores_script,
-    marcadores_qmd = exportacao_teste_t_marcadores_qmd,
-    marcadores_readme = exportacao_teste_t_marcadores_readme
   )
 )
 
@@ -3439,34 +3343,6 @@ exportacao_qmd_regressao <- function(item, raiz) {
       "#| fig-width: 6", "#| fig-height: 4"), "fig-"), "")
 
   linhas
-}
-
-# Sugestões entram apenas nas seções vazias de um relatório com um único teste t.
-# Não inferimos local, período, unidade amostral ou causalidade a partir da planilha.
-exportacao_textos_teste_t <- function(item) {
-  p <- item$parametros
-  rotulo <- function(nome, padrao) {
-    if (nzchar(trimws(nome %||% ""))) nome else padrao
-  }
-  resposta <- rotulo(p$rotulo_y, p$resposta)
-  grupo <- rotulo(p$rotulo_x, p$grupo)
-  ic <- format(100 * (p$nivel_confianca %||% .95), trim = TRUE, decimal.mark = ",")
-  alfa <- format(1 - (p$nivel_confianca %||% .95), trim = TRUE, decimal.mark = ",")
-  list(
-    introducao = c(
-      "*Sugestão de redação: adapte a pergunta e acrescente referências do seu tema antes de compartilhar o relatório.*", "",
-      "O teste t para duas amostras independentes compara a média de uma variável numérica entre dois grupos e avalia se a diferença observada escapa ao acaso. É um teste paramétrico: pede normalidade dentro de cada grupo e, na versão clássica, variâncias parecidas entre os grupos.", "",
-      sprintf("Neste estudo, comparou-se %s entre os dois grupos de %s. O objetivo foi verificar se as médias diferem e, em caso afirmativo, qual grupo apresenta a maior média, quantificando a incerteza e o tamanho da diferença.", resposta, grupo)),
-    metodos = c(
-      "*Sugestão de redação: complete a origem dos dados, o período, o local, a unidade amostral, as unidades de medida e os critérios de seleção.*", "",
-      sprintf("Compararam-se as médias de %s entre os dois grupos de %s por teste t para amostras independentes, com intervalo de confiança de %s%% e nível de significância de %s. A normalidade dentro de cada grupo foi examinada pelo teste de Shapiro-Wilk e a igualdade de variâncias pelo teste de Levene. Conforme esse resultado, adotou-se o t de Student (variâncias iguais) ou o t de Welch (variâncias diferentes). O tamanho do efeito foi quantificado pelo d de Cohen.", resposta, grupo, ic, alfa), "",
-      "A independência das observações depende do delineamento e deve ser justificada pela unidade amostral, considerando repetições e agrupamentos."),
-    discussao = c(
-      "*Sugestão para desenvolver a discussão: interprete a magnitude da diferença e o tamanho do efeito no contexto do estudo, com as referências consultadas.*", "",
-      "Uma diferença estatisticamente significativa indica que as médias dos grupos diferem além do esperado pelo acaso, mas não descreve, sozinha, o mecanismo. Considere o tamanho do efeito ao lado do p-valor: a significância diz que a diferença existe; o tamanho do efeito diz o quanto ela importa."),
-    conclusao = c(
-      "*Sugestão de redação: retome a pergunta da introdução e revise esta síntese depois de examinar os pressupostos.*", "")
-  )
 }
 
 
@@ -4085,12 +3961,24 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
   validacao <- exportacao_validar_manifesto(manifesto, exigir_word = FALSE)
   if (!validacao$ok) stop(paste(validacao$mensagens, collapse = " "), call. = FALSE)
   # A rota ClaRa parte da planilha e da receita, sem fotografia. Registros
-  # antigos que só se reproduzem pela base salva continuam no molde da ANOVA.
-  if (isTRUE(manifesto$codigo_clara) && exportacao_anova_usa_base_resolvida(base_externa)) {
+  # antigos que só se reproduzem pela base salva saem pelo exportador geral.
+  if (exportacao_anova_usa_base_resolvida(base_externa)) {
     manifesto$codigo_clara <- FALSE
   }
   # A árvore nova (R/analise.R como fonte da verdade, dois QMDs) é escolhida
   # pela entrada do registro do molde cujo seletor aceita este manifesto.
+  # A rota da ANOVA depende do número de grupos (com dois, a ClaRa faz o teste
+  # t). Ele é contado na base que a análise usa, e não lido do registro:
+  # registros antigos não o guardam.
+  manifesto$execucoes <- lapply(manifesto$execucoes %||% list(), function(item) {
+    if (!identical(item$tipo, "anova_um_fator")) return(item)
+    base <- if (identical(item$base_tipo, "derivada")) cache_bases[[item$base_id]]$df else dados_analise
+    p <- item$parametros %||% list()
+    if (is.null(base) || !all(is.element(c(p$resposta, p$fator), names(base)))) return(item)
+    completos <- stats::complete.cases(base[c(p$resposta, p$fator)])
+    item$resultado_resumo$grupos <- length(unique(as.character(base[[p$fator]][completos])))
+    item
+  })
   molde <- exportacao_molde_projeto_entrada(manifesto)
   if (isTRUE(molde$clara)) {
     manifesto$clara <- exportacao_clara_receita(manifesto, import_info, pipeline,

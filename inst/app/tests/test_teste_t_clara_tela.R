@@ -39,13 +39,14 @@ for (alternativa in c("two.sided", "greater", "less")) {
   })
 }
 
-# Com o projeto marcado para a ClaRa, o teste t sai pela rota dele.
-manifesto <- list(codigo_clara = TRUE, secoes_globais = list(), execucoes = list(e = list(
+# O teste t sai pela rota ClaRa, a padrão; só o exportador a desliga, nos
+# registros antigos com fotografia da base, e aí sai pelo exportador geral.
+manifesto <- list(secoes_globais = list(), execucoes = list(e = list(
   tipo = "teste_t_two_ind", incluir_word = TRUE,
   parametros = list(resposta = "peso_g", grupo = "racao", variancias_iguais = TRUE,
                     alternativa = "greater", nivel_confianca = .95))))
 stopifnot(identical(exportacao_molde_projeto_entrada(manifesto)$pasta, "teste_t_clara"))
 manifesto$codigo_clara <- FALSE
-stopifnot(identical(exportacao_molde_projeto_entrada(manifesto)$pasta, "teste_t_duas_amostras"))
+stopifnot(is.null(exportacao_molde_projeto_entrada(manifesto)))
 
 cat("OK: tela do teste t de duas amostras com a ClaRa (bilateral, maior e menor).\n")

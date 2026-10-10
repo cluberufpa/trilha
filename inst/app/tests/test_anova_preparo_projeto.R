@@ -1,6 +1,6 @@
-# Percurso da ANOVA no molde novo: preparo confirmado -> ZIP -> código que
-# viaja -> números do modelo. Script e QMDs rodam em sessões independentes,
-# dentro do projeto descompactado (o molde usa here::i_am, sem stub de here).
+# Percurso da ANOVA na rota ClaRa: preparo confirmado -> ZIP -> código que
+# viaja -> números do modelo. Roteiro e relatório rodam em sessões
+# independentes, dentro do projeto descompactado (here::i_am, sem stub de here).
 invisible(Sys.setlocale("LC_ALL", "English_United States.utf8"))
 source("app.R", encoding = "UTF-8")
 
@@ -44,58 +44,49 @@ projeto <- file.path(raiz, "anova_preparo")
 stopifnot(!file.exists(file.path(projeto, "dados/processados/base_resolvida.rds")))
 
 # Cada entrada roda num processo R novo, com a pasta do projeto como local de
-# trabalho — o .Rproj satisfaz here::i_am(), como no RStudio. O script e os
-# dois QMDs do molde devem entregar a mesma base, as mesmas exclusões e os
-# mesmos F, p e Tukey a 99%.
+# trabalho, como no RStudio. O roteiro e o relatório (rota ClaRa) devem
+# entregar a mesma base, as mesmas exclusões e os mesmos F, p e Tukey a 99%.
 esperado <- calcular_anova(cache$base_0001$df, "peso_kg", "densidade", .99)
 iguais <- function(x, y) isTRUE(all.equal(x, y, check.attributes = FALSE, tolerance = 1e-10))
-documentos <- c("relatorio_completo.qmd", "relatorio_artigo.qmd")
-entradas <- c(file.path(projeto, "R", "analise.R"), vapply(documentos, function(documento) {
-  extraido <- file.path(raiz, paste0(documento, ".R"))
-  knitr::purl(file.path(projeto, "relatorios", documento), output = extraido, quiet = TRUE)
-  extraido
-}, character(1)))
+stopifnot(identical(list.files(file.path(projeto, "relatorios"), pattern = "[.]qmd$"), "relatorio.qmd"),
+          !file.exists(file.path(projeto, "R", "funcoes.R")))
+extraido <- file.path(raiz, "relatorio.qmd.R")
+knitr::purl(file.path(projeto, "relatorios", "relatorio.qmd"), output = extraido, quiet = TRUE)
+entradas <- c(file.path(projeto, "R", "analise.R"), extraido)
 resultados <- list()
+literal <- function(x) encodeString(normalizePath(x, winslash = "/", mustWork = FALSE), quote = '"')
 for (i in seq_along(entradas)) {
   verificador <- file.path(raiz, paste0("validar_", i, ".R"))
-  resultado <- file.path(raiz, paste0("resultado_", i, ".rds"))
+  saida <- file.path(raiz, paste0("resultado_", i, ".rds"))
   log <- file.path(raiz, paste0("execucao_", i, ".log"))
-  literal <- function(x) encodeString(normalizePath(x, winslash = "/", mustWork = FALSE), quote = '"')
   writeLines(c(
     sprintf("setwd(%s)", literal(projeto)),
     "grDevices::pdf(NULL)",
     sprintf("source(%s, encoding = 'UTF-8')", literal(entradas[i])),
     sprintf(paste(
-      "saveRDS(list(compartilhada = as.data.frame(dados_analise),",
-      "base_da_anova = as.data.frame(dados_da_analise),",
-      "n_total = n_total, n_utilizado = n_utilizado, n_excluido = n_excluido,",
-      "n_base = nrow(base_anova),",
-      "f = tabela_anova$statistic[1], p = tabela_anova$p.value[1],",
-      "tukey = tukey[[1]], resumo = as.data.frame(tabela_resumo),",
-      "classe_efeito = classe_efeito, frase_anova = texto_anova), %s)"), literal(resultado))
+      "saveRDS(list(base = as.data.frame(base), amostra = resultado$amostra,",
+      "f = resultado$anova$f[1], p = resultado$anova$p[1], pares = resultado$pares,",
+      "resumo = as.data.frame(resultado$resumo), efeito = textos$efeito), %s)"), literal(saida))
   ), verificador, useBytes = TRUE)
   status <- system2(file.path(R.home("bin"), if (.Platform$OS.type == "windows") "Rscript.exe" else "Rscript"),
     shQuote(verificador), stdout = log, stderr = log)
   if (status != 0L) stop(paste(readLines(log, warn = FALSE), collapse = "\n"))
-  resultados[[i]] <- readRDS(resultado)
+  resultados[[i]] <- readRDS(saida)
 }
-script <- resultados[[1]]
-qmd_completo <- resultados[[2]]
-qmd_artigo <- resultados[[3]]
+tukey <- stats::TukeyHSD(esperado$fit, conf.level = .99)[[1]]
+esperada <- as.data.frame(cache$base_0001$df)
 for (env in resultados) {
-  stopifnot(iguais(env$compartilhada, compartilhada),
-    iguais(env$base_da_anova, cache$base_0001$df),
-    env$n_total == 18L, env$n_utilizado == 17L, env$n_excluido == 1L,
-    env$n_base == esperado$n,
+  base <- env$base
+  base$densidade <- as.character(base$densidade)
+  stopifnot(iguais(base, esperada),
+    env$amostra$total == 18L, env$amostra$usadas == 17L, env$amostra$excluidas == 1L,
+    env$amostra$usadas == esperado$n,
     iguais(env$f, esperado$f_anova),
     iguais(env$p, esperado$p_anova),
-    iguais(unname(env$tukey), unname(stats::TukeyHSD(esperado$fit, conf.level = .99)[[1]])))
+    iguais(env$pares$diferenca, unname(tukey[, "diff"])),
+    iguais(env$pares$ic_inf, unname(tukey[, "lwr"])))
 }
-stopifnot(iguais(script$resumo, qmd_completo$resumo),
-          iguais(script$resumo, qmd_artigo$resumo),
-          identical(script$classe_efeito, qmd_completo$classe_efeito),
-          identical(script$classe_efeito, qmd_artigo$classe_efeito),
-          identical(script$frase_anova, qmd_completo$frase_anova),
-          identical(script$frase_anova, qmd_artigo$frase_anova))
-cat("OK: ZIP ANOVA do molde, conferência da base, bases, exclusões, F, p, Tukey 99% e script/QMDs equivalentes.\n")
+stopifnot(iguais(resultados[[1]]$resumo, resultados[[2]]$resumo),
+          identical(resultados[[1]]$efeito, resultados[[2]]$efeito))
+cat("OK: ZIP ANOVA em ClaRa, receita com estrutura, trilha e ramo, exclusões, F, p, Tukey 99% e roteiro e relatório equivalentes.\n")
 cat("Projeto para Render:", normalizePath(projeto, winslash = "/"), "\n")

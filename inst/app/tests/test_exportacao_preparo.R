@@ -23,25 +23,27 @@ for (derivada in c(FALSE,TRUE)) {
  manifesto <- comunicacao_manifesto(comunicacao_estado_vazio(),execucoes,list(execucao_0001="Atualizada"))
  destino <- tempfile("exportado_",tmpdir=saida);dir.create(destino)
  projeto <- exportacao_criar_projeto(destino,nome,df,df,preparada,ps,NULL,bs,caches,execucoes,manifesto,1L,info,file.path(app_dir,"templates"))
+ # Rota ClaRa: a planilha fica direto em dados/, sem subpastas.
+ planilha <- file.path(projeto, "dados", exportacao_nome_planilha(info))
  stopifnot(file.exists(file.path(projeto,paste0(nome,".Rproj"))),
-           identical(readxl::excel_sheets(file.path(projeto,"dados/brutos",exportacao_nome_planilha(info))), "biometria"),
+           identical(readxl::excel_sheets(planilha), "biometria"),
            isTRUE(all.equal(
-             as.data.frame(readxl::read_excel(file.path(projeto,"dados/brutos",exportacao_nome_planilha(info)))),
+             as.data.frame(readxl::read_excel(planilha)),
              as.data.frame(readxl::read_excel(info$datapath, sheet="biometria")))) )
  esperada <- if(derivada)caches$base_0001$df else preparada
  esperada$especie <- factor(esperada$especie)
  esperada <- droplevels(tidyr::drop_na(esperada,massa_kg,especie))
- # O molde atual usa script fonte única, sem os antigos trechos nomeados.
+ # A receita do roteiro vai da planilha até a base desta análise (a
+ # compartilhada ou o ramo), num só encadeamento.
  env <- executar_preparo_molde(projeto)
- # O Excel recria row.names; comparamos todas as colunas, incluindo seus tipos.
- stopifnot(isTRUE(all.equal(as.list(env$base_reconstruida), as.list(preparada))))
- obtida <- as.data.frame(env$dados_da_analise)
- obtida$especie <- factor(obtida$especie)
+ obtida <- as.data.frame(env$base)
+ obtida$especie <- factor(as.character(obtida$especie))
  obtida <- droplevels(tidyr::drop_na(obtida, massa_kg, especie))
+ # O Excel recria row.names; comparamos todas as colunas, incluindo seus tipos.
  stopifnot(isTRUE(all.equal(as.list(obtida), as.list(esperada))))
  modelo <- stats::aov(massa_kg ~ especie, data=obtida)
  referencia <- stats::aov(massa_kg ~ especie, data=esperada)
  stopifnot(isTRUE(all.equal(stats::coef(modelo), stats::coef(referencia))))
 
- cat("PASSOU: projeto",nome,"reproduz",nrow(esperada),"linhas no preparo do script; os dois QMDs apontam a ele; aba utilizada e nome Rproj conferidos.\n")
+ cat("PASSOU: projeto",nome,"reproduz",nrow(esperada),"linhas na receita do roteiro em ClaRa; o relatório tem a mesma trava; aba utilizada e nome Rproj conferidos.\n")
 }
