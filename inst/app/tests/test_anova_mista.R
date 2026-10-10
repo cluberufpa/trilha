@@ -6,9 +6,6 @@ source(file.path("modules", "ficha_planejamento.R"), encoding = "UTF-8")
 source(file.path("modules", "registro_execucoes.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_execucao_explicita.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_anova_mista.R"), encoding = "UTF-8")
-source(file.path("modules", "mod_planejamento_variaveis.R"), encoding = "UTF-8")
-# Este arquivo é UTF-8; o source sem argumento segue a mesma forma usada no app.
-source(file.path("modules", "mod_planejamento_observacional.R"))
 
 arquivo <- file.path("..", "..", "..", "EAPACadernos", "projeto_anova_mista",
                      "dados", "brutos", "arrastos.csv")
@@ -79,44 +76,10 @@ testServer(
   }
 )
 
-# A prioridade da etapa: a ficha do planejamento chega à análise sem redigitação.
-ficha_compartilhada <- reactiveVal(NULL)
-testServer(
-  mod_planejamento_observacional_server,
-  args = list(tipo = "comparativo", ficha_destino_rv = ficha_compartilhada),
-  {
-    session$setInputs(
-      resposta = "Biomassa g",
-      eixos = "grupos",
-      n_niveis = 3,
-      sitios_por_nivel = 3,
-      subamostras_por_sitio = 3,
-      coluna_unidade = "praia",
-      coluna_subamostra = "arrasto"
-    )
-    session$flushReact()
-    session$setInputs(enviar_ficha = 1)
-    enviada <- ficha_compartilhada()
-    stopifnot(
-      identical(names(enviada), ficha_campos),
-      identical(enviada$unidade_coluna, "praia"),
-      identical(ficha_subamostra_coluna(enviada), "arrasto"),
-      ficha_tem_subamostras(enviada),
-      identical(names(enviada$eixos), "grupos"),
-      enviada$hierarquia$sitios_por_nivel == 3,
-      is.null(enviada$n_planejado), is.null(enviada$sorteio),
-      identical(enviada$analise_sugerida, "anova_mista_subamostras")
-    )
-    session$setInputs(subamostras_por_sitio = 1)
-    session$flushReact()
-    session$setInputs(enviar_ficha = 2)
-    simples <- ficha_compartilhada()
-    stopifnot(
-      !ficha_tem_subamostras(simples),
-      identical(ficha_subamostra_coluna(simples), ""),
-      identical(simples$analise_sugerida, "anova_um_fator")
-    )
-  }
-)
+# A ficha do planejamento não entra aqui: o planejamento acontece antes da
+# coleta e não precisa estar ligado às análises (decisão do professor,
+# 10/10/2026). O que a tela de variáveis de coleta põe na ficha, inclusive
+# as subamostras do sorteio por conglomerados, é conferido em
+# test_sortear_marco.R.
 
-cat("OK: ANOVA mista — cálculo, pseudorreplicação, ficha e estado Shiny\n")
+cat("OK: ANOVA mista — cálculo, pseudorreplicação e estado Shiny\n")
