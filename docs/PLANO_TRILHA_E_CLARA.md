@@ -237,6 +237,25 @@ vai cobrar e já se sabe hoje:
 - **Tamanho e dependências.** A Trilha tem cerca de 45 pacotes em `Imports`;
   vale revisar quais podem ir para `Suggests` antes do envio.
 
+### Fase 10 · Os dados dentro da ClaRa (ideia, sem decisão)
+
+Registrada pelo professor em 9/10/2026, só como pensamento: a ClaRa
+incorporar os conjuntos de dados do EAPADados, para que sobrem só dois
+pacotes para manter, a `trilha` e a `clara`. Se a ideia vingar:
+
+- **Não levar tudo.** O EAPADados tem hoje 43 arquivos em `data/`. O teto
+  seria uns 25 conjuntos de tamanho médio a grande e uns 15 pequenos, sem
+  inflar o pacote.
+- **Dar boa cara a cada conjunto.** Nomes de variáveis revistos, colunas que
+  nenhum exemplo usa retiradas, documentação de cada um.
+- **Aproveitar o CRAN.** O que faltar para algum teste, exploração ou
+  preparo pode vir de conjuntos de outros pacotes do CRAN, em vez de mais
+  dados próprios.
+- **Pacotes permitidos.** A regra continua: só CRAN, mais `clara`, `trilha`
+  e `EAPADados` (este, enquanto existir).
+
+Decidir só depois das Fases 4 e 5; até lá, os dados seguem no EAPADados.
+
 ## Sobre a crítica de que "isso não é R"
 
 A escolha foi difícil e continua defensável. A posição a sustentar, no
