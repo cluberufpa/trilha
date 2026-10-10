@@ -26,4 +26,5 @@
 ^\.git$
 ^\.gitignore$
 ^LICENSE\.md$
-^instalar_catalyser\.R$
+^instalar_trilha\.R$
+^\.claude$
