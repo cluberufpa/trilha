@@ -2598,6 +2598,217 @@ exportacao_anova_clara_marcadores_readme <- function(item, nome_projeto, import_
     list(VERSAO_CLARA = exportacao_versao_clara()))
 }
 
+# ---- Teste t em ClaRa -------------------------------------------------------
+# A rota ClaRa do teste t de duas amostras independentes. Serve à tela do
+# teste t (tipo teste_t_two_ind) e à ANOVA de um fator com só dois grupos,
+# em que comparar_medias() faz o teste t. Os parâmetros das duas telas têm
+# nomes diferentes; exportacao_teste_t_clara_parametros() os põe na mesma
+# forma, e daí saem a chamada, os marcadores e os textos.
+exportacao_teste_t_clara_parametros <- function(item) {
+  p <- item$parametros
+  anova <- identical(item$tipo, "anova_um_fator")
+  rotulo <- function(x, padrao) {
+    x <- trimws(as.character(x %||% ""))
+    if (nzchar(x)) x else padrao
+  }
+  resposta <- as.character(p$resposta %||% "resposta")
+  grupo <- as.character((if (anova) p$fator else p$grupo) %||% "grupo")
+  # Na ANOVA, o método (clássica ou Welch) diz se as variâncias são iguais;
+  # no teste t, a caixa da tela. A hipótese unilateral só existe no teste t.
+  variancias_iguais <- if (anova) identical(exportacao_anova_clara_metodo(item), "classica") else
+    isTRUE(p$variancias_iguais)
+  alternativa_r <- as.character(if (anova) "two.sided" else p$alternativa %||% "two.sided")
+  alternativa <- c(two.sided = "bilateral", greater = "maior", less = "menor")[[alternativa_r]]
+  list(
+    resposta = resposta,
+    grupo = grupo,
+    rotulo_resposta = rotulo(p$rotulo_y, resposta),
+    rotulo_grupos = rotulo(p$rotulo_x, grupo),
+    rotulo_y_escrito = nzchar(trimws(as.character(p$rotulo_y %||% ""))),
+    rotulo_x_escrito = nzchar(trimws(as.character(p$rotulo_x %||% ""))),
+    confianca = p$nivel_confianca %||% .95,
+    variancias_iguais = variancias_iguais,
+    alternativa = alternativa,
+    titulo = trimws(as.character(p$titulo_grafico %||% "")),
+    nome_teste = paste0("teste t de ", if (variancias_iguais) "Student" else "Welch",
+                        if (alternativa != "bilateral") " unilateral")
+  )
+}
+
+# A rota ClaRa do teste t vale para um projeto com uma execução só: um teste
+# t de duas amostras, ou uma ANOVA de um fator com dois grupos.
+exportacao_teste_t_clara_aceita <- function(manifesto) {
+  if (!isTRUE(manifesto$codigo_clara)) return(FALSE)
+  itens <- manifesto$execucoes %||% list()
+  incluidos <- exportacao_execucoes_incluidas(manifesto)
+  if (length(itens) != 1L || length(incluidos) != 1L) return(FALSE)
+  item <- incluidos[[1]]
+  if (identical(item$tipo, "teste_t_two_ind")) {
+    return(is.element(as.character(item$parametros$alternativa %||% "two.sided"),
+                      c("two.sided", "greater", "less")))
+  }
+  grupos <- suppressWarnings(as.integer(item$resultado_resumo$grupos %||% NA_integer_))
+  identical(item$tipo, "anova_um_fator") && length(grupos) == 1L && !is.na(grupos) &&
+    grupos == 2L && !is.na(exportacao_anova_clara_metodo(item))
+}
+
+# A chamada de comparar_medias() do teste t, nas três formas da ANOVA (ver
+# exportacao_anova_clara_chamada()): "tela", "script" e "relatorio", com os
+# mesmos argumentos. A alternativa vai sempre escrita, mesmo bilateral: é a
+# hipótese do estudo, decidida no planejamento.
+exportacao_teste_t_clara_chamada <- function(item, forma = c("tela", "script", "relatorio")) {
+  forma <- match.arg(forma)
+  q <- exportacao_teste_t_clara_parametros(item)
+  recuo <- strrep(" ", nchar("  comparar_medias("))
+  argumento <- function(nome, valor) sprintf("%-17s = %s", nome, valor)
+  linhas <- c(
+    rotulo_resposta = paste0(argumento("rotulo_resposta", encodeString(q$rotulo_resposta, quote = '"')), ","),
+    rotulo_grupos = paste0(argumento("rotulo_grupos", encodeString(q$rotulo_grupos, quote = '"')), ","),
+    confianca = paste0(argumento("confianca", format(q$confianca, digits = 15, decimal.mark = ".")), ","),
+    variancias = paste0(argumento("variancias_iguais", if (q$variancias_iguais) "TRUE" else "FALSE"), ","),
+    alternativa = paste0(argumento("alternativa", encodeString(q$alternativa, quote = '"')), ")")
+  )
+  notas <- c(
+    rotulo_resposta = paste0("no texto e na figura", if (!q$rotulo_y_escrito) ', ex.: "Peso final (g)"'),
+    rotulo_grupos = paste0("no texto e na figura", if (!q$rotulo_x_escrito) ', ex.: "Ração"'),
+    variancias = if (q$variancias_iguais) "TRUE: teste t de Student; FALSE: de Welch" else
+      "FALSE: teste t de Welch; TRUE: de Student",
+    alternativa = '"bilateral", "maior" ou "menor" (1º grupo contra o 2º)'
+  )
+  linhas <- switch(forma,
+    tela = linhas,
+    script = {
+      # Os comentários ao lado dos argumentos, todos na mesma coluna.
+      largura <- max(nchar(linhas[names(notas)])) + 2L
+      com_nota <- names(notas)
+      linhas[com_nota] <- paste0(formatC(linhas[com_nota], width = -largura), "# ", notas[com_nota])
+      linhas
+    },
+    relatorio = {
+      saida <- character()
+      for (nome in names(linhas)) {
+        if (is.element(nome, names(notas))) saida <- c(saida, paste0("# ", notas[[nome]], ":"))
+        saida <- c(saida, linhas[[nome]])
+      }
+      saida
+    })
+  c("resultado <- base |>",
+    paste0("  comparar_medias(", argumento("resposta", exportacao_nome_clara(q$resposta)), ","),
+    paste0(recuo, argumento("grupos", exportacao_nome_clara(q$grupo)), ","),
+    paste0(recuo, unname(linhas)))
+}
+
+# Os textos padrão das seções do relatório do teste t em ClaRa. Métodos:
+# só o teste que o script usa (Student ou Welch; bilateral ou unilateral).
+exportacao_teste_t_clara_textos <- function(item) {
+  q <- exportacao_teste_t_clara_parametros(item)
+  ic <- format(100 * q$confianca, trim = TRUE, decimal.mark = ",")
+  alfa <- format(1 - q$confianca, trim = TRUE, decimal.mark = ",")
+  hipotese <- switch(q$alternativa,
+    bilateral = "A hipótese alternativa foi bilateral (as médias diferem, em qualquer sentido).",
+    maior = "A hipótese alternativa, definida no planejamento, foi unilateral: a média do primeiro grupo maior que a do segundo.",
+    menor = "A hipótese alternativa, definida no planejamento, foi unilateral: a média do primeiro grupo menor que a do segundo.")
+  pressupostos <- if (q$variancias_iguais) paste(
+    "A normalidade da resposta foi avaliada em cada grupo pelo teste de Shapiro-Wilk, e a",
+    "igualdade das variâncias pelo teste de Levene, do pacote `car` [@fox2019].") else paste(
+    "A normalidade da resposta foi avaliada em cada grupo pelo teste de Shapiro-Wilk; o teste",
+    "de Welch não supõe variâncias iguais.")
+  list(
+    introducao = c(
+      "*Sugestão de redação: adapte a pergunta e acrescente referências do seu tema antes de compartilhar o relatório.*", "",
+      "O teste t para duas amostras independentes compara a média de uma variável numérica entre dois grupos e avalia se a diferença observada escapa ao acaso.", "",
+      sprintf("Neste estudo, comparou-se %s entre os dois grupos de %s.", q$rotulo_resposta, q$rotulo_grupos)),
+    metodos = c(
+      "*Sugestão de redação: complete a origem dos dados, o período, o local, a unidade amostral, as unidades de medida e os critérios de seleção.*", "",
+      paste(sprintf("As análises foram feitas no R [@rcore2025]. Compararam-se as médias de %s entre os dois grupos de %s pelo %s, com intervalo de confiança de %s%% e nível de significância de %s.",
+                    q$rotulo_resposta, q$rotulo_grupos, q$nome_teste, ic, alfa), hipotese), "",
+      paste(pressupostos, "Os testes formais foram lidos junto com os gráficos de resíduos, que",
+            "acompanham o roteiro de análise [@kozak2018]. O tamanho de efeito foi descrito pelo d de",
+            "Cohen e pelo g de Hedges, com intervalos de confiança, pelo pacote `effectsize`",
+            "[@benshachar2020]. As figuras foram construídas com o `ggplot2` [@wickham2016]."), "",
+      "A independência das observações depende do delineamento e deve ser justificada pela unidade amostral."),
+    discussao = c(
+      "*Sugestão para desenvolver a discussão: interprete a magnitude da diferença e o tamanho do efeito no contexto do estudo, com as referências consultadas.*", "",
+      "Uma diferença estatisticamente significativa indica que as médias dos grupos diferem além do esperado pelo acaso, mas não descreve, sozinha, o mecanismo. A significância diz que a diferença existe; o tamanho do efeito diz o quanto ela importa."),
+    conclusao = c(
+      "*Sugestão de redação: retome a pergunta da introdução e revise esta síntese depois de examinar os pressupostos.*", "")
+  )
+}
+
+exportacao_teste_t_clara_marcadores_script <- function(item) {
+  q <- exportacao_teste_t_clara_parametros(item)
+  unilateral <- q$alternativa != "bilateral"
+  titulo <- if (nzchar(q$titulo)) q$titulo else "Teste t de duas amostras"
+  list(
+    TITULO_COMENTARIO = toupper(titulo),
+    PERGUNTA_COMENTARIO = switch(q$alternativa,
+      bilateral = sprintf("a média de %s difere entre os dois grupos de %s?", q$rotulo_resposta, q$rotulo_grupos),
+      maior = sprintf("a média de %s no primeiro grupo de %s é maior que no segundo?", q$rotulo_resposta, q$rotulo_grupos),
+      menor = sprintf("a média de %s no primeiro grupo de %s é menor que no segundo?", q$rotulo_resposta, q$rotulo_grupos)),
+    CHAMADA_COMPARAR = exportacao_teste_t_clara_chamada(item, "script"),
+    COMENTARIO_COMPARAR = c(
+      sprintf("# Resumo, %s, pressupostos e letras, numa função só.", q$nome_teste),
+      "# A diferença é a média do primeiro grupo (na ordem dos níveis) menos a do",
+      "# segundo. Os rótulos ficam no resultado: gráficos e textos os usam.",
+      if (identical(item$tipo, "anova_um_fator")) c(
+        "# A análise veio da tela da ANOVA: com dois grupos, comparar_medias()",
+        "# faz o teste t, que dá o mesmo p da ANOVA."),
+      if (unilateral) c(
+        "# A hipótese é unilateral: o intervalo da diferença fica aberto de um lado",
+        "# (+∞ ou -∞). Ela precisa ter sido decidida antes de olhar os dados.")),
+    NOME_TESTE = q$nome_teste,
+    TITULO_CLARA = if (nzchar(q$titulo)) encodeString(q$titulo, quote = '"') else "NULL",
+    COMENTARIO_PRESSUPOSTOS = if (q$variancias_iguais) "Shapiro-Wilk em cada grupo e Levene, com a leitura" else
+      "Shapiro-Wilk em cada grupo, com a leitura"
+  )
+}
+
+exportacao_teste_t_clara_marcadores_qmd <- function(item, manifesto, import_info) {
+  q <- exportacao_teste_t_clara_parametros(item)
+  globais <- manifesto$secoes_globais %||% list()
+  sugestoes <- exportacao_teste_t_clara_textos(item)
+  secao <- function(nome, padrao) {
+    texto <- paste(as.character(globais[[nome]] %||% ""), collapse = "\n")
+    if (nzchar(trimws(texto))) texto else padrao
+  }
+  list(
+    INTRODUCAO = secao("introducao", sugestoes$introducao),
+    METODOS = secao("metodos", sugestoes$metodos),
+    DISCUSSAO = secao("discussao", sugestoes$discussao),
+    CONCLUSAO = secao("conclusao", sugestoes$conclusao),
+    TRECHO_PREPARO_QMD = manifesto$clara$qmd,
+    CHAMADA_COMPARAR = exportacao_teste_t_clara_chamada(item, "relatorio"),
+    TITULO_RELATORIO = if (nzchar(q$titulo)) q$titulo else "Título do trabalho (preencher)",
+    TITULO_CLARA = if (nzchar(q$titulo)) encodeString(q$titulo, quote = '"') else "NULL",
+    NOME_TESTE = q$nome_teste,
+    TBL_TESTE_CAP = paste0(
+      toupper(substr(q$nome_teste, 1, 1)), substring(q$nome_teste, 2),
+      " para a diferença entre as médias (primeiro grupo menos o segundo). ",
+      "IC: intervalo de confiança", if (q$alternativa != "bilateral") ", aberto de um lado", "; ",
+      "GL: graus de liberdade.")
+  )
+}
+
+exportacao_teste_t_clara_marcadores_readme <- function(item, nome_projeto, import_info) {
+  q <- exportacao_teste_t_clara_parametros(item)
+  planilha <- exportacao_nome_planilha(import_info)
+  list(
+    TITULO = if (nzchar(q$titulo)) q$titulo else nome_projeto,
+    PROJETO_RPROJ = paste0(nome_projeto, ".Rproj"),
+    ARQUIVO_BRUTO = planilha,
+    ARQUIVO_BRUTO_ARVORE = formatC(planilha, width = -max(27L, nchar(planilha) + 2L)),
+    RESPOSTA = q$rotulo_resposta,
+    GRUPO = q$rotulo_grupos,
+    IC = format(100 * q$confianca, trim = TRUE, decimal.mark = ","),
+    NOME_TESTE = q$nome_teste,
+    HIPOTESE_README = switch(q$alternativa,
+      bilateral = "bilateral (`alternativa = \"bilateral\"`): as médias diferem, em qualquer sentido",
+      maior = "unilateral (`alternativa = \"maior\"`): a média do primeiro grupo é maior que a do segundo",
+      menor = "unilateral (`alternativa = \"menor\"`): a média do primeiro grupo é menor que a do segundo"),
+    VERSAO_CLARA = exportacao_versao_clara()
+  )
+}
+
 # Funções auxiliares da receita, na rota ClaRa. O projeto não leva R/funcoes.R:
 # quando a receita de preparo usa moda() (imputar a moda) ou converter_datas(),
 # a definição delas entra no próprio roteiro, logo antes da receita, copiada
@@ -2721,7 +2932,8 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
                                      base_externa, dados_analise, cache_bases) {
   item <- exportacao_execucoes_incluidas(manifesto)[[1]]
   resposta <- as.character(item$parametros$resposta %||% "resposta")
-  fator <- as.character(item$parametros$fator %||% "grupo")
+  # Na ANOVA, o fator; no teste t de duas amostras, o grupo.
+  fator <- as.character(item$parametros$fator %||% item$parametros$grupo %||% "grupo")
   ramo <- identical(item$base_tipo, "derivada")
 
   receita <- exportacao_preparo_anova(manifesto, import_info, pipeline, registro_bases, base_externa)
@@ -2984,6 +3196,24 @@ molde_projeto_registro <- list(
     marcadores_script = exportacao_regressao_marcadores_script,
     marcadores_qmd = exportacao_regressao_marcadores_qmd,
     marcadores_readme = exportacao_regressao_marcadores_readme
+  ),
+  # Teste t em ClaRa: o teste t de duas amostras e a ANOVA com dois grupos.
+  # Vem antes das entradas da ANOVA e do teste t, para aceitar primeiro.
+  teste_t_clara = list(
+    tipo = "teste_t_two_ind",
+    pasta = "teste_t_clara",
+    apoio = "regressao_linear",
+    clara = TRUE,
+    documentos = c(relatorio.qmd = "relatorio.qmd"),
+    seleciona = exportacao_teste_t_clara_aceita,
+    prefixo = function(manifesto, nome_projeto, registro_bases, pipeline,
+                       base_externa, import_info, templates_dir) {
+      list(importar = exportacao_clara_importar(import_info),
+           preparo = manifesto$clara$script)
+    },
+    marcadores_script = exportacao_teste_t_clara_marcadores_script,
+    marcadores_qmd = exportacao_teste_t_clara_marcadores_qmd,
+    marcadores_readme = exportacao_teste_t_clara_marcadores_readme
   ),
   # Vem antes da entrada da ANOVA: quando o pesquisador escolhe a ClaRa e a
   # análise é a ANOVA clássica, esta entrada é a primeira a aceitar.
@@ -3878,7 +4108,8 @@ exportacao_criar_projeto <- function(destino, nome_projeto, dados_brutos,
         auxiliares[nzchar(trimws(auxiliares)) & !grepl("^\\s*#", auxiliares)], qmd[-1])
     }
   }
-  anova_nova <- !is.null(molde) && identical(molde$tipo, "anova_um_fator")
+  # A ANOVA com dois grupos sai pela rota ClaRa do teste t: também é molde novo.
+  anova_nova <- !is.null(molde) && (identical(molde$tipo, "anova_um_fator") || isTRUE(molde$clara))
 
   if (exportacao_anova_simples(manifesto) && !anova_nova) {
     codigo <- exportacao_preparo_anova(manifesto, import_info, pipeline, registro_bases, base_externa)

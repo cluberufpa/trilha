@@ -98,7 +98,7 @@ instalar_trilha <- function(iniciar = FALSE) {
     # (library(clara)). Enquanto não estiver no CRAN, vem do GitHub.
     ok_clara <- garante(
       "clara", github = "cluberufpa/ClaRa",
-      versao_minima = "0.10.0"
+      versao_minima = "0.11.0"
     )
     # A IDE é sempre atualizada: assim executar novamente este instalador
     # realmente traz o conteúdo mais recente da branch main.

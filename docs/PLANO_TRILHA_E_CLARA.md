@@ -277,6 +277,30 @@ curso:
 
 Uma onda por vez, e uma análise só fecha quando o projeto exportado
 renderiza o Word e passa nos critérios acima (regra 2 da ClaRa, estendida).
+
+**Andamento da onda 1 (10/10/2026): teste t de duas amostras feito.**
+Decisões do professor no mesmo dia: o teste t vem antes da Fase 3 (fecha o
+caso da ANOVA com dois grupos), e o projeto com várias análises juntas
+fica para depois. A tela oferecia hipótese unilateral, que a ClaRa não
+tinha; decidido que a ClaRa a ganha como argumento: ClaRa 0.11.0,
+`comparar_medias(..., alternativa = "bilateral", "maior" ou "menor")`, só
+com dois grupos, e a Trilha passa a pedir `clara (>= 0.11.0)`.
+
+- A tela do teste t de duas amostras independentes roda a chamada de
+  `exportacao_teste_t_clara_chamada()`, a mesma que o projeto escreve, e
+  mostra as frases, as tabelas, o efeito, a figura e o Q-Q da ClaRa. As
+  saídas comuns às três formas do teste t (hipóteses, tabela, distribuição
+  t) leem os números da ClaRa. Uma amostra e pareado não existem na ClaRa
+  e continuam com o `t.test()` direto.
+- Molde `templates/teste_t_clara/` (roteiro, relatório Word e README), na
+  entrada `teste_t_clara` do registro, usada com a caixa da ClaRa marcada.
+  Ela também recebe a **ANOVA com dois grupos**: a tela da ANOVA, com dois
+  grupos, roda a chamada do teste t, e o projeto sai por esta rota.
+- `test_clara_projeto_render.R` cobre as duas rotas (seis casos: ANOVA
+  clássica, Welch e automática; teste t de Welch bilateral, de Student
+  unilateral e a ANOVA com dois grupos), e `test_teste_t_clara_tela.R`
+  confere a tela nas três hipóteses.
+- Faltam na onda 1: Mann-Whitney e Kruskal-Wallis (`comparar_medianas()`).
 Mapas, planejamento amostral e o Laboratório de Conceitos não precisam da
 ClaRa: não são análises com relatório estatístico.
 

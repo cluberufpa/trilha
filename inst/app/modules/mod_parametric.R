@@ -257,6 +257,39 @@ teste_t_validar_duas_amostras <- function(df, resposta, grupo) {
   NULL
 }
 
+# ---- Duas amostras independentes, pela ClaRa ----------------------------------
+# O teste t de duas amostras roda a mesma chamada de comparar_medias() que o
+# Projeto R escreve (exportacao_teste_t_clara_chamada()): a tela avalia o
+# texto com o pacote clara. Uma amostra e pareado não existem na ClaRa e
+# continuam com o t.test() direto.
+teste_t_clara_rodar <- function(df, parametros) {
+  item <- list(tipo = "teste_t_two_ind", parametros = parametros)
+  chamada <- exportacao_teste_t_clara_chamada(item, "tela")
+  ambiente <- new.env(parent = asNamespace("clara"))
+  ambiente$base <- df
+  eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)
+  resultado <- ambiente$resultado
+  teste <- resultado$teste
+  grupos <- as.character(resultado$resumo[[resultado$nomes$grupos]])
+  list(
+    chamada = chamada,
+    resultado = resultado,
+    efeito = clara::medir_efeito(resultado),
+    textos = clara::escrever_resultados(resultado, casas = 2),
+    versao_clara = as.character(utils::packageVersion("clara")),
+    # As saídas comuns às três formas do teste t (tabela, hipóteses,
+    # distribuição t) leem o formato do t.test(); aqui ele vem da ClaRa.
+    t_out = list(
+      statistic = c(t = unname(teste$t)),
+      parameter = c(df = unname(teste$gl)),
+      p.value = unname(teste$p),
+      conf.int = c(unname(teste$ic_inf), unname(teste$ic_sup)),
+      estimate = stats::setNames(resultado$resumo$media, grupos),
+      alternative = parametros$alternativa
+    )
+  )
+}
+
 mod_parametric_server <- function(id, data_rv, import_info) {
   moduleServer(id, function(input, output, session) {
     revisao_execucao <- execucao_revisao_dados(data_rv)
@@ -404,19 +437,22 @@ mod_parametric_server <- function(id, data_rv, import_info) {
         df_clean <- na.omit(df_clean)
         df_clean[[input$two_var_x]] <- as.factor(df_clean[[input$two_var_x]])
 
+        # A análise é a da ClaRa, com a chamada que o Projeto R escreve.
+        clara_r <- teste_t_clara_rodar(df, list(
+          resposta = input$two_var_y,
+          grupo = input$two_var_x,
+          variancias_iguais = isTRUE(input$two_var_equal),
+          alternativa = alternative_val,
+          nivel_confianca = conf_level_decimal
+        ))
+
+        # Levene compara as variâncias dos dois grupos, como leitura que
+        # ajuda a escolher entre Student e Welch (car::leveneTest, o mesmo da
+        # ClaRa no Student).
         formula_obj <- as.formula(paste(backtick(input$two_var_y), "~", backtick(input$two_var_x)))
-        t_out <- t.test(formula_obj, data = df_clean, alternative = alternative_val, 
-                        conf.level = conf_level_decimal, var.equal = input$two_var_equal)
-        
-        # Obter resíduos do modelo linear para verificar normalidade
-        fit_lm <- lm(formula_obj, data = df_clean)
-        norm_data <- rstandard(fit_lm)
-        
-        # Levene compara as variâncias dos dois grupos; é o mesmo cálculo do
-        # script exportado (car::leveneTest sobre a fórmula do teste).
         teste_levene <- car::leveneTest(formula_obj, data = df_clean)
-        
-        list(t_out = t_out, norm_data = norm_data, type = "two_ind",
+
+        list(t_out = clara_r$t_out, clara = clara_r, norm_data = NULL, type = "two_ind",
              var_names = c(input$two_var_y, input$two_var_x),
              levene = teste_levene)
         
@@ -465,10 +501,12 @@ mod_parametric_server <- function(id, data_rv, import_info) {
         cat(sprintf("  H0: Média de %s = %s\n", res$var_names[1], input$one_mu))
         cat(sprintf("  H1: Média de %s %s %s\n", res$var_names[1], alt_symbol, input$one_mu))
       } else if (res$type == "two_ind") {
-        cat(sprintf("  H0: Média de %s (%s) = Média de %s (%s)\n", 
-                    res$var_names[1], "Grupo 1", res$var_names[1], "Grupo 2"))
-        cat(sprintf("  H1: Média de %s (%s) %s Média de %s (%s)\n", 
-                    res$var_names[1], "Grupo 1", alt_symbol, res$var_names[1], "Grupo 2"))
+        # Os grupos na ordem dos níveis: a diferença é o primeiro menos o segundo.
+        grupos <- names(res$t_out$estimate)
+        cat(sprintf("  H0: Média de %s em %s = Média em %s\n",
+                    res$var_names[1], grupos[1], grupos[2]))
+        cat(sprintf("  H1: Média de %s em %s %s Média em %s\n",
+                    res$var_names[1], grupos[1], alt_symbol, grupos[2]))
       } else if (res$type == "paired") {
         cat(sprintf("  H0: Média das diferenças (%s - %s) = 0\n", res$var_names[1], res$var_names[2]))
         cat(sprintf("  H1: Média das diferenças (%s - %s) %s 0\n", res$var_names[1], res$var_names[2], alt_symbol))
@@ -493,8 +531,9 @@ mod_parametric_server <- function(id, data_rv, import_info) {
         sprintf("%.4f", t_out$estimate)
       }
       
-      val_conf_low <- sprintf("%.4f", t_out$conf.int[1])
-      val_conf_high <- sprintf("%.4f", t_out$conf.int[2])
+      # No unilateral, um limite do IC é infinito: +∞ ou -∞, não "Inf".
+      val_conf_low <- clara::formatar_numero(t_out$conf.int[1], 4)
+      val_conf_high <- clara::formatar_numero(t_out$conf.int[2], 4)
       
       # Organizar estatísticas em um dataframe limpo
       df_res <- data.frame(
@@ -524,6 +563,46 @@ mod_parametric_server <- function(id, data_rv, import_info) {
       res <- test_results()
       req(res)
       t_out <- res$t_out
+
+      # Duas amostras: as frases, as tabelas e o efeito da ClaRa, e a
+      # chamada que vai escrita no Projeto R.
+      if (res$type == "two_ind") {
+        r <- res$clara
+        textos <- unclass(r$textos)
+        frases <- unlist(textos[c("amostra", "teste", "efeito")], use.names = FALSE)
+        avisos <- unlist(textos[c("alerta", "poder")], use.names = FALSE)
+        avisos <- avisos[nzchar(avisos)]
+        return(tagList(
+          div(class = "small text-muted mb-2",
+              sprintf("Análise feita pela ClaRa %s: %s.", r$versao_clara,
+                      exportacao_teste_t_clara_parametros(list(
+                        tipo = "teste_t_two_ind",
+                        parametros = list(grupo = res$var_names[2],
+                                          variancias_iguais = isTRUE(input$two_var_equal),
+                                          alternativa = input$alternative)))$nome_teste)),
+          div(class = "alert alert-secondary", style = "font-size: 0.9rem; line-height: 1.45;",
+              paste(frases[nzchar(frases)], collapse = " ")),
+          lapply(avisos, function(a) div(class = "alert alert-light border py-2 small", a)),
+          h6("Resumo por grupo", style = "font-weight: 700; color: #0F3B5F;"),
+          flextable::htmltools_value(clara::exibir_resumo(r$resultado, casas = 2, tema = "cinza")),
+          h6("Teste t", style = "font-weight: 700; color: #0F3B5F;"),
+          flextable::htmltools_value(clara::exibir_teste(r$resultado, tema = "cinza")),
+          h6("Tamanho de efeito", style = "font-weight: 700; color: #0F3B5F;"),
+          flextable::htmltools_value(clara::exibir_tabela(data.frame(
+            Medida = r$efeito$medida,
+            Valor = clara::formatar_numero(r$efeito$valor, 3),
+            `IC inferior` = clara::formatar_numero(r$efeito$ic_inf, 3),
+            `IC superior` = clara::formatar_numero(r$efeito$ic_sup, 3),
+            Leitura = r$efeito$leitura,
+            check.names = FALSE), tema = "cinza")),
+          tags$details(
+            tags$summary("A chamada da ClaRa, que vai escrita no Projeto R"),
+            tags$pre(paste(r$chamada, collapse = "\n")),
+            helpText("A base preparada se chama base. Acrescente mostrar_codigo = TRUE",
+                     "à chamada para ver o R comum que roda por baixo.")
+          )
+        ))
+      }
       
       p_val <- t_out$p.value
       sig_level <- 0.05
@@ -644,103 +723,25 @@ mod_parametric_server <- function(id, data_rv, import_info) {
       }
     })
     
-    # Figura de médias ± desvio padrão com letras de significância
-    # (apenas duas amostras independentes)
+    # Figura de médias com as letras do teste (apenas duas amostras
+    # independentes): a figura principal da ClaRa, com as mesmas escolhas
+    # da seção 6.2 do roteiro exportado.
     output$test_plot_medias <- renderPlot({
       res <- test_results()
       req(res, res$type == "two_ind")
-      df <- data_rv()
-      req(df, input$two_var_y, input$two_var_x)
-      
-      title_val <- if (nzchar(input$custom_title)) input$custom_title else "Médias com IC"
-      x_label <- if (nzchar(input$custom_label_x)) input$custom_label_x else ""
-      y_label <- if (nzchar(input$custom_label_y)) input$custom_label_y else "Valores"
-      
-      g_theme <- switch(input$graph_theme,
-                        "minimal" = theme_minimal(base_size = 14),
-                        "classic" = theme_classic(base_size = 14),
-                        "bw"      = theme_bw(base_size = 14),
-                        "gray"    = theme_gray(base_size = 14),
-                        "light"   = theme_light(base_size = 14),
-                        theme_minimal(base_size = 14))
-      
-      g_theme <- g_theme + theme(plot.title = element_text(face = "bold", size = 16, color = "#212529"))
-      
-      df_clean <- df[, c(input$two_var_y, input$two_var_x)]
-      df_clean <- na.omit(df_clean)
-      df_clean[[input$two_var_x]] <- as.factor(df_clean[[input$two_var_x]])
-      
-      alfa_painel <- 1 - input$conf_level / 100
-      cores_grupo <- c("#0F3B5F", "#E89B3C")
-      
-      resumo <- df_clean |>
-        dplyr::group_by(.data[[input$two_var_x]]) |>
-        dplyr::summarise(
-          media = mean(.data[[input$two_var_y]]),
-          dp = sd(.data[[input$two_var_y]]),
-          n = dplyr::n(),
-          .groups = "drop"
-        )
-      # IC bilateral de cada média; não confundir com IC da diferença testada.
-      margem_ic <- qt((1 + input$conf_level / 100) / 2, resumo$n - 1) * resumo$dp / sqrt(resumo$n)
-      resumo$ic_inf <- resumo$media - margem_ic
-      resumo$ic_sup <- resumo$media + margem_ic
-      # As letras seguem o p do teste escolhido (Student ou Welch, conforme o
-      # campo de variâncias): sem diferença, "a" para os dois grupos; com
-      # diferença, "a" para o grupo de maior média e "b" para o outro.
-      # which.max localiza a maior média pelo índice, sem comparar números de
-      # ponto flutuante por igualdade.
-      resumo$letra <- dplyr::case_when(
-        res$t_out$p.value >= alfa_painel ~ "a",
-        seq_along(resumo$media) == which.max(resumo$media) ~ "a",
-        TRUE ~ "b"
-      )
-      # Rótulo ao lado do losango, com vírgula decimal e as mesmas casas do
-      # projeto exportado (lá, fmt(); aqui, o mesmo formatC que os módulos
-      # usam). O DP é amostral no rótulo; as hastes mostram IC bilateral.
-      rotular_media <- function(x) formatC(x, format = "f", digits = 2, decimal.mark = ",")
-      resumo$rotulo_media <- paste0(rotular_media(resumo$media), " ± ", rotular_media(resumo$dp))
-      # Alturas do texto: a letra fica acima do ponto mais alto e da haste
-      # mais alta; o rótulo, ao lado do losango, na altura da média. A folga
-      # é aditiva (6% da amplitude da figura): com valores todos negativos,
-      # max * 1.06 colocaria o texto dentro dos dados.
-      valores_figura <- c(resumo$ic_sup, resumo$ic_inf,
-                          df_clean[[input$two_var_y]])
-      folga_y <- 0.06 * diff(range(valores_figura, na.rm = TRUE))
-      y_letra <- max(valores_figura, na.rm = TRUE) + folga_y
-      resumo$y_rotulo <- resumo$media
-
-      ggplot(resumo, aes(x = .data[[input$two_var_x]])) +
-        geom_col(aes(y = media, fill = .data[[input$two_var_x]]),
-          width = 0.30, alpha = 0.22, show.legend = FALSE) +
-        scale_fill_manual(values = cores_grupo) +
-        geom_jitter(
-          data = df_clean,
-          aes(y = .data[[input$two_var_y]], colour = .data[[input$two_var_x]]),
-          width = 0.10, size = 2.2, alpha = 0.7
-        ) +
-        geom_errorbar(aes(ymin = ic_inf, ymax = ic_sup),
-                      width = 0.08, linewidth = 0.8, colour = "#0F3B5F") +
-        geom_point(aes(y = media), shape = 18, size = 4.4, colour = "#0F3B5F") +
-        # Rótulo à direita do losango, com fundo transparente e sem borda,
-        # para continuar legível sobre pontos próximos.
-        geom_label(aes(y = y_rotulo, label = rotulo_media),
-                   nudge_x = 0.05, hjust = 0, vjust = 0.5, fontface = "bold",
-                   linewidth = 0, label.padding = grid::unit(0.12, "lines"),
-                   fill = NA, colour = "#0F3B5F",
-                   size = 3.2) +
-        geom_text(aes(y = y_letra, label = letra), size = 5, fontface = "bold", colour = "#0F3B5F") +
-        scale_colour_manual(values = cores_grupo, guide = "none") +
-        # A folga à direita evita que o rótulo ao lado do segundo grupo seja cortado.
-        scale_x_discrete(expand = expansion(add = c(0.6, 0.9))) +
-        scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
-        labs(
-          title = title_val,
-          x = x_label, y = y_label,
-          subtitle = paste0("Pontos: observações; losango: média; rótulo: média ± DP; hastes: IC bilateral da média.\n",
-                            "Letras iguais: sem diferença significativa")
-        ) +
-        g_theme
+      clara::grafico_medias(res$clara$resultado,
+                            explicacao       = TRUE,
+                            haste            = "ic",
+                            mostrar_barras   = TRUE,
+                            largura_barras   = 0.3,
+                            mostrar_pontos   = TRUE,
+                            mostrar_media_dp = TRUE,
+                            casas            = 1,
+                            angulo_rotulo    = -90,
+                            mostrar_letras   = TRUE,
+                            cores            = "ocean",
+                            tamanho_texto    = 12,
+                            fonte            = "sans")
     })
     
     # Gráfico de Distribuição t Teórica
@@ -775,7 +776,21 @@ mod_parametric_server <- function(id, data_rv, import_info) {
     output$normality_test_out <- renderPrint({
       res <- test_results()
       req(res)
-      
+
+      # Duas amostras: a normalidade em cada grupo, como a ClaRa confere.
+      if (res$type == "two_ind") {
+        pressupostos <- res$clara$resultado$pressupostos
+        normalidade <- pressupostos[pressupostos$teste == "Shapiro-Wilk", ]
+        print(data.frame(Pressuposto = normalidade$pressuposto,
+                         W = clara::formatar_numero(normalidade$estatistica, 4),
+                         p = clara::formatar_p(normalidade$p),
+                         Leitura = normalidade$leitura), row.names = FALSE)
+        cat("\nInterpretação:\n")
+        cat(strwrap(gsub("*", "", unclass(res$clara$textos)$pressupostos, fixed = TRUE),
+                    width = 78, prefix = "  "), sep = "\n")
+        return(invisible())
+      }
+
       shapiro_res <- shapiro.test(res$norm_data)
       print(shapiro_res)
       
@@ -827,7 +842,9 @@ mod_parametric_server <- function(id, data_rv, import_info) {
     output$qq_plot <- renderPlot({
       res <- test_results()
       req(res)
-      
+      # Duas amostras: o Q-Q da ClaRa, um painel por grupo.
+      if (res$type == "two_ind") return(clara::grafico_qq(res$clara$resultado))
+
       diag_data <- data.frame(ResiduosStd = res$norm_data)
       
       g_theme <- theme_minimal(base_size = 12) +

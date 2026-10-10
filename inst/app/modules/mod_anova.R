@@ -48,8 +48,13 @@ anova_clara_metodo_usado <- function(df, resposta, fator, metodo, nivel_confianc
 # mesma função do exportador e o avalia num ambiente em que `base` é a base
 # escolhida na tela. Devolve a chamada, o resultado, o efeito e as frases.
 anova_clara_rodar <- function(df, parametros) {
-  item <- list(parametros = parametros)
-  chamada <- exportacao_anova_clara_chamada(item, "tela")
+  item <- list(tipo = "anova_um_fator", parametros = parametros)
+  # Com dois grupos, a chamada é a do teste t (com a hipótese bilateral
+  # escrita), a mesma que o projeto do teste t em ClaRa escreve.
+  completos <- stats::complete.cases(df[c(parametros$resposta, parametros$fator)])
+  grupos <- length(unique(as.character(df[[parametros$fator]][completos])))
+  chamada <- if (grupos == 2L) exportacao_teste_t_clara_chamada(item, "tela") else
+    exportacao_anova_clara_chamada(item, "tela")
   ambiente <- new.env(parent = asNamespace("clara"))
   ambiente$base <- df
   eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)

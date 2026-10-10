@@ -1,0 +1,14 @@
+project:
+  type: default
+  output-dir: saida
+  execute-dir: project
+  render:
+    - relatorios/relatorio.qmd
+
+lang: pt-BR
+execute:
+  cache: false
+  freeze: false
+  echo: false
+  message: false
+  warning: true

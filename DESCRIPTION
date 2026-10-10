@@ -61,7 +61,7 @@ Imports:
     missMDA,
     patchwork,
     EAPADados (>= 0.1.10),
-    clara (>= 0.10.0)
+    clara (>= 0.11.0)
 Suggests:
     here,
     knitr,
