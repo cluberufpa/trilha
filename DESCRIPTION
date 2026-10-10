@@ -1,7 +1,7 @@
 Package: trilha
 Type: Package
 Title: Trilha: da Pergunta ao Relatório, uma Só Trilha de Análise em R
-Version: 0.2.2
+Version: 0.2.3
 Author: Evaldo Silva [aut, cre]
 Maintainer: Evaldo Silva <astuciasnor@gmail.com>
 Authors@R: c(
@@ -61,7 +61,7 @@ Imports:
     missMDA,
     patchwork,
     EAPADados (>= 0.1.10),
-    clara (>= 0.11.0)
+    clara (>= 0.12.0)
 Suggests:
     here,
     knitr,

@@ -334,6 +334,30 @@ com dois grupos, e a Trilha passa a pedir `clara (>= 0.11.0)`.
 Mapas, planejamento amostral e o Laboratório de Conceitos não precisam da
 ClaRa: não são análises com relatório estatístico.
 
+**Andamento da onda 2 (10/10/2026): regressão linear simples feita.**
+Decisões do professor no mesmo dia: `relacionar_variaveis(resposta,
+preditor)`, figura principal `grafico_reta()`, uma reta só nesta versão (o
+grupo da tela só colore os pontos, em `colorir_por`) e diagnóstico com
+resíduos, Q-Q e uma tabela de influência. ClaRa 0.12.0; a Trilha passa a
+pedir `clara (>= 0.12.0)` (versão 0.2.3).
+
+- Com "Linear (reta)" e sem "uma reta por grupo", a tela da regressão roda a
+  chamada de `exportacao_regressao_clara_chamada()`, a mesma que o projeto
+  escreve, e mostra as frases, as tabelas (coeficientes e ajuste), o
+  efeito, os pressupostos, as observações para conferir e as três figuras
+  da ClaRa. O "Ver código R" mostra as chamadas da ClaRa e o R comum por
+  trás delas. O Durbin-Watson da tela passa a ser o da ClaRa, com semente
+  fixa (antes mudava a cada clique).
+- Molde `templates/regressao_clara/` (roteiro, relatório Word e README), na
+  entrada `regressao_clara` do registro. A receita da base com carimbo
+  (`exportacao_clara_receita()`) aprendeu a ficar sem grupos: o carimbo traz
+  as linhas e as médias da resposta e do preditor.
+- Seguem no molde antigo (`regressao_linear`), sem ClaRa: as retas por grupo
+  (outro modelo, com interação), a potência e o Von Bertalanffy.
+- `test_clara_projeto_render.R` ganhou dois casos (reta simples; cor por
+  população com Durbin-Watson) e `test_regressao_clara_tela.R` confere a tela.
+- Falta na onda 2: a correlação.
+
 ### Fase 5 · CRAN
 
 Primeiro a `clara` (menor e sem interface), depois a `trilha`. O que o CRAN

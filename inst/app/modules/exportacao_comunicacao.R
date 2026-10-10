@@ -2810,6 +2810,238 @@ exportacao_teste_t_clara_marcadores_readme <- function(item, nome_projeto, impor
   )
 }
 
+# ---- Regressão linear simples em ClaRa --------------------------------------
+# A rota ClaRa da regressão linear simples: uma reta só, com
+# relacionar_variaveis(). A variável de grupo da tela só colore os pontos de
+# grafico_reta(); com "uma reta por grupo" marcada, o projeto segue no molde
+# antigo (outro modelo, ainda sem ClaRa). Os parâmetros da tela viram uma
+# lista só, de onde saem a chamada, os marcadores e os textos.
+exportacao_regressao_clara_parametros <- function(item) {
+  p <- item$parametros
+  rotulo <- function(x, padrao) {
+    x <- trimws(as.character(x %||% ""))
+    if (nzchar(x)) x else padrao
+  }
+  resposta <- as.character(p$resposta %||% "resposta")
+  preditor <- as.character(p$preditor %||% "preditor")
+  grupo <- as.character(p$grupo %||% "none")
+  list(
+    resposta = resposta,
+    preditor = preditor,
+    grupo = if (identical(grupo, "none") || !nzchar(grupo)) NULL else grupo,
+    rotulo_resposta = rotulo(p$rotulo_resposta, resposta),
+    rotulo_preditor = rotulo(p$rotulo_preditor, preditor),
+    rotulo_resposta_escrito = nzchar(trimws(as.character(p$rotulo_resposta %||% ""))),
+    rotulo_preditor_escrito = nzchar(trimws(as.character(p$rotulo_preditor %||% ""))),
+    confianca = p$nivel_confianca %||% .95,
+    autocorrelacao = isTRUE(p$avaliar_autocorrelacao),
+    mostrar_equacao = !isFALSE(p$mostrar_equacao),
+    titulo = trimws(as.character(p$titulo_personalizado %||% ""))
+  )
+}
+
+# A regressão em ClaRa vale para um projeto com uma execução só: uma reta
+# linear, sem retas separadas por grupo.
+exportacao_regressao_clara_aceita <- function(manifesto) {
+  if (isFALSE(manifesto$codigo_clara)) return(FALSE)
+  itens <- manifesto$execucoes %||% list()
+  incluidos <- exportacao_execucoes_incluidas(manifesto)
+  if (length(itens) != 1L || length(incluidos) != 1L) return(FALSE)
+  exportacao_regressao_clara_simples(incluidos[[1]])
+}
+
+# Uma reta só: modelo linear e, havendo grupo, sem uma reta por grupo.
+exportacao_regressao_clara_simples <- function(item) {
+  p <- item$parametros %||% list()
+  grupo <- as.character(p$grupo %||% "none")
+  identical(item$tipo, "regressao_linear") &&
+    identical(p$tipo_modelo %||% "linear", "linear") &&
+    !(nzchar(grupo) && !identical(grupo, "none") && isTRUE(p$regressao_por_grupo))
+}
+
+# A chamada de relacionar_variaveis(), nas três formas da ANOVA (ver
+# exportacao_anova_clara_chamada()): "tela", "script" e "relatorio", com os
+# mesmos argumentos. avaliar_autocorrelacao vai sempre escrito: é uma decisão
+# sobre o delineamento.
+exportacao_regressao_clara_chamada <- function(item, forma = c("tela", "script", "relatorio")) {
+  forma <- match.arg(forma)
+  q <- exportacao_regressao_clara_parametros(item)
+  recuo <- strrep(" ", nchar("  relacionar_variaveis("))
+  argumento <- function(nome, valor) sprintf("%-22s = %s", nome, valor)
+  linhas <- c(
+    rotulo_resposta = paste0(argumento("rotulo_resposta", encodeString(q$rotulo_resposta, quote = '"')), ","),
+    rotulo_preditor = paste0(argumento("rotulo_preditor", encodeString(q$rotulo_preditor, quote = '"')), ","),
+    confianca = paste0(argumento("confianca", format(q$confianca, digits = 15, decimal.mark = ".")), ","),
+    autocorrelacao = paste0(argumento("avaliar_autocorrelacao", if (q$autocorrelacao) "TRUE" else "FALSE"), ")")
+  )
+  notas <- c(
+    rotulo_resposta = paste0("no texto e na figura", if (!q$rotulo_resposta_escrito) ', ex.: "Peso (g)"'),
+    rotulo_preditor = paste0("no texto e na figura", if (!q$rotulo_preditor_escrito) ', ex.: "Comprimento (cm)"'),
+    autocorrelacao = "TRUE só se a ordem das linhas for a da coleta"
+  )
+  linhas <- switch(forma,
+    tela = linhas,
+    script = {
+      largura <- max(nchar(linhas[names(notas)])) + 2L
+      com_nota <- names(notas)
+      linhas[com_nota] <- paste0(formatC(linhas[com_nota], width = -largura), "# ", notas[com_nota])
+      linhas
+    },
+    relatorio = {
+      saida <- character()
+      for (nome in names(linhas)) {
+        if (is.element(nome, names(notas))) saida <- c(saida, paste0("# ", notas[[nome]], ":"))
+        saida <- c(saida, linhas[[nome]])
+      }
+      saida
+    })
+  c("resultado <- base |>",
+    paste0("  relacionar_variaveis(", argumento("resposta", exportacao_nome_clara(q$resposta)), ","),
+    paste0(recuo, argumento("preditor", exportacao_nome_clara(q$preditor)), ","),
+    paste0(recuo, unname(linhas)))
+}
+
+# A chamada de grafico_reta(), a figura principal. "script": todas as escolhas
+# escritas, com as opções ao lado; "relatorio": sem a explicação do topo (ela
+# vai para a legenda) e com a fonte serifada do Word.
+exportacao_regressao_clara_figura <- function(item, forma = c("script", "relatorio", "tela")) {
+  forma <- match.arg(forma)
+  q <- exportacao_regressao_clara_parametros(item)
+  argumento <- function(nome, valor) sprintf("%-15s = %s", nome, valor)
+  recuo <- strrep(" ", nchar("  grafico_reta("))
+  linhas <- c(
+    titulo = argumento("titulo", if (nzchar(q$titulo)) encodeString(q$titulo, quote = '"') else "NULL"),
+    explicacao = argumento("explicacao", if (identical(forma, "relatorio")) "FALSE" else "TRUE"),
+    faixa = argumento("mostrar_faixa", "TRUE"),
+    equacao = argumento("mostrar_equacao", if (q$mostrar_equacao) "TRUE" else "FALSE"),
+    cores_por = if (!is.null(q$grupo)) argumento("colorir_por", exportacao_nome_clara(q$grupo)),
+    rotulo_cores = if (!is.null(q$grupo)) argumento("rotulo_cores", encodeString(q$grupo, quote = '"')),
+    cores = argumento("cores", '"ocean"'),
+    casas = argumento("casas", if (identical(forma, "relatorio")) "casas" else "2"),
+    tamanho = argumento("tamanho_texto", "12"),
+    fonte = argumento("fonte", if (identical(forma, "relatorio")) '"serif"' else '"sans"')
+  )
+  linhas <- linhas[!vapply(linhas, is.null, logical(1))]
+  linhas <- unlist(linhas)
+  linhas[-length(linhas)] <- paste0(linhas[-length(linhas)], ",")
+  linhas[length(linhas)] <- paste0(linhas[length(linhas)], ")")
+  if (identical(forma, "script")) {
+    notas <- c(explicacao = "FALSE tira a explicação do topo",
+               equacao = "a equação da reta e o R² no canto",
+               cores_por = "só a cor dos pontos; a reta é uma só",
+               cores = '"ocean", "cinza" ou um vetor',
+               casas = "casas dos coeficientes na equação",
+               fonte = '"sans" (Arial) ou "serif" (Times)')
+    notas <- notas[is.element(names(notas), names(linhas))]
+    largura <- max(nchar(linhas)) + 2L
+    linhas[names(notas)] <- paste0(formatC(linhas[names(notas)], width = -largura), "# ", notas)
+  }
+  c(paste0("  grafico_reta(", linhas[1]), paste0(recuo, unname(linhas[-1])))
+}
+
+# Os textos padrão das seções do relatório da regressão em ClaRa.
+exportacao_regressao_clara_textos <- function(item, import_info = list()) {
+  q <- exportacao_regressao_clara_parametros(item)
+  ic <- format(100 * q$confianca, trim = TRUE, decimal.mark = ",")
+  alfa <- format(1 - q$confianca, trim = TRUE, decimal.mark = ",")
+  # O exemplo do barbo, que a Trilha traz pronto, ganha os textos próprios.
+  barbo <- identical(import_info$source, "package") &&
+    identical(import_info$package_dataset, "morfometria_barbo")
+  independencia <- if (q$autocorrelacao) paste(
+    "A independência das observações foi conferida pelo teste de Durbin-Watson na ordem",
+    "das linhas, que corresponde à ordem da coleta.") else paste(
+    "A independência das observações depende do delineamento e deve ser justificada pela",
+    "unidade amostral.")
+  list(
+    introducao = c(
+      "*Sugestão de redação: adapte a pergunta e acrescente referências do seu tema antes de compartilhar o relatório.*", "",
+      if (barbo) "A forma corporal dos peixes pode ser descrita pela relação entre suas medidas morfométricas. No conjunto `morfometria_barbo`, do EAPADados, as medidas de *Barbus petenyi* já foram corrigidas alometricamente pelo comprimento padrão. Assim, a pergunta se refere à associação entre medidas de forma corporal, e não à velocidade de crescimento dos peixes. O conjunto é um recorte didático de dados disponibilizados no Mendeley Data [@takacs2022]." else
+        "A regressão linear simples descreve como uma variável numérica muda, em média, com outra, e quanto da variação da primeira a reta explica.", "",
+      sprintf("Neste estudo, examinou-se como %s varia em função de %s.", q$rotulo_resposta, q$rotulo_preditor)),
+    metodos = c(
+      "*Sugestão de redação: complete a origem dos dados, o período, o local, a unidade amostral, as unidades de medida e os critérios de seleção.*", "",
+      if (barbo) c("Utilizou-se o recorte `morfometria_barbo` do EAPADados. A base de origem reúne indivíduos de cinco populações; filtros e exclusões aplicados neste projeto devem ser descritos. Uma reta conjunta descreve a associação no conjunto analisado e não separa relações dentro de cada população de diferenças entre populações.", ""),
+      sprintf("As análises foram feitas no R [@rcore2025]. A relação entre %s (resposta) e %s (preditor) foi descrita por regressão linear simples, ajustada por mínimos quadrados, com intervalo de confiança de %s%% e nível de significância de %s.",
+              q$rotulo_resposta, q$rotulo_preditor, ic, alfa), "",
+      paste("A normalidade dos resíduos foi avaliada pelo teste de Shapiro-Wilk e a constância da",
+            "variância pelo teste de Breusch-Pagan, do pacote `car` [@fox2019]; os testes foram lidos",
+            "junto com os gráficos de resíduos [@kozak2018]. Observações com resíduo padronizado acima",
+            "de 3, alavancagem acima de 2p/n ou distância de Cook acima de 4/n foram conferidas, sem",
+            "exclusão automática. O tamanho de efeito foi descrito pelo R² e pelo r de Pearson, com",
+            "intervalos de confiança [@benshachar2020]. As figuras foram construídas com o `ggplot2`",
+            "[@wickham2016]."), "",
+      independencia),
+    discussao = c(
+      "*Sugestão para desenvolver a discussão: interprete a inclinação na unidade das variáveis e o R² no contexto do estudo, com as referências consultadas.*", "",
+      if (barbo) "Neste exemplo, uma associação entre medidas corrigidas descreve covariação da forma corporal. Ela não demonstra crescimento individual nem um mecanismo causal. Como a base reúne cinco populações, diferenças entre elas podem contribuir para a associação conjunta; confira a dispersão por população e o delineamento antes de generalizar." else
+        "A inclinação descreve a variação média observada na faixa dos dados. A interpretação causal, a extrapolação para fora dessa faixa e a generalização dependem do delineamento e do contexto científico."),
+    conclusao = c(
+      "*Sugestão de redação: retome a pergunta da introdução e revise esta síntese depois de examinar os diagnósticos.*", "")
+  )
+}
+
+exportacao_regressao_clara_marcadores_script <- function(item) {
+  q <- exportacao_regressao_clara_parametros(item)
+  titulo <- if (nzchar(q$titulo)) q$titulo else "Regressão linear simples"
+  list(
+    TITULO_COMENTARIO = toupper(titulo),
+    PERGUNTA_COMENTARIO = sprintf("como %s varia, em média, em função de %s?",
+                                  q$rotulo_resposta, q$rotulo_preditor),
+    CHAMADA_RELACIONAR = exportacao_regressao_clara_chamada(item, "script"),
+    COMENTARIO_RELACIONAR = c(
+      "# Reta, coeficientes, ajuste, pressupostos e influência, numa função só.",
+      "# Os rótulos ficam no resultado: gráficos e textos os usam.",
+      if (q$autocorrelacao) c(
+        "# A ordem das linhas é a ordem da coleta: por isso o Durbin-Watson entra",
+        "# (avaliar_autocorrelacao = TRUE).") else c(
+        "# A independência vem do delineamento; o Durbin-Watson só entra quando a",
+        "# ordem das linhas é a ordem da coleta (avaliar_autocorrelacao = TRUE)."),
+      if (!is.null(q$grupo)) c(
+        sprintf("# Na tela, os pontos foram coloridos por %s; a reta é uma só, a de", q$grupo),
+        "# todas as observações juntas.")),
+    FIGURA_RETA = exportacao_regressao_clara_figura(item, "script"),
+    COMENTARIO_PRESSUPOSTOS = if (q$autocorrelacao) "Shapiro-Wilk, Breusch-Pagan e Durbin-Watson, com a leitura" else
+      "Shapiro-Wilk e Breusch-Pagan nos resíduos, com a leitura"
+  )
+}
+
+exportacao_regressao_clara_marcadores_qmd <- function(item, manifesto, import_info) {
+  q <- exportacao_regressao_clara_parametros(item)
+  globais <- manifesto$secoes_globais %||% list()
+  sugestoes <- exportacao_regressao_clara_textos(item, import_info)
+  secao <- function(nome, padrao) {
+    texto <- paste(as.character(globais[[nome]] %||% ""), collapse = "\n")
+    if (nzchar(trimws(texto))) texto else padrao
+  }
+  list(
+    INTRODUCAO = secao("introducao", sugestoes$introducao),
+    METODOS = secao("metodos", sugestoes$metodos),
+    DISCUSSAO = secao("discussao", sugestoes$discussao),
+    CONCLUSAO = secao("conclusao", sugestoes$conclusao),
+    TRECHO_PREPARO_QMD = manifesto$clara$qmd,
+    CHAMADA_RELACIONAR = exportacao_regressao_clara_chamada(item, "relatorio"),
+    FIGURA_RETA = exportacao_regressao_clara_figura(item, "relatorio"),
+    TITULO_RELATORIO = if (nzchar(q$titulo)) q$titulo else "Título do trabalho (preencher)",
+    ROTULO_RESPOSTA = q$rotulo_resposta,
+    ROTULO_PREDITOR = q$rotulo_preditor
+  )
+}
+
+exportacao_regressao_clara_marcadores_readme <- function(item, nome_projeto, import_info) {
+  q <- exportacao_regressao_clara_parametros(item)
+  planilha <- exportacao_nome_planilha(import_info)
+  list(
+    TITULO = if (nzchar(q$titulo)) q$titulo else nome_projeto,
+    PROJETO_RPROJ = paste0(nome_projeto, ".Rproj"),
+    ARQUIVO_BRUTO = planilha,
+    ARQUIVO_BRUTO_ARVORE = formatC(planilha, width = -max(27L, nchar(planilha) + 2L)),
+    RESPOSTA = q$rotulo_resposta,
+    PREDITOR = q$rotulo_preditor,
+    IC = format(100 * q$confianca, trim = TRUE, decimal.mark = ","),
+    VERSAO_CLARA = exportacao_versao_clara()
+  )
+}
+
 # Funções auxiliares da receita, na rota ClaRa. O projeto não leva R/funcoes.R:
 # quando a receita de preparo usa moda() (imputar a moda) ou converter_datas(),
 # a definição delas entra no próprio roteiro, logo antes da receita, copiada
@@ -2933,6 +3165,9 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
                                      base_externa, dados_analise, cache_bases) {
   item <- exportacao_execucoes_incluidas(manifesto)[[1]]
   resposta <- as.character(item$parametros$resposta %||% "resposta")
+  # Na regressão não há grupos: o carimbo leva as médias da resposta e do
+  # preditor, e a base não ganha o passo do fator.
+  regressao <- identical(item$tipo, "regressao_linear")
   # Na ANOVA, o fator; no teste t de duas amostras, o grupo.
   fator <- as.character(item$parametros$fator %||% item$parametros$grupo %||% "grupo")
   ramo <- identical(item$base_tipo, "derivada")
@@ -2974,18 +3209,23 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
   col_fator <- exportacao_nome_clara(fator)
   col_resposta <- exportacao_nome_clara(resposta)
   base_tela <- as.data.frame(if (ramo) cache_bases[[item$base_id]]$df else dados_analise)
-  grupos <- base_tela[[fator]]
-  niveis <- if (is.factor(grupos)) levels(grupos) else sort(unique(as.character(stats::na.omit(grupos))))
-  grupos <- factor(as.character(grupos), levels = niveis)
-  contagem <- as.vector(table(grupos))
-  medias <- as.vector(tapply(base_tela[[resposta]], grupos, mean, na.rm = TRUE))
   numero <- function(x) ifelse(is.finite(x), formatC(x, format = "fg", digits = 4, decimal.mark = ","), "sem dados")
-  niveis_r <- paste0("c(", paste(encodeString(niveis, quote = '"'), collapse = ", "), ")")
-
-  passo_fator <- c(
-    "  # Os grupos como fator, na ordem em que a Trilha os mostrou.",
-    sprintf("  mutate(%s = factor(%s, levels = %s))", col_fator, col_fator, niveis_r)
-  )
+  if (regressao) {
+    preditor <- as.character(item$parametros$preditor %||% "preditor")
+    col_preditor <- exportacao_nome_clara(preditor)
+    passo_fator <- character()
+  } else {
+    grupos <- base_tela[[fator]]
+    niveis <- if (is.factor(grupos)) levels(grupos) else sort(unique(as.character(stats::na.omit(grupos))))
+    grupos <- factor(as.character(grupos), levels = niveis)
+    contagem <- as.vector(table(grupos))
+    medias <- as.vector(tapply(base_tela[[resposta]], grupos, mean, na.rm = TRUE))
+    niveis_r <- paste0("c(", paste(encodeString(niveis, quote = '"'), collapse = ", "), ")")
+    passo_fator <- c(
+      "  # Os grupos como fator, na ordem em que a Trilha os mostrou.",
+      sprintf("  mutate(%s = factor(%s, levels = %s))", col_fator, col_fator, niveis_r)
+    )
+  }
   if (cadeia_unica) {
     if (ramo && length(especificos)) {
       registro <- bases_obter(registro_bases, item$base_id)
@@ -2994,20 +3234,27 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
                                if (nzchar(nome_ramo)) paste0(" \"", nome_ramo, "\"") else ""),
                        especificos)
     }
-    receita_final <- c(soltas, "base <- dados_brutos |>",
+    receita_final <- c(soltas, if (length(compartilhada) || length(especificos) || length(passo_fator))
+                         "base <- dados_brutos |>" else "base <- dados_brutos",
                        encadear(list(compartilhada, especificos, passo_fator)))
   } else {
     # Preparo com lógica própria: a receita fica como veio e a base sai no fim.
     while (length(receita) && !nzchar(trimws(receita[length(receita)]))) receita <- receita[-length(receita)]
+    origem <- if (ramo) "dados" else "base_compartilhada"
     receita_final <- c(receita, "",
-                       sprintf("base <- %s |>", if (ramo) "dados" else "base_compartilhada"),
+                       if (length(passo_fator)) sprintf("base <- %s |>", origem) else sprintf("base <- %s", origem),
                        passo_fator)
   }
   travar <- sprintf("stopifnot(nrow(base) == %dL)", nrow(base_tela))
-  carimbo <- c(
-    "# 3.2 Conferir com a tela. O carimbo é o que a Trilha mostrou ao exportar.",
-    "# O QUE CONFERIR: a tabela calculada pelo R deve repetir o carimbo.",
-    sprintf("# Carimbo: %d linhas.", nrow(base_tela)),
+  carimbo_numeros <- if (regressao) c(
+    strwrap(paste0("Média de ", resposta, ": ", numero(mean(base_tela[[resposta]], na.rm = TRUE)),
+                   "; média de ", preditor, ": ", numero(mean(base_tela[[preditor]], na.rm = TRUE)), "."),
+            width = 76, initial = "# ", prefix = "#   "),
+    "base |>",
+    "  summarise(n = n(),",
+    sprintf("            media_%s = mean(%s, na.rm = TRUE),", "resposta", col_resposta),
+    sprintf("            media_%s = mean(%s, na.rm = TRUE))", "preditor", col_preditor)
+  ) else c(
     strwrap(paste0("Contagem por ", fator, ": ",
                    paste(niveis, contagem, collapse = "; "), "."),
             width = 76, initial = "# ", prefix = "#   "),
@@ -3016,14 +3263,28 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
             width = 76, initial = "# ", prefix = "#   "),
     "base |>",
     sprintf("  group_by(%s) |>", col_fator),
-    sprintf("  summarise(n = n(), media = mean(%s, na.rm = TRUE))", col_resposta),
+    sprintf("  summarise(n = n(), media = mean(%s, na.rm = TRUE))", col_resposta)
+  )
+  carimbo <- c(
+    "# 3.2 Conferir com a tela. O carimbo é o que a Trilha mostrou ao exportar.",
+    "# O QUE CONFERIR: a tabela calculada pelo R deve repetir o carimbo.",
+    sprintf("# Carimbo: %d linhas.", nrow(base_tela)),
+    carimbo_numeros,
     "",
     "# Se a receita mudar o número de linhas, o Render para aqui.",
     travar
   )
+  # Sem nenhum passo (regressão sem tratamentos), a base é a própria planilha.
+  sem_passos <- identical(trimws(receita_final[nzchar(trimws(receita_final)) &
+                                                 !grepl("^\\s*#", receita_final)]),
+                          "base <- dados_brutos")
   script <- c(
-    "# 3.1 A receita. Da planilha à base desta análise, num só encadeamento:",
-    "# cada passo é uma linha, lida de cima para baixo.",
+    if (sem_passos) c(
+      "# 3.1 A receita. Nenhum tratamento foi registrado na Trilha: a base desta",
+      "# análise é a própria planilha. Um filtro ou uma correção entraria aqui,",
+      "# um passo por linha, com o pipe (|>).") else c(
+      "# 3.1 A receita. Da planilha à base desta análise, num só encadeamento:",
+      "# cada passo é uma linha, lida de cima para baixo."),
     receita_final, "", carimbo
   )
 
@@ -3121,6 +3382,24 @@ molde_projeto_registro <- list(
     marcadores_readme = exportacao_t_degrau_marcadores_readme
   ),
 
+  # Regressão linear simples em ClaRa: uma reta só. Vem antes da entrada da
+  # regressão antiga, que fica para as retas separadas por grupo.
+  regressao_clara = list(
+    tipo = "regressao_linear",
+    pasta = "regressao_clara",
+    apoio = "regressao_linear",
+    clara = TRUE,
+    documentos = c(relatorio.qmd = "relatorio.qmd"),
+    seleciona = exportacao_regressao_clara_aceita,
+    prefixo = function(manifesto, nome_projeto, registro_bases, pipeline,
+                       base_externa, import_info, templates_dir) {
+      list(importar = exportacao_clara_importar(import_info),
+           preparo = manifesto$clara$script)
+    },
+    marcadores_script = exportacao_regressao_clara_marcadores_script,
+    marcadores_qmd = exportacao_regressao_clara_marcadores_qmd,
+    marcadores_readme = exportacao_regressao_clara_marcadores_readme
+  ),
   regressao_linear = list(
     tipo = "regressao_linear",
     pasta = "regressao_linear",

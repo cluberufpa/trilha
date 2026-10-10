@@ -1,4 +1,49 @@
-# Módulo de Regressão Linear Simples e Não-Linear para IDE_R
+# Módulo de Regressão Linear Simples e Não-Linear da Trilha
+
+# ---- Regressão linear simples pela ClaRa ------------------------------------
+# Com "Linear (reta)" e uma reta só (sem retas separadas por grupo), a tela
+# roda a análise como o projeto vai rodar: monta o texto da chamada de
+# relacionar_variaveis() com a mesma função do exportador e o avalia num
+# ambiente em que `base` é a base da tela. Devolve a chamada, o resultado, o
+# efeito e as frases. Potência, Von Bertalanffy e retas por grupo seguem sem
+# a ClaRa.
+regressao_clara_rodar <- function(df, parametros) {
+  item <- list(tipo = "regressao_linear", parametros = parametros)
+  chamada <- exportacao_regressao_clara_chamada(item, "tela")
+  ambiente <- new.env(parent = asNamespace("clara"))
+  ambiente$base <- df
+  eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)
+  resultado <- ambiente$resultado
+  list(
+    parametros = parametros,
+    chamada = chamada,
+    resultado = resultado,
+    efeito = clara::medir_efeito(resultado),
+    textos = clara::escrever_resultados(resultado, casas = 2),
+    versao_clara = as.character(utils::packageVersion("clara"))
+  )
+}
+
+# A figura principal da tela: a mesma chamada de grafico_reta() que o
+# roteiro escreve, avaliada sobre o resultado da tela.
+regressao_clara_figura <- function(r) {
+  item <- list(tipo = "regressao_linear", parametros = r$parametros)
+  chamada <- c("resultado |>", exportacao_regressao_clara_figura(item, "tela"))
+  ambiente <- new.env(parent = asNamespace("clara"))
+  ambiente$resultado <- r$resultado
+  eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)
+}
+
+# O R comum por trás da chamada: a mesma chamada, com mostrar_codigo = TRUE.
+regressao_clara_codigo <- function(r, df) {
+  chamada <- r$chamada
+  chamada[length(chamada)] <- sub("[)]$", ",", chamada[length(chamada)])
+  recuo <- strrep(" ", nchar("  relacionar_variaveis("))
+  chamada <- c(chamada, paste0(recuo, "mostrar_codigo         = TRUE)"))
+  ambiente <- new.env(parent = asNamespace("clara"))
+  ambiente$base <- df
+  utils::capture.output(invisible(eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)))
+}
 
 # Motor de ajuste não-linear (potência, Von Bertalanffy, logístico).
 # Fonte canônica: EAPADados; fallback local para execução offline.
@@ -14,6 +59,11 @@ mod_regression_ui <- function(id, is_logistic = FALSE) {
   aba_ajuste <- if (is_logistic) "Curva de Probabilidade" else "Reta Ajustada"
   aba_residuos <- if (is_logistic) "Resíduos de Deviance" else "Resíduos vs Ajustados"
   aba_diagnostico <- if (is_logistic) "Influência (Cook)" else "Normalidade (Q-Q Plot)"
+  # Uma reta só (linear, sem retas por grupo): a tela usa a ClaRa, com o tema
+  # Ocean e os rótulos da análise; os controles de aparência antigos somem.
+  usa_clara_js <- if (is_logistic) "false" else sprintf(
+    "input['%s'] == 'linear' && (input['%s'] == 'none' || !input['%s'])",
+    ns("model_type"), ns("var_group"), ns("grp_reg"))
   tagList(
     layout_columns(
       col_widths = c(1, 1, 1),
@@ -64,7 +114,7 @@ mod_regression_ui <- function(id, is_logistic = FALSE) {
               "Baixe o Projeto R em ",
               strong("Comunicação de Resultados"), ". Execute a análise, clique em ",
               strong("Adicionar ao Projeto R"), " e escolha lá os componentes do relatório. ",
-              "No RStudio, abra o projeto e use Render para gerar o caderno HTML e o Word."
+              "No RStudio, abra o projeto e use Render para gerar o relatório em Word."
             ),
             div(style = "margin-top: 8px;"),
             actionButton(ns("export_code"), "Ver Código R", icon = icon("code"),
@@ -80,18 +130,7 @@ mod_regression_ui <- function(id, is_logistic = FALSE) {
         nav_panel(
           title = "Tabela de Resultados",
           icon = icon("table"),
-          card_body(
-            verbatimTextOutput(ns("formula_text")),
-            div(style = "margin-bottom: -20px;", DTOutput(ns("coef_table"), height = "auto")),
-            hr(style = "margin: 10px 0; border-color: #dee2e6;"),
-            uiOutput(ns("metrics_summary")),
-            if (!is_logistic) conditionalPanel(
-              condition = sprintf("input['%s'] == 'linear'", ns("model_type")),
-              hr(), tags$h5("Pressupostos da reta global"),
-              DTOutput(ns("pressupostos_table")),
-              helpText("Leia os testes junto aos gráficos de resíduos e Q-Q. Retas por grupo exigem diagnóstico de cada grupo.")
-            )
-          )
+          card_body(uiOutput(ns("tabela_resultados_ui")))
         ),
         nav_panel(
           title = aba_ajuste,
@@ -130,14 +169,16 @@ mod_regression_ui <- function(id, is_logistic = FALSE) {
               textInput(ns("custom_label_x"), "Rótulo Eixo X:", value = ""),
               textInput(ns("custom_label_y"), "Rótulo Eixo Y:", value = "")
             ),
+            # Na ClaRa, os gráficos de diagnóstico têm títulos e eixos próprios,
+            # que explicam o que procurar.
             conditionalPanel(
-              condition = sprintf("input['%s'] == '%s'", ns("active_tab"), aba_residuos),
+              condition = sprintf("input['%s'] == '%s' && !(%s)", ns("active_tab"), aba_residuos, usa_clara_js),
               textInput(ns("resid_title"), "Título do Gráfico:", value = ""),
               textInput(ns("resid_label_x"), "Rótulo Eixo X:", value = ""),
               textInput(ns("resid_label_y"), "Rótulo Eixo Y:", value = "")
             ),
             conditionalPanel(
-              condition = sprintf("input['%s'] == '%s'", ns("active_tab"), aba_diagnostico),
+              condition = sprintf("input['%s'] == '%s' && !(%s)", ns("active_tab"), aba_diagnostico, usa_clara_js),
               textInput(ns("qq_title"), "Título do Gráfico:", value = ""),
               textInput(ns("qq_label_x"), "Rótulo Eixo X:", value = ""),
               textInput(ns("qq_label_y"), "Rótulo Eixo Y:", value = "")
@@ -148,22 +189,32 @@ mod_regression_ui <- function(id, is_logistic = FALSE) {
                 condition = sprintf("input['%s'] != 'none'", ns("var_group")),
                 div(style = "display: flex; flex-direction: column; gap: 2px; margin-top: -5px; margin-bottom: 10px;",
                   checkboxInput(ns("grp_reg"), "Ajustar reta por grupo (Retas independentes)", value = TRUE),
-                  div(style = "display: flex; gap: 15px;",
-                    checkboxInput(ns("grp_color"), "Mapear Cor", value = TRUE),
-                    checkboxInput(ns("grp_fill"), "Mapear Preenchimento", value = TRUE)
+                  conditionalPanel(
+                    condition = sprintf("input['%s']", ns("grp_reg")),
+                    div(style = "display: flex; gap: 15px;",
+                      checkboxInput(ns("grp_color"), "Mapear Cor", value = TRUE),
+                      checkboxInput(ns("grp_fill"), "Mapear Preenchimento", value = TRUE)
+                    )
+                  ),
+                  conditionalPanel(
+                    condition = sprintf("!input['%s']", ns("grp_reg")),
+                    helpText("Uma reta só, a de todos os pontos; o grupo colore os pontos.")
                   )
                 )
               )
             ),
             sliderInput(ns("conf_level"), "Nível de confiança (%):",
                         min = 80, max = 99, value = 95, step = 1),
-            selectInput(ns("graph_theme"), "Tema do Gráfico:",
-                        choices = c("Mínimo" = "minimal",
-                                    "Clássico" = "classic",
-                                    "Preto e Branco" = "bw",
-                                    "Cinza" = "gray",
-                                    "Light" = "light"),
-                        selected = "minimal"),
+            conditionalPanel(
+              condition = sprintf("!(%s)", usa_clara_js),
+              selectInput(ns("graph_theme"), "Tema do Gráfico:",
+                          choices = c("Mínimo" = "minimal",
+                                      "Clássico" = "classic",
+                                      "Preto e Branco" = "bw",
+                                      "Cinza" = "gray",
+                                      "Light" = "light"),
+                          selected = "minimal")
+            ),
             # Mostrar a equação somente na aba principal do ajuste.
             conditionalPanel(
               condition = sprintf("input['%s'] == '%s'", ns("active_tab"), aba_ajuste),
@@ -406,6 +457,115 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
     # Detecta se o ajuste é uma curva não-linear (lista de ajustar_curva) vs lm
     is_curve <- function(fit) is.list(fit) && !is.null(fit$tipo) && !inherits(fit, "lm")
 
+    # As escolhas da tela numa lista só: é ela que vai para o registro da
+    # execução e para a chamada da ClaRa, para a tela e o projeto falarem o
+    # mesmo.
+    parametros_tela <- function() {
+      list(
+        resposta = input$var_y,
+        preditor = input$var_x,
+        grupo = input$var_group %||% "none",
+        tipo_modelo = input$model_type %||% if (isTRUE(is_logistic)) "logistico" else "linear",
+        regressao_por_grupo = isTRUE(input$grp_reg),
+        nivel_confianca = nivel_confianca(),
+        avaliar_autocorrelacao = isTRUE(input$avaliar_autocorrelacao),
+        mostrar_equacao = isTRUE(input$show_eq),
+        tema = input$graph_theme %||% "minimal",
+        titulo_personalizado = input$custom_title %||% "",
+        rotulo_preditor = input$custom_label_x %||% "",
+        rotulo_resposta = input$custom_label_y %||% ""
+      )
+    }
+
+    # Com uma reta só, a análise é a da ClaRa: a mesma chamada que o Projeto R
+    # escreve. NULL nos outros modelos e nas retas por grupo.
+    clara_rv <- eventReactive(gatilho_execucao(), {
+      if (isTRUE(is_logistic)) return(NULL)
+      parametros <- parametros_tela()
+      if (!exportacao_regressao_clara_simples(list(tipo = "regressao_linear", parametros = parametros)))
+        return(NULL)
+      req(model_fit())
+      tryCatch(regressao_clara_rodar(dados_modulo(), parametros),
+        error = function(e) validate(need(FALSE, paste("A ClaRa não conseguiu ajustar a reta:", conditionMessage(e)))))
+    }, ignoreInit = FALSE)
+
+    # Uma tabela qualquer no tema cinza da ClaRa, pronta para a tela.
+    tabela_clara <- function(tabela) {
+      flextable::htmltools_value(clara::exibir_tabela(tabela, tema = "cinza"))
+    }
+    titulo_secao <- function(texto) {
+      tags$h6(texto, style = "color: #0F3B5F; font-weight: 700; margin: 14px 0 8px;")
+    }
+
+    # O painel da tabela: a ClaRa com uma reta só; o caminho antigo nos demais.
+    output$tabela_resultados_ui <- renderUI({
+      r <- clara_rv()
+      if (is.null(r)) {
+        return(tagList(
+          verbatimTextOutput(session$ns("formula_text")),
+          div(style = "margin-bottom: -20px;", DTOutput(session$ns("coef_table"), height = "auto")),
+          hr(style = "margin: 10px 0; border-color: #dee2e6;"),
+          uiOutput(session$ns("metrics_summary")),
+          if (!isTRUE(is_logistic) && identical(input$model_type, "linear")) tagList(
+            hr(), tags$h5("Pressupostos da reta global"),
+            DTOutput(session$ns("pressupostos_table")),
+            helpText("Leia os testes junto aos gráficos de resíduos e Q-Q. Retas por grupo exigem diagnóstico de cada grupo.")
+          )
+        ))
+      }
+      res <- r$resultado
+      textos <- unclass(r$textos)
+      frases <- unlist(textos[c("amostra", "teste", "equacao", "efeito")], use.names = FALSE)
+      avisos <- unlist(textos[c("alerta", "poder")], use.names = FALSE)
+      avisos <- avisos[nzchar(avisos)]
+      efeito <- r$efeito
+      pressupostos <- res$pressupostos
+      influencia <- res$influencia
+      tagList(
+        div(class = "small text-muted mb-2",
+            sprintf("Análise feita pela ClaRa %s: regressão linear simples (relacionar_variaveis()).",
+                    r$versao_clara)),
+        titulo_secao("Narrativa automática"),
+        div(class = "alert alert-secondary", style = "font-size: 0.9rem; line-height: 1.45;",
+            paste(frases[nzchar(frases)], collapse = " ")),
+        if (res$amostra$excluidas > 0) div(
+          class = "alert alert-warning py-2 small", icon("filter"),
+          sprintf(" %d linha(s) foram excluídas por dados faltantes em '%s' ou '%s'. Restaram %d observações.",
+                  res$amostra$excluidas, res$nomes$resposta, res$nomes$preditor, res$amostra$usadas)),
+        lapply(avisos, function(a) div(class = "alert alert-light border py-2 small", a)),
+        hr(),
+        titulo_secao("Coeficientes"),
+        flextable::htmltools_value(clara::exibir_teste(res, tema = "cinza", nota = textos$nota_tabela)),
+        titulo_secao("Ajuste do modelo"),
+        flextable::htmltools_value(clara::exibir_resumo(res, tema = "cinza")),
+        titulo_secao("Tamanho de efeito"),
+        tabela_clara(data.frame(
+          Medida = efeito$medida,
+          Valor = clara::formatar_numero(efeito$valor, 3),
+          IC = paste(clara::formatar_numero(efeito$ic_inf, 3), "a", clara::formatar_numero(efeito$ic_sup, 3)),
+          Leitura = efeito$leitura,
+          check.names = FALSE)),
+        hr(),
+        titulo_secao("Pressupostos dos resíduos"),
+        tabela_clara(data.frame(
+          Pressuposto = pressupostos$pressuposto,
+          Teste = pressupostos$teste,
+          Estatística = clara::formatar_numero(pressupostos$estatistica, 3),
+          p = clara::formatar_p(pressupostos$p),
+          Leitura = pressupostos$leitura,
+          check.names = FALSE)),
+        div(class = "alert alert-light border py-2 small mt-2", textos$pressupostos),
+        titulo_secao("Observações para conferir"),
+        div(class = "small mb-2", textos$influencia),
+        if (nrow(influencia)) tabela_clara(data.frame(
+          Linha = influencia$linha_da_base,
+          `Resíduo padronizado` = clara::formatar_numero(influencia$residuo_padronizado),
+          Alavancagem = clara::formatar_numero(influencia$alavancagem, 3),
+          Cook = clara::formatar_numero(influencia$cook, 3),
+          check.names = FALSE))
+      )
+    })
+
     # Texto da fórmula ajustada
     output$formula_text <- renderPrint({
       fit <- model_fit()
@@ -573,6 +733,13 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
 
     # Gráfico 1: Reta / Curva Ajustada
     output$fit_plot <- renderPlot({
+      # Uma reta só: a figura principal da ClaRa, a mesma do roteiro. A
+      # equação segue a caixa da tela, mesmo depois da execução.
+      r <- clara_rv()
+      if (!is.null(r)) {
+        r$parametros$mostrar_equacao <- isTRUE(input$show_eq)
+        return(regressao_clara_figura(r))
+      }
       df <- dados_modulo()
       req(df, input$var_x, input$var_y)
       fit <- model_fit()
@@ -781,6 +948,8 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
 
     # Gráfico 2: Resíduos vs Ajustados
     output$resid_fit_plot <- renderPlot({
+      r <- clara_rv()
+      if (!is.null(r)) return(clara::grafico_residuos(r$resultado))
       fit <- model_fit()
       req(fit)
       mdl <- if (is_curve(fit)) fit$modelo else fit
@@ -824,6 +993,8 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
 
     # Gráfico 3: influência para GLM; Normal Q-Q para os demais modelos.
     output$qq_plot <- renderPlot({
+      r <- clara_rv()
+      if (!is.null(r)) return(clara::grafico_qq(r$resultado))
       fit <- model_fit()
       req(fit)
 
@@ -903,6 +1074,39 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
       req(input$var_x, input$var_y, import_info())
       info <- import_info()
       base_execucao <- base_contexto()
+
+      # Uma reta só: o código é o da ClaRa, as mesmas chamadas do Projeto R,
+      # seguidas do R comum que roda por trás de relacionar_variaveis().
+      r <- tryCatch(clara_rv(), error = function(e) NULL)
+      if (!is.null(r)) {
+        item <- list(tipo = "regressao_linear", parametros = r$parametros)
+        return(paste(c(
+          "# A regressão em ClaRa: as mesmas chamadas do R/analise.R do Projeto R.",
+          "# `base` é a base que a tela usou (no projeto, ela nasce da planilha).",
+          "library(clara)",
+          "",
+          exportacao_regressao_clara_chamada(item, "script"),
+          "",
+          "resultado",
+          "resultado |>",
+          "  medir_efeito()",
+          "",
+          "resultado |>",
+          exportacao_regressao_clara_figura(item, "script"),
+          "",
+          "resultado |>",
+          "  grafico_residuos()",
+          "resultado |>",
+          "  grafico_qq()",
+          "",
+          "textos <- resultado |>",
+          "  escrever_resultados(casas = 2)",
+          "",
+          "# ---- O R comum por trás de relacionar_variaveis() ----",
+          "# (o mesmo que a chamada imprime com mostrar_codigo = TRUE)",
+          regressao_clara_codigo(r, dados_modulo())
+        ), collapse = "\n"))
+      }
 
       # 1. Carregamento de Pacotes
       code <- c(
@@ -1202,20 +1406,7 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
         analise_id = analise_id,
         tipo = tipo,
         titulo = titulo,
-        parametros = list(
-          resposta = input$var_y,
-          preditor = input$var_x,
-          grupo = input$var_group %||% "none",
-          tipo_modelo = input$model_type %||% if (isTRUE(is_logistic)) "logistico" else "linear",
-          regressao_por_grupo = isTRUE(input$grp_reg),
-          nivel_confianca = nivel_confianca(),
-          avaliar_autocorrelacao = isTRUE(input$avaliar_autocorrelacao),
-          mostrar_equacao = isTRUE(input$show_eq),
-          tema = input$graph_theme %||% "minimal",
-          titulo_personalizado = input$custom_title %||% "",
-          rotulo_preditor = input$custom_label_x %||% "",
-          rotulo_resposta = input$custom_label_y %||% ""
-        ),
+        parametros = parametros_tela(),
         saidas_disponiveis = c(
           "narrativa", "tabela", "grafico", "pressupostos", "diagnosticos", "console"
         ),

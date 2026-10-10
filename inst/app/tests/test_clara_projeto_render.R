@@ -11,11 +11,13 @@ for (arquivo in c("registro_tratamentos.R", "registro_bases.R", "registro_execuc
                   "registro_comunicacao.R", "exportacao_comunicacao.R")) {
   source(file.path("modules", arquivo), encoding = "UTF-8")
 }
-# As telas da ANOVA (anova_clara_rodar) e do teste t (teste_t_clara_rodar),
-# para conferir que elas rodam a chamada que o projeto escreve.
+# As telas da ANOVA (anova_clara_rodar), do teste t (teste_t_clara_rodar) e
+# da regressão (regressao_clara_rodar), para conferir que elas rodam a
+# chamada que o projeto escreve.
 suppressPackageStartupMessages({
   source(file.path("modules", "mod_anova.R"), encoding = "UTF-8")
   source(file.path("modules", "mod_parametric.R"), encoding = "UTF-8")
+  source(file.path("modules", "mod_regression.R"), encoding = "UTF-8")
 })
 
 # O Quarto é a peça que gera o Word. Sem ele, a verificação não acontece, e
@@ -49,6 +51,23 @@ item_t <- function(variancias_iguais, alternativa) {
     parametros = list(tipo_teste = "two_ind", resposta = "peso_g", grupo = "racao",
       nivel_confianca = .95, variancias_iguais = variancias_iguais, alternativa = alternativa))
 }
+# Barbos: duas medidas do corpo, para a regressão linear simples.
+barbos <- as.data.frame(EAPADados::morfometria_barbo)
+item_reta <- function(grupo = "none", por_grupo = FALSE, autocorrelacao = FALSE) {
+  list(id = "execucao_0001", tipo = "regressao_linear",
+    titulo = "Altura do corpo do barbo pela distância dorsal-pélvica",
+    incluir_word = TRUE, estado_dependencia = "Atualizada", base_tipo = "compartilhada",
+    base_id = "dados_analise", base_objeto = "dados_analise",
+    parametros = list(resposta = "altura_maxima_corpo", preditor = "distancia_dorsal_pelvica",
+      grupo = grupo, tipo_modelo = "linear", regressao_por_grupo = por_grupo,
+      nivel_confianca = .95, avaliar_autocorrelacao = autocorrelacao, mostrar_equacao = TRUE,
+      titulo_personalizado = "", rotulo_preditor = "Distância dorsal-pélvica (mm)",
+      rotulo_resposta = "Altura máxima do corpo (mm)"))
+}
+t_inclinacao <- function() {
+  ajuste <- lm(altura_maxima_corpo ~ distancia_dorsal_pelvica, data = barbos)
+  unname(summary(ajuste)$coefficients[2, "t value"])
+}
 f_anova <- function() summary(aov(peso_g ~ racao, data = bagres))[[1]]$`F value`[1]
 t_dois <- function(variancias_iguais, alternativa) {
   unname(t.test(peso_g ~ racao, data = dois, var.equal = variancias_iguais,
@@ -61,7 +80,10 @@ rotas_info <- list(
   anova_clara = list(chamada = exportacao_anova_clara_chamada,
     estatistica = "resultado$anova$f[1]", tabela = "Resíduo"),
   teste_t_clara = list(chamada = exportacao_teste_t_clara_chamada,
-    estatistica = "resultado$teste$t[1]", tabela = "Diferença")
+    estatistica = "resultado$teste$t[1]", tabela = "Diferença"),
+  regressao_clara = list(chamada = exportacao_regressao_clara_chamada,
+    estatistica = "resultado$coeficientes$t[2]", tabela = "Intercepto",
+    resumo = "R² ajustado")
 )
 
 # Os casos de cada rota: os dados, as escolhas da tela, a tela que roda e o
@@ -83,8 +105,22 @@ casos <- list(
     # A ANOVA com dois grupos sai pela rota do teste t.
     anova_dois_grupos = list(dados = dois, item = item_anova("classica", dados = dois),
       tela = anova_clara_rodar, esperado = function() t_dois(TRUE, "two.sided"))
+  ),
+  regressao_clara = list(
+    reta = list(dados = barbos, item = item_reta(), tela = regressao_clara_rodar,
+      esperado = t_inclinacao,
+      import_info = list(source = "package", package_dataset = "morfometria_barbo")),
+    # A cor por população não muda a reta; o Durbin-Watson entra no roteiro.
+    cor_e_ordem = list(dados = barbos, item = item_reta("populacao", FALSE, TRUE),
+      tela = regressao_clara_rodar, esperado = t_inclinacao,
+      import_info = list(source = "package", package_dataset = "morfometria_barbo"))
   )
 )
+
+# Uma reta por grupo é outro modelo, ainda sem ClaRa: segue no molde antigo.
+stopifnot(identical(exportacao_molde_projeto_entrada(list(
+  execucoes = list(execucao_0001 = item_reta("populacao", TRUE)), codigo_clara = TRUE))$pasta,
+  "regressao_linear"))
 
 rotas <- Filter(function(entrada) isTRUE(entrada$clara), molde_projeto_registro)
 stopifnot(length(rotas) >= 2L)
@@ -116,7 +152,7 @@ for (entrada in rotas) for (nome_caso in names(casos[[entrada$pasta]])) {
     dados_brutos = caso$dados, base_resolvida = caso$dados, dados_analise = caso$dados,
     pipeline = list(), base_externa = NULL, registro_bases = list(), cache_bases = list(),
     registro_execucoes = manifesto$execucoes, manifesto = manifesto, revisao_origem = 1L,
-    import_info = list(source = "package", package_dataset = "isoproteica_bagre"),
+    import_info = caso$import_info %||% list(source = "package", package_dataset = "isoproteica_bagre"),
     templates_dir = "templates")
 
   # 0. A chamada que a tela roda é a que o projeto escreve: as três formas
@@ -180,7 +216,7 @@ for (entrada in rotas) for (nome_caso in names(casos[[entrada$pasta]])) {
                          encoding = "UTF-8", warn = FALSE), collapse = "")
   valor_texto <- formatC(caso$esperado(), format = "f", digits = 2, decimal.mark = ",")
   stopifnot(grepl(info$tabela, xml, fixed = TRUE),
-    grepl("Média ± DP", xml, fixed = TRUE),
+    grepl(info$resumo %||% "Média ± DP", xml, fixed = TRUE),
     grepl(valor_texto, xml, fixed = TRUE),
     !grepl("Error in|Erro em", xml))
   # No unilateral, o Word diz que o intervalo é aberto.

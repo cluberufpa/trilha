@@ -1,7 +1,7 @@
 # ============================================================================
 #  Sorteio e visualização de Delineamento em Parcelas Subdivididas
 #  Pacote de sorteio: agricolae  |  Desenho: ggplot2
-#  EAPA / CatalyseR — Estatística Aplicada à Pesca e Aquicultura
+#  EAPA / Trilha — Estatística Aplicada à Pesca e Aquicultura
 # ============================================================================
 
 library(agricolae)

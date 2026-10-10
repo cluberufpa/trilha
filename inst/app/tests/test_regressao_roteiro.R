@@ -173,7 +173,11 @@ cat(sprintf("BARBO: beta=%.8f; R2=%.8f; Shapiro p=%.8f; BP p=%.8f\n",
 # O teste não depende de uma pasta temporária histórica existente no computador.
 destino <- Sys.getenv("CATALYSER_TESTE_REGRESSAO_DESTINO", unset = tempfile("regressao_barbo_"))
 dir.create(destino, recursive = TRUE, showWarnings = FALSE)
-manifesto <- list(execucoes = list(execucao_0001 = item_barbo), secoes_globais = list())
+manifesto <- list(execucoes = list(execucao_0001 = item_barbo), secoes_globais = list(),
+                  # Uma reta só sai pela rota ClaRa; o molde antigo segue para as
+                  # retas por grupo e para os registros antigos, em que o exportador
+                  # desliga a ClaRa. É esse caminho que este teste confere.
+                  codigo_clara = FALSE)
 projeto <- exportacao_criar_projeto(destino = destino, nome_projeto = "regressao_barbo",
   dados_brutos = barbo, base_resolvida = barbo, dados_analise = barbo,
   pipeline = list(), base_externa = NULL, registro_bases = list(), cache_bases = list(),

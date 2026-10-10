@@ -1,5 +1,5 @@
 # =============================================================================
-# instalar_dependencias.R — rode ISTO uma vez antes de abrir a CatalyseR.
+# instalar_dependencias.R — rode ISTO uma vez antes de abrir a Trilha.
 #
 #   source("instalar_dependencias.R")
 #
@@ -42,7 +42,7 @@ r_minimo <- {
   } else ""
 }
 if (nzchar(r_minimo) && getRversion() < r_minimo) {
-  stop(sprintf("Este R e %s, mas a CatalyseR exige >= %s. Atualize o R primeiro.",
+  stop(sprintf("Este R e %s, mas a Trilha exige >= %s. Atualize o R primeiro.",
                getRversion(), r_minimo), call. = FALSE)
 }
 cat("R          :", as.character(getRversion()),

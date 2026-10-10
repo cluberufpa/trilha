@@ -1,5 +1,5 @@
 # =============================================================================
-#  CatalyseR - Instalador oficial  (EAPADados + clara + trilha)
+#  Trilha - Instalador oficial  (EAPADados + clara + trilha)
 #  Estatistica Aplicada a Pesca e Aquicultura com R
 # -----------------------------------------------------------------------------
 #  COMO USAR (super simples):
@@ -40,7 +40,7 @@ instalar_trilha <- function(iniciar = FALSE) {
   rv <- getRversion()
   cat(sprintf("\n%s Versao do R detectada: %s\n", SETA, rv))
   if (rv < "4.3.0") {
-    cat(sprintf("\n%s O seu R e %s, mas a CatalyseR precisa de R >= 4.3.0.\n", FALHA, rv))
+    cat(sprintf("\n%s O seu R e %s, mas a Trilha precisa de R >= 4.3.0.\n", FALHA, rv))
     cat("   Atualize o R em https://cran.r-project.org e rode este script de novo.\n\n")
     return(invisible(FALSE))
   }
@@ -98,7 +98,7 @@ instalar_trilha <- function(iniciar = FALSE) {
     # (library(clara)). Enquanto não estiver no CRAN, vem do GitHub.
     ok_clara <- garante(
       "clara", github = "cluberufpa/ClaRa",
-      versao_minima = "0.11.0"
+      versao_minima = "0.12.0"
     )
     # A IDE é sempre atualizada: assim executar novamente este instalador
     # realmente traz o conteúdo mais recente da branch main.
@@ -125,12 +125,12 @@ instalar_trilha <- function(iniciar = FALSE) {
   falhou <- c(falhas_cran, if (!ok_dados) "EAPADados", if (!ok_clara) "clara",
               if (!ok_ide) "trilha")
   if (length(falhou) == 0) {
-    cat(sprintf("\n  %s Tudo pronto! Para abrir a CatalyseR, rode:\n\n", OK))
+    cat(sprintf("\n  %s Tudo pronto! Para abrir a Trilha, rode:\n\n", OK))
     cat("      trilha::run_app(launch.browser = TRUE)\n\n")
     cat("  Para iniciar sem abrir o navegador automaticamente:\n\n")
     cat("      trilha::run_app(launch.browser = FALSE)\n\n")
     if (ide_ja_carregada) {
-      cat("  A CatalyseR estava carregada antes da atualização.\n")
+      cat("  A Trilha estava carregada antes da atualização.\n")
       cat("  Reinicie o R: Session > Restart R (Ctrl+Shift+F10 no RStudio).\n")
       cat("  Depois execute trilha::run_app(launch.browser = TRUE).\n\n")
     } else if (isTRUE(iniciar)) {
@@ -141,7 +141,7 @@ instalar_trilha <- function(iniciar = FALSE) {
   }
   cat(sprintf("\n  %s Nao foi possivel instalar: %s\n\n", FALHA, paste(falhou, collapse = ", ")))
   cat("  Dicas:\n")
-  cat("   - No Windows, instale dependencias CRAN em binario; a CatalyseR nao compila codigo nativo.\n")
+  cat("   - No Windows, instale dependencias CRAN em binario; a Trilha nao compila codigo nativo.\n")
   cat("   - Sem internet ou atras de proxy: verifique a conexao e tente de novo.\n")
   cat("   - Rode este script novamente: ele preserva as dependencias compativeis e atualiza a IDE.\n\n")
   invisible(FALSE)
