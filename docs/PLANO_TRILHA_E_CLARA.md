@@ -62,11 +62,20 @@ Os dois obstáculos anotados em 8/10 se resolvem assim:
 
 - **Repositório privado:** tornar `cluberufpa/ClaRa` público (os alunos
   instalam de lá, como já fazem com a Trilha). A licença MIT já está lá.
-- **Projeto só com CRAN:** enquanto a `clara` não estiver no CRAN, o projeto
-  exportado continua levando a cópia em `R/clara/`, mas essa cópia passa a
-  sair do pacote instalado, não de uma pasta mantida à mão. Quando a `clara`
-  entrar no CRAN, o projeto troca o `source("R/clara/clara.R")` por
-  `library(clara)` e volta a depender só do CRAN, sem cópia.
+- **Projeto só com CRAN:** ~~enquanto a `clara` não estiver no CRAN, o
+  projeto exportado continua levando a cópia em `R/clara/`~~. **Decidido em
+  9/10/2026 (opção b do professor): o projeto usa `library(clara)`**, sem
+  cópia. A `clara` só depende do CRAN e é leve; enquanto não estiver no
+  CRAN, instala-se do GitHub (`remotes::install_github("cluberufpa/ClaRa")`,
+  o mesmo que o `instalar_trilha.R` fará). A regra do projeto exportado
+  passa a ser "só CRAN e a `clara`".
+
+**Nomes das funções de apresentação** (confirmado em 9/10/2026): `exibir_*`
+recebe um resultado já calculado e devolve a tabela (`exibir_teste()`,
+`exibir_resumo()`, `exibir_tabela()`); "mostrar" fica para o código
+(`mostrar_codigo = TRUE`). Nos moldes antigos da Trilha, `mostrar_*`
+(`mostrar_anova()`) recebe os dados e roda o teste; esses saem com a Fase 3,
+e nenhuma função nova, na ClaRa ou na Trilha, usa `mostrar_` para tabela.
 
 Nome do pacote: **`clara`**, minúsculo, como `trilha`. Na prosa, "ClaRa".
 Os dois nomes estão livres no CRAN (consulta de 9/10/2026).
@@ -168,9 +177,14 @@ exportados ficaram para depois (dados só nos testes, decisão I).
   cluberufpa/ClaRa`; o `instalar_trilha.R` instala as duas.
 - A ANOVA de um fator passa a mostrar na tela o resultado da chamada da
   ClaRa (hoje a tela tem cálculo próprio). É o teste da arquitetura.
-- A cópia de `inst/app/templates/clara/` deixa de existir: o exportador
-  copia os arquivos do pacote instalado (`system.file()`), na versão que a
-  tela usou, e grava essa versão no README do projeto.
+- A cópia de `inst/app/templates/clara/` deixa de existir, e o projeto
+  exportado também não leva mais `R/clara/`: o `analise.R` e o
+  `relatorio.qmd` carregam `library(clara)`, e o README do projeto diz a
+  versão da `clara` que a tela usou e como instalá-la.
+- O `relatorio.qmd` da rota ClaRa troca o `transmute()` + `flextable_ocean()`
+  das duas tabelas por `exibir_teste()` e `exibir_resumo()` (ClaRa 0.10.0),
+  e o `funcoes.R` do projeto deixa de precisar de `fmt()`, `formatar_p()` e
+  `flextable_ocean()`.
 - Um teste da Trilha que, para cada análise com rota ClaRa, gera o projeto,
   roda o `analise.R` e renderiza o `relatorio.qmd` numa sessão limpa.
 
