@@ -1,9 +1,9 @@
-# Execute de inst/app. Confere a opção experimental "código em ClaRa" do
-# Projeto R da ANOVA de um fator: o script e o relatório (um só QMD, o Word)
+# Execute de inst/app. Confere o Projeto R da ANOVA de um fator em ClaRa, a
+# rota padrão desde a Fase 3: o script e o relatório (um só QMD, o Word)
 # carregam o pacote clara com library(clara), sem cópia da ClaRa nem
-# R/funcoes.R; cada um roda em sessão nova e reproduz os números da ANOVA. Confere também que, sem a opção, o projeto continua
-# saindo pelo molde atual, e que Welch e automático também saem em ClaRa,
-# com variancias_iguais escrito no script.
+# R/funcoes.R; cada um roda em sessão nova e reproduz os números da ANOVA.
+# Welch e automático também saem em ClaRa, com variancias_iguais escrito
+# no script.
 grDevices::pdf(NULL)
 for (arquivo in c("registro_tratamentos.R", "registro_bases.R", "registro_execucoes.R",
                   "registro_comunicacao.R", "exportacao_comunicacao.R")) {
@@ -20,8 +20,9 @@ item <- list(id = "execucao_0001", tipo = "anova_um_fator", titulo = "Peso final
                   "grafico", "pressupostos", "diagnosticos"))
 bagres <- as.data.frame(EAPADados::isoproteica_bagre)
 
-# A escolha da rota: ClaRa só com a opção marcada, em qualquer método com a
-# escolha registrada (no automático, a que a tela fez: metodo_usado).
+# A escolha da rota: ClaRa em qualquer método com a escolha registrada (no
+# automático, a que a tela fez: metodo_usado). Só o exportador desliga a
+# ClaRa (codigo_clara = FALSE), nos registros antigos com fotografia da base.
 com_clara <- list(execucoes = list(execucao_0001 = item), secoes_globais = list(),
                   codigo_clara = TRUE)
 sem_clara <- list(execucoes = list(execucao_0001 = item), secoes_globais = list())
@@ -38,11 +39,13 @@ automatico <- list(execucoes = list(execucao_0001 = item_auto), secoes_globais =
 automatico_sem <- list(execucoes = list(execucao_0001 = item_auto_sem), secoes_globais = list(),
                        codigo_clara = TRUE)
 stopifnot(identical(exportacao_molde_projeto_entrada(com_clara)$pasta, "anova_clara"),
-  identical(exportacao_molde_projeto_entrada(sem_clara)$pasta, "anova_projeto"),
+  identical(exportacao_molde_projeto_entrada(sem_clara)$pasta, "anova_clara"),
+  is.null(exportacao_molde_projeto_entrada(c(sem_clara, list(codigo_clara = FALSE)))),
   identical(exportacao_molde_projeto_entrada(welch)$pasta, "anova_clara"),
   identical(exportacao_molde_projeto_entrada(automatico)$pasta, "anova_clara"),
-  # Automático sem a escolha registrada: a ClaRa não decide pelo Levene.
-  identical(exportacao_molde_projeto_entrada(automatico_sem)$pasta, "anova_projeto"),
+  # Automático sem a escolha registrada: a ClaRa não decide pelo Levene, e o
+  # projeto sai pelo exportador geral.
+  is.null(exportacao_molde_projeto_entrada(automatico_sem)),
   identical(exportacao_anova_clara_metodo(item_auto), "welch"))
 
 destino <- Sys.getenv("CATALYSER_TESTE_CLARA_DESTINO", unset = tempfile("anova_clara_"))
