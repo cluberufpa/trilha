@@ -234,7 +234,7 @@ em_preparacao <- mapas_em_preparacao
 # Interface do Usuário (UI)
 ui <- page_navbar(
   id = "main_navbar",
-  window_title = "CatalyseR",
+  window_title = "Trilha",
   title = div(
     style = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 7px !important; padding: 2px 6px !important; width: 100% !important; height: 100% !important;",
     tags$a(
@@ -252,8 +252,8 @@ ui <- page_navbar(
     tags$a(
       id = "sobre-custom-btn",
       href = "#",
-      title = "Sobre a CatalyseR",
-      `aria-label` = "Abrir Sobre a CatalyseR",
+      title = "Sobre a Trilha",
+      `aria-label` = "Abrir Sobre a Trilha",
       onclick = "var el = document.querySelector(\"a[data-value='Sobre']\"); if(el) el.click(); return false;",
       style = "display: flex; flex-direction: column; align-items: center; justify-content: center; width: 56px; min-width: 56px; height: 76px; text-decoration: none; color: #1d4ed8 !important; padding: 3px; transition: all 0.2s ease; cursor: pointer;",
       tags$i(class = "fas fa-university", style = "font-size: 1.7rem; color: #1d4ed8; margin-bottom: 3px;"),
@@ -848,7 +848,7 @@ ui <- page_navbar(
     ),
     # Onde amostrar: localização das unidades no território (antigo "Pontos / Estações"
     # do menu de mapas). Por ora abre o mapa de estações; as abas "Sortear locais" e
-    # "Conferir a distribuição" virão depois (ver Especificacao_CatalyseR_Mapas.md).
+    # "Conferir a distribuição" virão depois (ver APOIO/mapas.md, na pasta-mãe do ecossistema).
     nav_panel(
       title = "Onde amostrar",
       icon = icon("location-crosshairs"),
@@ -1252,7 +1252,7 @@ ui <- page_navbar(
         card_header("Regressão Linear Múltipla"),
         card_body(
           h5("Módulo em Desenvolvimento", class = "text-primary"),
-          p("Esta análise estará disponível em breve no CatalyseR!"),
+          p("Esta análise estará disponível em breve na Trilha!"),
           helpText(
             "Permitirá ajustar modelos com múltiplas variáveis preditoras. Exemplos de aplicação:",
             tags$ul(
@@ -1514,7 +1514,7 @@ ui <- page_navbar(
     )
   ),
 
-  # Identidade CatalyseR na primeira faixa
+  # Identidade Trilha na primeira faixa
   nav_item(
     div(
       class = "navbar-slogan-container",
