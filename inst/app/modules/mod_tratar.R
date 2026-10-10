@@ -376,6 +376,9 @@ mod_tratar_server <- function(id, base_rv, replay_rv, pipeline_rv, import_info, 
       pipeline_rv(c(pipeline_rv(), list(nova)))
       showNotification(sprintf("Etapa adicionada: %s", tratamentos[[tipo]]$rotulo(params)),
                        type = "message", duration = 3)
+      # Aviso opcional do tratamento: a etapa entra, mas o aluno fica sabendo.
+      aviso <- if (is.function(tratamentos[[tipo]]$avisar)) tratamentos[[tipo]]$avisar(df, params)
+      if (!is.null(aviso)) showNotification(aviso, type = "warning", duration = 10)
     })
 
     sel_idx <- reactive({ i <- suppressWarnings(as.integer(input$etapa_sel)); if (length(i)) i else NA_integer_ })

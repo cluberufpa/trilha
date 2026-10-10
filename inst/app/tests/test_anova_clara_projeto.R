@@ -381,10 +381,17 @@ for (i in seq_along(entradas_welch)) {
 # em sessão nova com as 19 linhas.
 trilha_moda <- list(list(tipo = "tratar_na", ativa = TRUE,
                          params = list(coluna = "peso_g", metodo = "moda")))
-# Uma moda clara (112 duas vezes): com empate, trat_moda() e moda() escolhem
-# valores diferentes, e a conferência do exportador para a exportação.
+# Nenhum peso se repete: empate. A tela (trat_moda) e o projeto (moda e
+# trilha_moda) escolhem o menor valor; antes, a tela pegava o primeiro que
+# aparecia, e a conferência do exportador barrava a exportação.
 brutos_moda <- brutos
-brutos_moda$peso_g[4] <- 112
+stopifnot(identical(trat_moda(brutos_moda$peso_g), 98),
+  trilha::trilha_moda(brutos_moda$peso_g) == 98,
+  identical(trat_moda(c("sul", "norte", "leste")), "leste"),
+  identical(trat_moda(factor(c("z", "a"), levels = c("z", "a"))), factor("z", levels = c("z", "a"))),
+  # Sem moda numa coluna numérica, a etapa entra com um aviso.
+  !is.null(tratamentos$tratar_na$avisar(brutos_moda, list(coluna = "peso_g", metodo = "moda"))),
+  is.null(tratamentos$tratar_na$avisar(data.frame(p = c(1, 1, NA)), list(coluna = "p", metodo = "moda"))))
 com_moda_base <- replay_pipeline(brutos_moda, trilha_moda)$df
 item_moda <- list(id = "execucao_0001", tipo = "anova_um_fator", titulo = "Peso de tilápias",
   incluir_word = TRUE, estado_dependencia = "Atualizada", base_tipo = "compartilhada",

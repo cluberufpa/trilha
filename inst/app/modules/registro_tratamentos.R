@@ -23,10 +23,22 @@ trat_num_txt <- function(x) {
 
 trat_q <- function(v) paste(sprintf('"%s"', v), collapse = ", ")
 
+# O valor mais frequente. No empate, o menor (na ordem do sort(): números do
+# menor para o maior, textos em ordem alfabética, fatores na ordem dos
+# níveis), como o "most_frequent" do scikit-learn e o moda() / trilha_moda()
+# do código exportado: a tela e o projeto chegam ao mesmo valor.
 trat_moda <- function(x) {
-  ux <- unique(x[!is.na(x)])
-  if (!length(ux)) return(NA)
-  ux[which.max(tabulate(match(x, ux)))]
+  valores <- x[!is.na(x)]
+  if (!length(valores)) return(NA)
+  ux <- sort(unique(valores))
+  ux[which.max(tabulate(match(valores, ux)))]
+}
+
+# Coluna numérica sem nenhum valor repetido: não há moda, e o empate escolheria
+# o menor valor. Para números, a média ou a mediana dizem mais.
+trat_sem_moda <- function(x) {
+  valores <- x[!is.na(x)]
+  is.numeric(x) && length(valores) > 1L && !anyDuplicated(valores)
 }
 
 trat_cols_num <- function(df) names(df)[vapply(df, is.numeric, logical(1))]
@@ -171,6 +183,16 @@ tratamentos <- list(
           !is.numeric(df[[p$coluna]]))
         return("Media/mediana exigem coluna numerica.")
       NULL
+    },
+    # Aviso que não impede a etapa (opcional no contrato): a moda numa
+    # coluna numérica em que nenhum valor se repete.
+    avisar = function(df, p) {
+      if (!identical(p$metodo, "moda")) return(NULL)
+      cols <- if (identical(p$coluna, "__num__")) trat_cols_num(df) else p$coluna
+      sem_moda <- cols[vapply(cols, function(c) trat_sem_moda(df[[c]]), logical(1))]
+      if (!length(sem_moda)) return(NULL)
+      sprintf(paste("Em %s nenhum valor se repete: não há moda, e o menor valor foi usado.",
+                    "Para números, prefira a mediana."), paste(sem_moda, collapse = ", "))
     },
     aplicar = function(df, p) {
       cols <- if (identical(p$coluna, "__num__")) trat_cols_num(df) else p$coluna

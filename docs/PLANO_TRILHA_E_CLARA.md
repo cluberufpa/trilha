@@ -222,9 +222,20 @@ exportados ficaram para depois (dados só nos testes, decisão I).
   4. **Bartlett:** a ClaRa não calcula.
   5. **Dois grupos:** a tela faz a ANOVA; a ClaRa, o teste t.
 - Achado no caminho, anterior a esta fase: com empate (nenhum valor
-  repetido), o `trat_moda()` da tela pega o primeiro valor que aparece e o
+  repetido), o `trat_moda()` da tela pegava o primeiro valor que aparece e o
   `moda()` / `trilha_moda()` do código exportado, o menor; a conferência do
-  exportador barra a exportação nesse caso.
+  exportador barrava a exportação. **Corrigido em 10/10/2026** (decisão do
+  professor): no empate, a tela também fica com o menor valor, como o
+  "most_frequent" do scikit-learn; numa coluna numérica sem nenhum valor
+  repetido, a etapa entra com um aviso que recomenda a mediana.
+
+**Decisões do professor sobre as diferenças (10/10/2026):** pressupostos do
+Welch como na ClaRa (Shapiro em cada grupo); letras como na ClaRa, que segue
+a regra pedida (o grupo de maior média recebe "a", e as letras novas
+aparecem em ordem alfabética, descendo pelas médias; conferido em todas as
+bases de treino); com dois grupos, o teste t da ClaRa (a ANOVA de dois
+fatores é outra tela e não muda). Em aberto: o intervalo do tamanho de
+efeito e o Bartlett.
 
 ### Fase 3 · Uma rota só de exportação
 
