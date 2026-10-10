@@ -1579,13 +1579,13 @@ server <- function(input, output, session) {
     ),
     flow = list(
       title = "1. Fluxo de Trabalho",
-      keywords = "ide_r catalyst andaimes visuais paradigma ensino aprendizagem fluxo trabalho",
+      keywords = "ide_r trilha andaimes visuais paradigma ensino aprendizagem fluxo trabalho",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Fluxo de Trabalho Recomendado</h4>
-        <p>O CatalyseR guia você através de uma jornada visual para a realização de análises estatísticas reprodutíveis. Para tirar o máximo proveito da IDE, siga este fluxo:</p>
+        <p>A Trilha guia você através de uma jornada visual para a realização de análises estatísticas reprodutíveis. Para tirar o máximo proveito da IDE, siga este fluxo:</p>
         <ol>
           <li><b>Importação de Dados:</b> Carregue e prepare seus dados no menu <b>Preparando Dados</b>. Certifique-se de ajustar a tipagem das colunas se necessário.</li>
-          <li><b>Análise Exploratória e Modelagem:</b> Em <i>Explorando os Dados</i>, conheça a planilha, as variáveis e as relações antes de escolher um teste. A CatalyseR sugere um caminho; você decide e pode guardar cada resultado em <i>Inserir análise</i>.</li>
+          <li><b>Análise Exploratória e Modelagem:</b> Em <i>Explorando os Dados</i>, conheça a planilha, as variáveis e as relações antes de escolher um teste. A Trilha sugere um caminho; você decide e pode guardar cada resultado em <i>Inserir análise</i>.</li>
           <li><b>Projeto R:</b> Abra o menu <i>Comunicação de Resultados</i> para reunir as análises e exportar o projeto.</li>
         </ol>
       ")
@@ -1639,7 +1639,7 @@ server <- function(input, output, session) {
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Diagrama de Caixa (Boxplot)</h4>
         <p>Em <b>Explorando os Dados > Encontrar Relações</b>, compare grupos antes do teste. Pontos sinalizados merecem investigação, não exclusão automática.</p>
-        <p><b>Destaques do CatalyseR:</b></p>
+        <p><b>Destaques da Trilha:</b></p>
         <ul>
           <li><b>Apresentação:</b> Escolha boxplot, violino ou ambos.</li>
           <li><b>Por grupo:</b> Use <i>Relações > Comparações por grupo</i> para separar a variável por um fator, como sexo, espécie ou local.</li>
@@ -1666,7 +1666,7 @@ server <- function(input, output, session) {
       keywords = "exportar zip comunicacao resultados nome dataset projeto rproj quarto qmd download individual unica",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Tipos de Exportação de Projetos</h4>
-        <p>Na IDE CatalyseR, você encontrará dois tipos de exportadores de código, com objetivos didáticos distintos:</p>
+        <p>Na Trilha, você encontrará dois tipos de exportadores de código, com objetivos didáticos distintos:</p>
 
         <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>1. Projeto R da Comunicação de Resultados</h5>
         <p>Ideal para quando você conclui sua sessão de estudos ou para a entrega de relatórios e trabalhos práticos completos. No menu <b>Comunicação de Resultados</b>, o botão <b>Baixar Projeto R (.zip)</b> reúne as análises da sessão:</p>
@@ -1830,19 +1830,20 @@ install.packages(\"knitr\")</code></pre>
   about_topics <- list(
     intro = list(
       title = "1. Introdução e Filosofia",
-      keywords = "ide_r catalyst barreira sintaxe frustracao graducao posgraduacao ufpa catalyser estresse origem nome trocadilho",
+      keywords = "ide_r trilha barreira sintaxe frustracao graducao posgraduacao ufpa estresse origem nome estudio",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>A Barreira da Sintaxe e o Estresse no Aprendizado</h4>
         <p>O ensino de Estatística Aplicada para cursos de graduação e pós-graduação que não pertencem à área da computação (como Ciências Biológicas, Agronomia, Ciências da Saúde) enfrenta um dilema clássico. O aprendizado da linguagem de programação frequentemente cria uma barreira de entrada muito alta devido a erros de digitação de sintaxe (como parênteses esquecidos, aspas erradas ou caminhos locais incorretos), fazendo com que alunos se frustrem e desistam antes mesmo de conseguirem interpretar os resultados estatísticos.</p>
-        <p>A <b>IDE CatalyseR</b>, desenvolvida na <b>UFPA (Universidade Federal do Pará)</b>, rompe essa barreira ao colocar o estudante no controle conceitual. Criada especificamente para catalisar o aprendizado e as análises com R, ela visa reduzir drasticamente o estresse e a frustração dos estudantes ao utilizar a metodologia pedagógica de <i>Andaimes Visuais</i> e <i>Engenharia Reversa</i>.</p>
+        <p>A <b>Trilha</b>, desenvolvida na <b>UFPA (Universidade Federal do Pará)</b>, rompe essa barreira ao colocar o estudante no controle conceitual. Criada especificamente para abrir caminho ao aprendizado e às análises com R, ela visa reduzir drasticamente o estresse e a frustração dos estudantes ao utilizar a metodologia pedagógica de <i>Andaimes Visuais</i> e <i>Engenharia Reversa</i>.</p>
         
-        <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 20px;'>A Origem do Nome \"CatalyseR\"</h5>
-        <p>O nome é um neologismo científico e um trocadilho linguístico rico:</p>
+        <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 20px;'>A Origem do Nome \"Trilha\"</h5>
+        <p>O nome diz o que a ferramenta é: uma trilha de análise, da pergunta ao relatório.</p>
         <ul>
-          <li><b>Origem Francesa:</b> Deriva do verbo francês <i>catalyser</i> (catalisar) e de <i>analyser</i> (analisar). Reflete a fusão perfeita de acelerar reações (aprendizado) com o exame minucioso de dados (análise).</li>
-          <li><b>O \"R\" Capitalizado:</b> O sufixo <b>R</b> capitalizado ao final denota o foco na linguagem de programação R. Portanto, <b>CatalyseR</b> significa literalmente: <i>\"catalisar e analisar por meio do R\"</i>.</li>
-          <li><b>Redução da Energia de Ativação (Estresse):</b> Em termos químicos, um catalisador diminui a energia de ativação necessária para iniciar uma reação. Da mesma forma, a IDE CatalyseR diminui a \"energia de ativação cognitiva\" (o estresse inicial de lidar com códigos e erros de sintaxe), permitindo que os estudantes saltem direto para a análise científica produtiva.</li>
+          <li><b>Um caminho ordenado:</b> O estudante planeja a coleta, prepara os dados, explora, analisa e comunica, nessa ordem. Cada passo deixa rastro em código R, e o rastro inteiro vira o Projeto R exportado.</li>
+          <li><b>Jeito de estúdio:</b> A Trilha reúne pesquisa, análise e escrita num só lugar, como um estúdio, sem precisar de \"Studio\" no nome.</li>
+          <li><b>O pacote:</b> No R, a Trilha é o pacote <code>trilha</code>, em minúsculas, como se digita em <code>library(trilha)</code>.</li>
         </ul>
+        <p style='text-align: center; font-style: italic;'>Da pergunta ao relatório, uma só trilha de análise.</p>
 
         <div style='text-align: center; margin-top: 25px; border-top: 1px solid #dee2e6; padding-top: 15px;'>
           <span style='font-size: 0.9rem; color: #6c757d; font-weight: 600; margin-right: 12px; vertical-align: middle;'>Desenvolvido com:</span>
@@ -1858,7 +1859,7 @@ install.packages(\"knitr\")</code></pre>
       keywords = "paradigma visual scaffolding passos exploracao visual engenharia reversa",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>O Paradigma dos Andaimes Visuais</h4>
-        <p>O modelo pedagógico da IDE CatalyseR baseia-se em 3 passos essenciais:</p>
+        <p>O modelo pedagógico da Trilha baseia-se em 3 passos essenciais:</p>
         <ol>
           <li><b>Passo 1: Exploração Visual.</b> O estudante carrega os dados e ajusta modelos estatísticos e gráficos de forma imediata na tela, validando suas hipóteses visualmente e sem erros de código.</li>
           <li><b>Passo 2: Geração de Código Limpo.</b> A IDE gera de forma automática e transparente os scripts correspondentes a cada decisão tomada em tela.</li>
@@ -1867,17 +1868,17 @@ install.packages(\"knitr\")</code></pre>
       ")
     ),
     revolutionary = list(
-      title = "3. Por que a IDE CatalyseR?",
+      title = "3. Por que a Trilha?",
       keywords = "revolucionaria tradicional comparacao paradigma tabela ufpa estresse",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Por que essa abordagem é Revolucionária?</h4>
-        <p>Veja como o paradigma dos Andaimes Visuais da IDE CatalyseR inverte a frustração e diminui o estresse do aprendizado de R:</p>
+        <p>Veja como o paradigma dos Andaimes Visuais da Trilha inverte a frustração e diminui o estresse do aprendizado de R:</p>
         <table class='table table-striped table-bordered table-sm' style='margin-top: 15px; font-size: 0.9rem;'>
           <thead>
             <tr>
               <th>Aspecto</th>
               <th>Abordagem Tradicional</th>
-              <th>O Paradigma CatalyseR (UFPA)</th>
+              <th>O Paradigma da Trilha (UFPA)</th>
             </tr>
           </thead>
           <tbody>
@@ -1910,7 +1911,7 @@ install.packages(\"knitr\")</code></pre>
       keywords = "estrutura arquivos rproj rda csv script qmd quarto rstudio",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Estrutura de Cada Componente Gerado</h4>
-        <p>Os projetos baixados na IDE CatalyseR possuem uma estrutura padronizada e profissional:</p>
+        <p>Os projetos baixados na Trilha possuem uma estrutura padronizada e profissional:</p>
         <ul>
           <li><b>projeto_analise.Rproj:</b> Dando duplo clique neste arquivo, o RStudio abre automaticamente configurado com a pasta de trabalho correta, dispensando comandos complicados como <i>setwd()</i>.</li>
           <li><b>dados/dados_limpos.rda e csv:</b> Arquivos de dados limpos gerados nativamente pela IDE, garantindo formatação correta de decimais e evitando problemas de importação.</li>
@@ -1923,18 +1924,18 @@ install.packages(\"knitr\")</code></pre>
       title = "5. Como Rodar e Implantar",
       keywords = "rodar executar implantar rstudio pacote instalar shiny server nuvem deploy local",
       content = HTML("
-        <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Como Rodar e Implantar o CatalyseR</h4>
-        <p>Como uma ferramenta pedagógica, existem três formas principais de disponibilizar o CatalyseR para estudantes e pesquisadores, cada uma atendendo a um nível de maturidade técnica:</p>
+        <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Como Rodar e Implantar a Trilha</h4>
+        <p>Como uma ferramenta pedagógica, existem três formas principais de disponibilizar a Trilha para estudantes e pesquisadores, cada uma atendendo a um nível de maturidade técnica:</p>
         
         <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>1. Nuvem/Servidor Web (A mais elegante e sem barreiras)</h5>
         <p>A melhor abordagem de todas é hospedar o aplicativo em um servidor web (como <b>Shiny Server</b>, <b>Shinyapps.io</b> ou <b>Posit Connect</b>).</p>
         <ul>
-          <li><b>Como funciona:</b> A instituição de ensino hospeda a IDE em seu servidor. Os alunos acessam diretamente pelo navegador através de um link (ex: <i>https://r-catalyst.suauniversidade.edu</i>).</li>
+          <li><b>Como funciona:</b> A instituição de ensino hospeda a IDE em seu servidor. Os alunos acessam diretamente pelo navegador através de um link (ex: <i>https://trilha.suauniversidade.edu</i>).</li>
           <li><b>Vantagem pedagógica:</b> <b>Zero instalação inicial.</b> O estudante não precisa ter R ou RStudio instalado no primeiro dia de aula. Ele carrega seus dados e explora conceitos estatísticos de imediato. Após validar suas análises visualmente, baixa o arquivo ZIP e inicia o estudo local no RStudio.</li>
         </ul>
 
         <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>2. Empacotamento em Pacote R (A mais portátil e offline)</h5>
-        <p>A CatalyseR já é distribuída como pacote de R, chamado <code>trilha</code>, no GitHub.</p>
+        <p>A Trilha já é distribuída como pacote de R, chamado <code>trilha</code>, no GitHub.</p>
         <ul>
           <li><b>Como funciona:</b> O usuário instala o pacote uma vez e, depois, abre a IDE com um comando:
             <pre style='background: #f1f3f5; padding: 8px; border-radius: 6px; font-size: 0.85rem;'>install.packages(\"pak\")
@@ -1950,11 +1951,11 @@ trilha::run_app(launch.browser = TRUE)</pre>
           <li><b>Como funciona:</b> O usuário abre a pasta no RStudio, abre o arquivo <code>app.R</code> e clica no botão <b>\"Run App\"</b> no canto superior direito do editor, ou executa no console:
             <pre style='background: #f1f3f5; padding: 8px; border-radius: 6px; font-size: 0.85rem;'>shiny::runApp()</pre>
           </li>
-          <li><b>Vantagem pedagógica:</b> Ideal para professores ou alunos interessados em entender a arquitetura do próprio Shiny, permitindo que eles editem o código e customizem novos módulos ou estilos para o CatalyseR.</li>
+          <li><b>Vantagem pedagógica:</b> Ideal para professores ou alunos interessados em entender a arquitetura do próprio Shiny, permitindo que eles editem o código e customizem novos módulos ou estilos para a Trilha.</li>
         </ul>
 
         <hr>
-        <p><b>Recomendação Pedagógica:</b> A abordagem híbrida é a mais elegante. Disponibilize o <b>CatalyseR na nuvem (Opção 1)</b> para as aulas teóricas e práticas iniciais. À medida que os alunos ganham autonomia executando localmente os códigos do ZIP exportado, incentive-os a instalar a ferramenta em suas próprias máquinas usando as <b>Opções 2 ou 3</b>.</p>
+        <p><b>Recomendação Pedagógica:</b> A abordagem híbrida é a mais elegante. Disponibilize a <b>Trilha na nuvem (Opção 1)</b> para as aulas teóricas e práticas iniciais. À medida que os alunos ganham autonomia executando localmente os códigos do ZIP exportado, incentive-os a instalar a ferramenta em suas próprias máquinas usando as <b>Opções 2 ou 3</b>.</p>
       ")
     ),
     pedagogical_cycle = list(
@@ -1962,7 +1963,7 @@ trilha::run_app(launch.browser = TRUE)</pre>
       keywords = "ciclo cientifico tripe pedagogico tripes planejamento experimental amostral script comunicacao artigo relatorio quarto qmd",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>O Ciclo Científico e os Três Tripés Pedagógicos</h4>
-        <p>O CatalyseR foi concebido não apenas como uma ferramenta para gerar códigos de forma automática, mas como um elemento de integração para um ciclo completo de aprendizado científico, estruturado sobre <b>três pilares essenciais (os três tripés)</b>:</p>
+        <p>A Trilha foi concebida não apenas como uma ferramenta para gerar códigos de forma automática, mas como um elemento de integração para um ciclo completo de aprendizado científico, estruturado sobre <b>três pilares essenciais (os três tripés)</b>:</p>
         
         <ol style='line-height: 1.6; margin-top: 15px;'>
           <li><b>Pilar 1: Obtenção Rigorosa de Dados (Planejamento)</b>
@@ -1986,7 +1987,7 @@ trilha::run_app(launch.browser = TRUE)</pre>
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>O Plus Didático: Curva de Distribuição Teórica Interativa</h4>
         <p>No ensino clássico de bioestatística e testes de hipóteses, um dos maiores desafios pedagógicos é a abstraction da tomada de decisão. Alunos frequentemente decoram regras como <i>\"p-valor menor que alfa rejeita H0\"</i> ou <i>\"t calculado maior que t tabelado rejeita H0\"</i>, mas sem compreender o significado geométrico e probabilístico dessas relações.</p>
-        <p>Para preencher essa lacuna, o CatalyseR introduz uma ferramenta visual avançada: a <b>Visualização Gráfica da Distribuição t de Student Teórica</b>, permitindo o confronto imediato entre a teoria probabilística e os dados observados.</p>
+        <p>Para preencher essa lacuna, a Trilha introduz uma ferramenta visual avançada: a <b>Visualização Gráfica da Distribuição t de Student Teórica</b>, permitindo o confronto imediato entre a teoria probabilística e os dados observados.</p>
 
         <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>1. Objetivos Pedagógicos</h5>
         <ul>
@@ -2005,7 +2006,7 @@ trilha::run_app(launch.browser = TRUE)</pre>
           <li><b>Escalonamento Automático dos Eixos:</b> Para evitar que valores extremamente elevados de t calculado fiquem de fora do gráfico, a escala do eixo X é ajustada dinamicamente com base no valor de t<sub>calc</sub>: <code>max(4.5, abs(t_calc) + 1.5)</code>.</li>
         </ul>
 
-        <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>3. Integração com a Filosofia do CatalyseR</h5>
+        <h5 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 600; margin-top: 15px;'>3. Integração com a Filosofia da Trilha</h5>
         <p>Mantendo o paradigma dos <i>Andaimes Visuais</i>, toda essa lógica de plotagem não é apenas exibida na tela. O código completo do ggplot2 que desenha a curva, calcula as caudas e adiciona as marcações críticas é <b>gerado automaticamente e exportado</b> como parte do script R do teste t. Isso permite que o aluno execute o código em seu próprio RStudio local, estude como manipular funções de densidade em gráficos e personalize a curva para seus próprios relatórios.</p>
       ")
     )
