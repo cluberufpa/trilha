@@ -63,7 +63,7 @@ viz_write_project <- function(file, prefix, data_rv, import_info, code_lines) {
   writeLines(unlist(code_lines), file.path(sc, paste0(prefix, ".R")))
   writeLines(c("Version: 1.0", "RestoreWorkspace: Default", "SaveWorkspace: Default", "Encoding: UTF-8"),
              file.path(pd, "projeto_analise.Rproj"))
-  writeLines(c(paste0("PACOTE DE ESTUDO: ", toupper(prefix), " (CatalyseR)"),
+  writeLines(c(paste0("PACOTE DE ESTUDO: ", toupper(prefix), " (Trilha)"),
                "- projeto_analise.Rproj: duplo clique para abrir no RStudio.",
                "- dados/    : dados limpos (.rda, .csv, .xlsx).",
                paste0("- scripts/", prefix, ".R : código ggplot2 do gráfico.")),
@@ -77,7 +77,7 @@ viz_write_project <- function(file, prefix, data_rv, import_info, code_lines) {
 
 # Prólogo comum dos scripts exportados
 viz_code_head <- function() {
-  c("# --- GRÁFICO REPRODUTÍVEL (CatalyseR) ---",
+  c("# --- GRÁFICO REPRODUTÍVEL (Trilha) ---",
     "# install.packages('ggplot2')",
     "library(ggplot2)",
     "",

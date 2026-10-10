@@ -1,4 +1,4 @@
-# Módulo de Testes Não Paramétricos para a CatalyseR
+# Módulo de Testes Não Paramétricos para a Trilha
 # Qui-quadrado de independência (3 fontes: tabela preparada, duas variáveis,
 # entrada manual), Mann-Whitney, Wilcoxon pareado e Kruskal-Wallis.
 
@@ -634,7 +634,7 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
       pp <- export_params()
       tt <- pp$test_type
       code <- c(
-        "# --- Reprodutibilidade: Testes Não Paramétricos (CatalyseR) ---",
+        "# --- Reprodutibilidade: Testes Não Paramétricos (Trilha) ---",
         "# install.packages(c('ggplot2'))",
         "source('scripts/funcoes_nonparametric.R')",
         "library(ggplot2)",

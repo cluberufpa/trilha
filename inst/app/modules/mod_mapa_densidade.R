@@ -160,7 +160,7 @@ mod_mapa_densidade_server <- function(id, data_rv, import_info) {
         geom_code <- if (input$metodo == "hex") sprintf("  geom_hex(bins = %d) +", input$bins)
                      else sprintf("  geom_bin2d(bins = %d) +", input$bins)
         code <- c(
-          "# --- MAPA DE DENSIDADE / HEATMAP (CatalyseR) ---",
+          "# --- MAPA DE DENSIDADE / HEATMAP (Trilha) ---",
           "# install.packages('ggplot2')  # hexbin, se usar geom_hex",
           "library(ggplot2)",
           "",
@@ -177,7 +177,7 @@ mod_mapa_densidade_server <- function(id, data_rv, import_info) {
         writeLines(code, file.path(sc, "mapa_densidade.R"))
         writeLines(c("Version: 1.0", "RestoreWorkspace: Default", "SaveWorkspace: Default", "Encoding: UTF-8"),
                    file.path(pd, "projeto_analise.Rproj"))
-        writeLines(c("PACOTE DE ESTUDO: MAPA DE DENSIDADE (CatalyseR)",
+        writeLines(c("PACOTE DE ESTUDO: MAPA DE DENSIDADE (Trilha)",
                      "- dados/ocorrencias.csv : coordenadas lon, lat.",
                      "- scripts/mapa_densidade.R : código ggplot2 (bin2d/hex)."),
                    file.path(pd, "README.txt"))

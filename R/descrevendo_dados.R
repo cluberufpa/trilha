@@ -467,7 +467,7 @@ trilha_codigo_descricao <- function(parametros) {
                            "Valores ausentes" = ausentes, "Pistas para começar" = unname(pistas),
                            row.names = NULL, check.names = FALSE)
       grafico <- exploracao_retratos(dados, tipos)
-      narrativa <- paste(narrativa, "Comece conferindo a natureza de cada coluna: um código numérico pode representar uma categoria. A CatalyseR sugere um retrato, mas você pode mudar essa leitura no próximo passo.")
+      narrativa <- paste(narrativa, "Comece conferindo a natureza de cada coluna: um código numérico pode representar uma categoria. A Trilha sugere um retrato, mas você pode mudar essa leitura no próximo passo.")
     }),
     retrato = quote({
       caminho <- sugestao_caminho(tipo_x)

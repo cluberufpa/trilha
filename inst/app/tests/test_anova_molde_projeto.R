@@ -1,6 +1,6 @@
 # Execute de inst/app. Confere a árvore e o roteiro ANOVA do molde novo que
 # efetivamente vão para o aluno, e que script e QMDs rodam em sessões novas
-# reproduzindo os números da CatalyseR. Regras da rodada 4: catalyser e
+# reproduzindo os números da Trilha. Regras da rodada 4: catalyser e
 # EAPADados com checagem amigável na seção 1, seção 3 em etapas 3.1–3.4,
 # lista de pacotes do README igual à seção 1, títulos-pergunta, diagnósticos
 # com out-width "75%" centralizados e referências cruzadas sem "??" no HTML.
@@ -166,7 +166,7 @@ stopifnot(all(vapply(rotulos_artigo, function(rotulo)
   any(grepl(paste0("@", rotulo), artigo, fixed = TRUE)), logical(1))))
 
 # Script e cada QMD rodam em processos R independentes, como no Render.
-# Além de rodarem, os números precisam reproduzir a ANOVA da CatalyseR.
+# Além de rodarem, os números precisam reproduzir a ANOVA da Trilha.
 esperado <- aov(peso_g ~ racao, data = bagres)
 sumario <- summary(esperado)[[1]]
 tukey_esperado <- TukeyHSD(esperado, conf.level = .95)$racao

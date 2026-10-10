@@ -3,7 +3,7 @@
 # O manifesto editorial escolhe o que entra no relatório. O registro central de
 # execuções, por sua vez, sempre é preservado integralmente no Projeto R.
 #
-# Desde a Fase D (set/2026) a CatalyseR não gera o Word: ela gera só o Projeto
+# Desde a Fase D (set/2026) a Trilha não gera o Word: ela gera só o Projeto
 # R, e o Word (e o caderno HTML) nascem no RStudio, quando o pesquisador clica
 # em Render. O projeto exportado é o par do EAPACaderno:
 #
@@ -223,7 +223,7 @@ exportacao_trecho_pacotes <- function() {
     "library(effectsize)",
     "library(EAPADados)",
     "",
-    "# As funções de análise: as mesmas que a CatalyseR usou na tela, para o",
+    "# As funções de análise: as mesmas que a Trilha usou na tela, para o",
     "# resultado ser idêntico. ?trilha_anova mostra a ajuda de qualquer uma.",
     "if (!requireNamespace(\"trilha\", quietly = TRUE) ||",
     "    getNamespaceVersion(\"trilha\") < package_version(\"0.1.18\")) {",
@@ -317,7 +317,7 @@ exportacao_bloco_estrutural <- function(base_externa = NULL, import_info = list(
     "# -----------------------------------------------------------------------",
     "# 2. Operações estruturais",
     "# -----------------------------------------------------------------------",
-    "# Houve mudança estrutural promovida na CatalyseR (Pivotar/Separar ou",
+    "# Houve mudança estrutural promovida na Trilha (Pivotar/Separar ou",
     "# Criar e Editar Variáveis e Níveis). Para o projeto reproduzir exatamente a base que você",
     "# viu na tela, o script carrega a fotografia materializada na exportação.",
     "base_resolvida <- as.data.frame(readRDS(here(\"dados\", \"processados\", \"base_resolvida.rds\")))",
@@ -363,7 +363,7 @@ exportacao_trecho_tratar <- function(pipeline, base_externa = NULL,
   c(
     exportacao_marcador("tratar"),
     "# Transforma a planilha na Base Compartilhada, exatamente como aconteceu na",
-    "# CatalyseR: primeiro as operações estruturais, depois a Trilha de Preparo, na",
+    "# Trilha: primeiro as operações estruturais, depois a Trilha de Preparo, na",
     "# ordem lógica registrada. Sai dados_analise, conferido contra a fotografia da IDE.",
     "",
     exportacao_encadear_preparo(c(
@@ -372,7 +372,7 @@ exportacao_trecho_tratar <- function(pipeline, base_externa = NULL,
     "# -----------------------------------------------------------------------",
     "# 4. Conferência",
     "# -----------------------------------------------------------------------",
-    "# A CatalyseR também exportou uma fotografia de `dados_analise`. A função",
+    "# A Trilha também exportou uma fotografia de `dados_analise`. A função",
     "# abaixo compara a base reconstruída com ela e avisa se algo divergir.",
     "# O QUE CONFERIR: a mensagem deve dizer que a base é idêntica à fotografia.",
     "trilha_conferir_base(",
@@ -931,7 +931,7 @@ exportacao_codigo_estudo <- function(execucao, incluir_carregamento = TRUE,
     } else {
       c(
         "# Este tipo de análise ainda não tem código passo a passo; o trecho",
-        "# -resultado, logo abaixo, a refaz pela função da CatalyseR.",
+        "# -resultado, logo abaixo, a refaz pela função da Trilha.",
         "resultado <- trilha_executar(execucao, dados)"
       )
     }
@@ -1045,12 +1045,12 @@ exportacao_comentario_componente <- function(componente, rotulo) {
     descritivos = "Resumo por grupo: n, média e desvio padrão.",
     tabela = "A tabela do modelo ajustado.",
     comparacoes = "Comparações par a par: quem difere de quem.",
-    grafico = "O gráfico, como apareceu na CatalyseR.",
+    grafico = "O gráfico, como apareceu na Trilha.",
     pressupostos = "Os testes de pressupostos do modelo.",
     diagnosticos = "Os gráficos de diagnóstico dos resíduos."
   )
   if (componente %in% names(frases)) return(paste0("# ", frases[[componente]]))
-  sprintf("# %s desta análise, como na CatalyseR.", rotulo)
+  sprintf("# %s desta análise, como na Trilha.", rotulo)
 }
 
 # Nome do trecho (e do chunk) de um componente: `anova-profundidade-m-tukey`.
@@ -1113,7 +1113,7 @@ exportacao_chunk_componente <- function(execucao_id, componente,
   )
 }
 
-# Trecho de apresentação: a análise refeita pela função da CatalyseR, com os
+# Trecho de apresentação: a análise refeita pela função da Trilha, com os
 # parâmetros escritos por extenso. É o que alimenta as tabelas, os gráficos e
 # a narrativa do relatório, e não depende de nenhum arquivo de metadados.
 exportacao_trecho_resultado <- function(item, raiz, variavel) {
@@ -1126,7 +1126,7 @@ exportacao_trecho_resultado <- function(item, raiz, variavel) {
   lista[length(lista)] <- paste0(lista[length(lista)], ",")
   c(
     exportacao_marcador(paste0(raiz, "-resultado")),
-    "# A mesma análise, agora pela função da CatalyseR, que devolve narrativa,",
+    "# A mesma análise, agora pela função da Trilha, que devolve narrativa,",
     "# tabelas e gráficos já formatados, com os parâmetros abaixo exatamente como",
     "# você escolheu na tela.",
     sprintf("# Sai %s, o objeto que os trechos de apresentação mostram.", variavel),
@@ -1161,7 +1161,7 @@ exportacao_trecho_analise <- function(item, raiz) {
   c(
     exportacao_marcador(paste0(raiz, "-analise")),
     "# A análise passo a passo, o que você escreveria no RStudio para fazê-la sem",
-    "# a CatalyseR. Usa dados_da_analise, do trecho anterior.",
+    "# a Trilha. Usa dados_da_analise, do trecho anterior.",
     if (exportacao_codigo_vivo(item)) c(
       "# NO RELATÓRIO: roda de verdade, em silêncio (output: false); as saídas",
       "# formatadas vêm do trecho -resultado. Para ver os objetos crus, rode as",
@@ -1193,7 +1193,7 @@ exportacao_trecho_base <- function(item, raiz, registro_bases) {
     return(c(
       exportacao_marcador(paste0(raiz, "-base")),
       "# Constrói a base desta análise num salto só a partir de dados_analise, com",
-      "# a receita registrada na CatalyseR. Sai dados_da_analise, lido adiante.",
+      "# a receita registrada na Trilha. Sai dados_da_analise, lido adiante.",
       receita,
       sprintf("dados_da_analise <- %s", base$nome_r),
       "# Se alterar esta receita, confira a base antes de salvar e renderizar:",
@@ -1242,7 +1242,7 @@ exportacao_cabecalho_script <- function(nome_projeto) {
     "#",
     "# Este script é o código do relatório (relatorios/relatorio.qmd) com as",
     "# explicações que o relatório não mostra. Aqui se aprende; lá se apresenta.",
-    "# Foi gerado pela CatalyseR a partir do que você fez na tela: cada análise",
+    "# Foi gerado pela Trilha a partir do que você fez na tela: cada análise",
     "# aparece em código R, passo a passo, para você ler, rodar e adaptar.",
     "#",
     "# COMO RODAR",
@@ -1272,7 +1272,7 @@ exportacao_cabecalho_script <- function(nome_projeto) {
     "# O trecho instalar só instala o que falta; dar Source no script inteiro",
     "# instala pacotes ausentes, o que é aceitável, mas leva tempo e pede internet.",
     "# A planilha bruta nunca é alterada; a conferência do trecho tratar compara",
-    "# a base reconstruída com a fotografia exportada pela CatalyseR.",
+    "# a base reconstruída com a fotografia exportada pela Trilha.",
     "# Não use Source como substituto de Render: o script não produz HTML/DOCX.",
     "#",
     "",
@@ -1320,7 +1320,7 @@ exportacao_anova_simples <- function(manifesto) {
     identical(as.character(inc[[1]]$tipo %||% ""), "anova_um_fator")
 }
 
-# A função de datas mora no pacote CatalyseR. Retira somente sua
+# A função de datas mora no pacote Trilha. Retira somente sua
 # definição dos blocos registrados, preservando chamadas e demais operações.
 # Usa as linhas da expressão R, inclusive em receitas salvas antes deste ajuste.
 exportacao_preparo_sem_funcao_data <- function(codigo) {
@@ -1543,7 +1543,7 @@ exportacao_preparo_anova <- function(manifesto, import_info = list(), pipeline =
   if (exportacao_anova_usa_base_resolvida(base_externa)) {
     # A fotografia é anterior à trilha: os tratamentos abaixo rodam uma só vez.
     linhas <- c(
-      "# Partimos da base preparada e salva pela CatalyseR antes dos tratamentos.",
+      "# Partimos da base preparada e salva pela Trilha antes dos tratamentos.",
       "# Para refazer essas operações a partir do Excel, adapte o registro abaixo.",
       "dados <- base_resolvida",
       "# Registro das operações anteriores, mantido como referência:",
@@ -1642,7 +1642,7 @@ exportacao_modelo_anova <- function(arquivo, manifesto, import_info,
              "{{SUBTITULO_YAML}}" = exportacao_yaml_texto(identificacao$subtitulo),
              "{{AUTORES_YAML}}" = paste(identificacao$autores_yaml, collapse = "\n"),
              "{{DESCRICAO_PREPARO}}" = if (usa_base_salva)
-               paste("O preparo utiliza a base reorganizada e salva na CatalyseR, seguida dos tratamentos registrados.",
+               paste("O preparo utiliza a base reorganizada e salva na Trilha, seguida dos tratamentos registrados.",
                      "A planilha original é preservada. As operações que produziram a base salva ficam documentadas no código.") else
                paste("O preparo reproduz as escolhas de importação, as edições de variáveis e os tratamentos registrados.",
                      "A planilha de entrada é preservada."),
@@ -1885,7 +1885,7 @@ exportacao_molde_tratar <- function(pipeline, base_externa = NULL,
       exportacao_trecho_tratar(pipeline, base_externa, import_info = import_info))))
   inicio <- grep("^# Transforma a planilha na Base Compartilhada", linhas)
   if (length(inicio) && length(linhas) >= inicio[1] + 2L &&
-      grepl("^# CatalyseR: primeiro as operações estruturais", linhas[inicio[1] + 1L]) &&
+      grepl("^# Trilha: primeiro as operações estruturais", linhas[inicio[1] + 1L]) &&
       grepl("^# ordem lógica registrada", linhas[inicio[1] + 2L])) {
     linhas <- linhas[-(inicio[1]:(inicio[1] + 2L))]
   }
@@ -1909,7 +1909,7 @@ exportacao_molde_tratar <- function(pipeline, base_externa = NULL,
     "# 3.1 Reconstruir. A receita registrada, aplicada à planilha bruta: cada",
     if (usa_base_resolvida) "# operação é uma linha do encadeamento, lida de cima para baixo. (A base" else
       "# operação é uma linha do encadeamento, lida de cima para baixo.",
-    if (usa_base_resolvida) "# já vem da fotografia estrutural salva pela CatalyseR.)" else if (sem_preparo)
+    if (usa_base_resolvida) "# já vem da fotografia estrutural salva pela Trilha.)" else if (sem_preparo)
       "# (Sem preparo adicional, a receita é a própria planilha.)" else NULL,
     cadeia,
     "",
@@ -2024,15 +2024,15 @@ exportacao_sanitizar_molde <- function(linhas) {
   # Comentários dos trechos compartilhados que citam a IDE: o molde os
   # reaproveita com texto neutro; o exportador legado mantém o original.
   trocas <- c(
-    "# A CatalyseR também exportou uma fotografia de `dados_analise`. A função" =
+    "# A Trilha também exportou uma fotografia de `dados_analise`. A função" =
       "# O projeto traz uma fotografia de `dados_analise` em dados/processados/. A função",
-    "# Houve mudança estrutural promovida na CatalyseR (Pivotar/Separar ou" =
+    "# Houve mudança estrutural promovida na Trilha (Pivotar/Separar ou" =
       "# Houve mudança estrutural (Pivotar/Separar ou",
     "# viu na tela, o script carrega a fotografia materializada na exportação." =
       "# viu na tela, o script carrega a fotografia que acompanha o projeto.",
     "# Escolhas da importação e reestruturações, na ordem registrada na IDE." =
       "# Escolhas da importação e reestruturações, nesta ordem:",
-    "# a receita registrada na CatalyseR. Sai dados_da_analise, lido adiante." =
+    "# a receita registrada na Trilha. Sai dados_da_analise, lido adiante." =
       "# a receita registrada. Sai dados_da_analise, lido adiante."
   )
   for (alvo in names(trocas)) linhas[linhas == alvo] <- trocas[[alvo]]
@@ -2402,7 +2402,7 @@ exportacao_anova_clara_aceita <- function(manifesto) {
 
 # O método que o script em ClaRa escreve: "classica" ou "welch". A ClaRa
 # nunca escolhe o teste pelo Levene; no automático, quem escolheu foi a
-# CatalyseR, e o script recebe a escolha já feita (metodo_usado), escrita em
+# Trilha, e o script recebe a escolha já feita (metodo_usado), escrita em
 # variancias_iguais. Sem essa escolha registrada, a rota ClaRa não se aplica.
 exportacao_anova_clara_metodo <- function(item) {
   p <- item$parametros
@@ -2432,7 +2432,7 @@ exportacao_anova_clara_textos_metodo <- function(item) {
         c("# Resumo, ANOVA, pressupostos (Shapiro-Wilk e Levene), Tukey e letras,",
           "# numa função só. Os rótulos ficam no resultado: gráficos e textos os usam."),
       if (automatico) c(
-        "# O método veio da escolha automática da CatalyseR: o Levene",
+        "# O método veio da escolha automática da Trilha: o Levene",
         if (welch) "# indicou variâncias diferentes, e a ANOVA de Welch foi a escolhida." else
           "# não indicou variâncias diferentes, e a ANOVA clássica foi a escolhida.",
         "# A escolha fica escrita em variancias_iguais; para mudá-la, troque ali.")),
@@ -2926,7 +2926,7 @@ exportacao_clara_sem_in <- function(linhas) {
 # `base` desta análise (trilha, ramo e grupos como fator na ordem mostrada
 # na tela), sem nomes intermediários. Em vez da fotografia, o roteiro leva
 # um carimbo: linhas, contagem e média por grupo, tirados da base que a
-# CatalyseR mostrou, para o aluno conferir com o R. Só o número de linhas é
+# Trilha mostrou, para o aluno conferir com o R. Só o número de linhas é
 # travado com stopifnot(). Devolve os blocos do script e do chunk dos QMDs.
 exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_bases,
                                      base_externa, dados_analise, cache_bases) {
@@ -2982,7 +2982,7 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
   niveis_r <- paste0("c(", paste(encodeString(niveis, quote = '"'), collapse = ", "), ")")
 
   passo_fator <- c(
-    "  # Os grupos como fator, na ordem em que a CatalyseR os mostrou.",
+    "  # Os grupos como fator, na ordem em que a Trilha os mostrou.",
     sprintf("  mutate(%s = factor(%s, levels = %s))", col_fator, col_fator, niveis_r)
   )
   if (cadeia_unica) {
@@ -3004,7 +3004,7 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
   }
   travar <- sprintf("stopifnot(nrow(base) == %dL)", nrow(base_tela))
   carimbo <- c(
-    "# 3.2 Conferir com a tela. O carimbo é o que a CatalyseR mostrou ao exportar.",
+    "# 3.2 Conferir com a tela. O carimbo é o que a Trilha mostrou ao exportar.",
     "# O QUE CONFERIR: a tabela calculada pelo R deve repetir o carimbo.",
     sprintf("# Carimbo: %d linhas.", nrow(base_tela)),
     strwrap(paste0("Contagem por ", fator, ": ",
@@ -3136,7 +3136,7 @@ exportacao_t_degrau_marcadores_qmd <- function(item, manifesto, import_info) {
       else "O teste t de uma amostra compara a média de uma resposta numérica com um valor de referência definido antes da análise.")),
     METODOS = secao("metodos", c(
       "*Descreva origem, local, período, unidades e delineamento. Verifique independência e, no pareado, a correspondência real das medidas.*",
-      "O teste t foi executado em R [@rcore2025], com a alternativa e a confiança registradas na CatalyseR. Os casos incompletos foram excluídos apenas nas medidas necessárias. O efeito padronizado usa o DP da resposta, na amostra única, ou o DP das diferenças, no pareado. O IC do efeito é bilateral por t não central. A interpretação exige examinar normalidade e delineamento [@zar2010].")),
+      "O teste t foi executado em R [@rcore2025], com a alternativa e a confiança registradas na Trilha. Os casos incompletos foram excluídos apenas nas medidas necessárias. O efeito padronizado usa o DP da resposta, na amostra única, ou o DP das diferenças, no pareado. O IC do efeito é bilateral por t não central. A interpretação exige examinar normalidade e delineamento [@zar2010].")),
     DISCUSSAO = secao("discussao", "*Compare a magnitude e o IC com a questão biológica. Um p-valor não mede importância prática e não demonstra causalidade. Acrescente estudos do seu tema.*"),
     CONCLUSAO = secao("conclusao", "*Responda à pergunta com a estimativa, sua incerteza e os limites do delineamento. A síntese automática precisa da revisão do pesquisador.*")
   )
@@ -3572,7 +3572,7 @@ exportacao_nota <- function(...) {
 
 exportacao_yaml_qmd <- function(titulo_projeto, globais = list()) {
   identificacao <- exportacao_identificacao_documento(
-    globais, titulo_projeto, "Projeto R exportado pela CatalyseR"
+    globais, titulo_projeto, "Projeto R exportado pela Trilha"
   )
   c(
     "---",
@@ -3590,7 +3590,7 @@ exportacao_yaml_qmd <- function(titulo_projeto, globais = list()) {
     "format:",
     "  # 1. Word: relatório para o leitor, somente com texto, tabelas e figuras.",
     "  docx:",
-    "    # Modelo de página com aparência de artigo, o mesmo da CatalyseR.",
+    "    # Modelo de página com aparência de artigo, o mesmo da Trilha.",
     "    reference-doc: custom-reference.docx",
     "    toc: false",
     "    number-sections: true",
@@ -3773,7 +3773,7 @@ exportacao_gerar_qmd <- function(manifesto, titulo_projeto = "Relatório de aná
       if (primeira) exportacao_nota(
         "Cada análise segue o mesmo desenho. Um chunk de trabalho reúne três",
         "trechos do script, porque não há texto entre eles: a base da análise,",
-        "a análise passo a passo e o resultado pela função da CatalyseR. Depois,",
+        "a análise passo a passo e o resultado pela função da Trilha. Depois,",
         "um chunk por componente mostra o que você escolheu para o relatório,",
         "cada um sob o seu título."
       ) else NULL,
@@ -3942,10 +3942,10 @@ exportacao_leiame_projeto <- function(nome_projeto, import_info = list()) {
   planilha <- exportacao_nome_planilha(import_info)
   c(
     paste0("# ", nome_projeto), "",
-    "Projeto de análise gerado pela CatalyseR. Ele tem a mesma estrutura do",
+    "Projeto de análise gerado pela Trilha. Ele tem a mesma estrutura do",
     "EAPACaderno, o projeto-modelo do ecossistema EAPA: uma planilha entra, um",
     "documento faz tudo, um relatório em Word sai. A diferença é que aqui a",
-    "análise já foi feita: você a montou na CatalyseR, e o projeto a refaz em",
+    "análise já foi feita: você a montou na Trilha, e o projeto a refaz em",
     "código, para você ler, rodar e adaptar. O Word não vem pronto de",
     "propósito: ele nasce aqui, no RStudio, quando você clica em Render, e é",
     "assim que se vê de onde cada tabela e cada frase saem.", "",
@@ -4436,7 +4436,7 @@ preparo_leitura_entrada <- function(info) {
 
 # A aba de importação e a sequência completa usam a mesma leitura.
 preparo_codigo_importacao <- function(info) {
-  paste(c("# Importação — CatalyseR",
+  paste(c("# Importação — Trilha",
     "# Guarde o arquivo original junto ao script ou ajuste o caminho da leitura.",
     "", preparo_leitura_entrada(info), "", exportacao_preparo_importacao(info),
     "", "# Confira dimensões e tipos antes de preparar os dados.", "dim(dados)", "str(dados)"), collapse = "\n")
@@ -4447,6 +4447,6 @@ preparo_codigo_completo <- function(info, pipeline = list(), base_externa = NULL
   manifesto <- list(execucoes = list(preparo = list(incluir_word = TRUE, base_tipo = "compartilhada")))
   codigo <- exportacao_preparo_anova(manifesto, info, pipeline, base_externa = base_externa)
   codigo <- exportacao_preparo_sem_funcao_data(codigo)
-  paste(c("# Preparo completo — CatalyseR", "# Guarde o arquivo original junto ao script ou ajuste o caminho da leitura.",
+  paste(c("# Preparo completo — Trilha", "# Guarde o arquivo original junto ao script ou ajuste o caminho da leitura.",
     "library(dplyr)", "library(tidyr)", "", leitura, "", codigo, "", "dados_analise <- base_compartilhada"), collapse = "\n")
 }

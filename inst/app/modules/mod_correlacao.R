@@ -118,7 +118,7 @@ mod_correlacao_server <- function(id, data_rv, import_info) {
         leitura <- sprintf('dados <- readxl::read_excel("%s", sheet = "%s")', fn, abn)
       }
       paste(c(
-        "# Script gerado pela CatalyseR — Correlacao",
+        "# Script gerado pela Trilha — Correlacao",
         "library(ggplot2)", leitura, "",
         sprintf('r <- cor.test(dados[["%s"]], dados[["%s"]], method = "%s")', input$var_x, input$var_y, input$metodo %||% "pearson"),
         "print(r)", "",

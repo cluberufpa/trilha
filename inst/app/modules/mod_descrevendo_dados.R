@@ -307,7 +307,7 @@ mod_descrevendo_dados_ui <- function(id, area) {
           if (modo == "dispersao") selectInput(prefixo("tendencia"), "Linha de tendência:", c("Linear" = "linear", "Suavizada (LOESS)" = "loess", "Sem linha" = "nenhuma")),
           if (modo == "outliers") numericInput(prefixo("limite_z"), "Sinalizar quando |z| for maior que:", 3, min = .1, step = .1),
           actionButton(prefixo("executar"), "Executar análise", icon = icon("play"), class = "btn-primary"),
-          helpText("A CatalyseR sugere um caminho. A decisão continua sendo sua, junto com a pergunta e o delineamento."),
+          helpText("A Trilha sugere um caminho. A decisão continua sendo sua, junto com a pergunta e o delineamento."),
           if (area == "pressupostos") helpText("Aqui você examina variáveis. Para validar um modelo, examine seus resíduos e o delineamento. Nenhum valor é removido automaticamente."),
           if (area == "transformar") helpText("Compare as transformações sugeridas. A base original não é alterada; esta seção não aplica mudanças à Trilha de Preparo.")
         ),

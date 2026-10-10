@@ -957,7 +957,7 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
         receita <- receita[!grepl("^print\\(", receita)]
         code <- c(
           code,
-          "# Base derivada escolhida na CatalyseR",
+          "# Base derivada escolhida na Trilha",
           "# O Projeto R integrado incluirá antes os tratamentos da Base Compartilhada.",
           "dados_analise <- dados",
           receita,

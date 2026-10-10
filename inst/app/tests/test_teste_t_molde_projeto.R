@@ -151,7 +151,7 @@ stopifnot(all(vapply(rotulos_artigo, function(rotulo)
   any(grepl(paste0("@", rotulo), artigo, fixed = TRUE)), logical(1))))
 
 # Script e cada QMD rodam em processos R independentes, reproduzindo o teste
-# t da CatalyseR, preservando a escolha registrada no painel.
+# t da Trilha, preservando a escolha registrada no painel.
 formula_teste <- comprimento_cefalotorax_mm ~ sexo
 esperado <- t.test(formula_teste, data = lagostas,
   var.equal = item$parametros$variancias_iguais,

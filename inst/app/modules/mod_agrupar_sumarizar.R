@@ -1,4 +1,4 @@
-# Módulo Agrupar / Sumarizar para a CatalyseR
+# Módulo Agrupar / Sumarizar para a Trilha
 # ---------------------------------------------------------------------------
 # Reduz uma base a uma linha por grupo, calculando resumos frequentes. O módulo
 # trabalha antes da Trilha global e pode promover o resultado para as análises.
@@ -113,7 +113,7 @@ agrupar_gerar_codigo <- function(grupos, variaveis, funcoes, info = NULL) {
   # Todas as expressões recebem vírgula porque `.groups` vem em seguida.
   linhas_resumo <- paste0("    ", exprs, ",")
   paste(c(
-    "# Script gerado pela CatalyseR — Agrupar / Sumarizar",
+    "# Script gerado pela Trilha — Agrupar / Sumarizar",
     "library(dplyr)", leitura, "",
     "dados_agrupados <- dados |>",
     sprintf("  group_by(%s) |>", paste(agrupar_bt(grupos), collapse = ", ")),

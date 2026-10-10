@@ -19,7 +19,7 @@ pressupostos, diagnósticos, console e o objeto \code{aov} em \code{objeto}.
 }
 \description{
 Ajusta um modelo fatorial (\code{resposta ~ fator_a * fator_b}) e devolve os
-componentes que a CatalyseR usa na Comunicação de Resultados. A função
+componentes que a Trilha usa na Comunicação de Resultados. A função
 trabalha com observações individuais, remove e conta casos incompletos e
 mantém as médias por célula separadas da tabela do modelo.
 }

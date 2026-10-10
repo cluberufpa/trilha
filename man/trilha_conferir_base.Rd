@@ -13,7 +13,7 @@ trilha_conferir_base(
 \arguments{
 \item{reconstruida}{A base que o script acabou de montar.}
 
-\item{caminho_fotografia}{Caminho do \code{.rds} exportado pela CatalyseR.}
+\item{caminho_fotografia}{Caminho do \code{.rds} exportado pela Trilha.}
 
 \item{rotulo}{Nome que aparece nas mensagens.}
 }
@@ -23,7 +23,7 @@ trilha_conferir_base(
 }
 \description{
 O chunk \code{tratar} do \code{relatorio.qmd} exportado reconstroi a base a partir da
-planilha bruta. A CatalyseR tambem exportou uma fotografia do que estava na tela. Esta
+planilha bruta. A Trilha tambem exportou uma fotografia do que estava na tela. Esta
 funcao compara as duas e diz, em portugues, se o projeto reproduz o que voce
 viu.
 }

@@ -4,7 +4,7 @@ utils::globalVariables(c(
   ".data", "Coluna", "Frequ\u00eancia", "Linha", "ic_inferior",
   "ic_superior", "id", "media", "momento", "valor"
 ))
-# Funcoes de analise da CatalyseR
+# Funcoes de analise da Trilha
 # -----------------------------------------------------------------------------
 # Estas sao as funcoes que o ALUNO usa. Elas aparecem nos scripts do Projeto R
 # exportado e tem ajuda em portugues: digite ?trilha_anova, por exemplo.
@@ -18,7 +18,7 @@ utils::globalVariables(c(
 #   as demais sao apoio: preparo, conferencia e apresentacao
 # =============================================================================
 
-# Funções canônicas do Projeto R integrado da CatalyseR
+# Funções canônicas do Projeto R integrado da Trilha
 # -----------------------------------------------------------------------------
 # Este arquivo é copiado para o projeto exportado. Cada script de execução
 # chama trilha_executar() com a configuração registrada na IDE e a base
@@ -142,7 +142,7 @@ trilha_moda <- function(x) {
 #' Conferir uma base reconstruida contra a fotografia exportada
 #'
 #' O chunk `tratar` do `relatorio.qmd` exportado reconstroi a base a partir da
-#' planilha bruta. A CatalyseR tambem exportou uma fotografia do que estava na tela. Esta
+#' planilha bruta. A Trilha tambem exportou uma fotografia do que estava na tela. Esta
 #' funcao compara as duas e diz, em portugues, se o projeto reproduz o que voce
 #' viu.
 #'
@@ -151,7 +151,7 @@ trilha_moda <- function(x) {
 #' que importa: numero de linhas, nomes de colunas e valores.
 #'
 #' @param reconstruida A base que o script acabou de montar.
-#' @param caminho_fotografia Caminho do `.rds` exportado pela CatalyseR.
+#' @param caminho_fotografia Caminho do `.rds` exportado pela Trilha.
 #' @param rotulo Nome que aparece nas mensagens.
 #' @return `TRUE` quando as bases sao equivalentes, `FALSE` caso contrario
 #'   (invisivel nos dois casos). Nunca interrompe o relatorio.
@@ -213,7 +213,7 @@ trilha_conferir_base <- function(reconstruida, caminho_fotografia,
 #' Manter apenas os casos completos, contando o que saiu
 #'
 #' Remove as linhas que tem dado faltante em qualquer uma das colunas indicadas e
-#' devolve, junto, quantas ficaram e quantas sairam. E o habito que a CatalyseR
+#' devolve, junto, quantas ficaram e quantas sairam. E o habito que a Trilha
 #' adota em todas as analises: **nenhuma linha e descartada em silencio**.
 #'
 #' @param dados Um data.frame.
@@ -236,7 +236,7 @@ trilha_completos <- function(dados, colunas) {
   )
 }
 
-#' Formatar uma tabela no tema visual da CatalyseR
+#' Formatar uma tabela no tema visual da Trilha
 #'
 #' Aplica a identidade Ocean Gradient a um data.frame: cabecalho azul-marinho
 #' com letras brancas, sem grade interna, primeira coluna a esquerda. E o mesmo
@@ -1863,7 +1863,7 @@ anova2_grafico_combinacoes_celulas <- function(
 #' ANOVA de dois fatores com interação
 #'
 #' Ajusta um modelo fatorial (`resposta ~ fator_a * fator_b`) e devolve os
-#' componentes que a CatalyseR usa na Comunicação de Resultados. A função
+#' componentes que a Trilha usa na Comunicação de Resultados. A função
 #' trabalha com observações individuais, remove e conta casos incompletos e
 #' mantém as médias por célula separadas da tabela do modelo.
 #'
@@ -2073,7 +2073,7 @@ trilha_anova_dois_fatores <- function(dados, p) {
 
 #' Grafico de linhas
 #'
-#' Monta um grafico de linhas com o visual da CatalyseR. Antes de desenhar,
+#' Monta um grafico de linhas com o visual da Trilha. Antes de desenhar,
 #' descarta as observacoes sem valor em X ou em Y e informa quantas foram: o
 #' ggplot2 faria isso com um aviso discreto, e aqui a exclusao fica explicita.
 #'
@@ -2459,9 +2459,9 @@ trilha_hca <- function(dados, p) {
   )
 }
 
-#' Executar uma analise registrada na CatalyseR
+#' Executar uma analise registrada na Trilha
 #'
-#' Cada vez que voce clica em "Adicionar aos resultados" na CatalyseR, a
+#' Cada vez que voce clica em "Adicionar aos resultados" na Trilha, a
 #' configuracao daquela analise e congelada: qual base, quais variaveis, qual
 #' nivel de confianca. Esta funcao pega essa configuracao e refaz a analise,
 #' devolvendo tudo pronto para o relatorio.

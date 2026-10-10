@@ -2,7 +2,7 @@
 % Please edit documentation in R/analises.R
 \name{trilha_tabela_ocean}
 \alias{trilha_tabela_ocean}
-\title{Formatar uma tabela no tema visual da CatalyseR}
+\title{Formatar uma tabela no tema visual da Trilha}
 \usage{
 trilha_tabela_ocean(x)
 }

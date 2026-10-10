@@ -1,4 +1,4 @@
-# Módulo "Adicionar Tratamentos à Base" para a CatalyseR (Fase 2)
+# Módulo "Adicionar Tratamentos à Base" para a Trilha (Fase 2)
 # ---------------------------------------------------------------------------
 # Edita o PIPELINE de preparo GLOBAL (pipeline_rv, criado no app). O dados_analise
 # do app e o REPLAY desse pipeline sobre a base_resolvida (ordem LOGICA); a trilha

@@ -408,7 +408,7 @@ escrever_word_monitoramento <- function(caminho, cfg) {
   titulo <- function(texto) doc <<- officer::body_add_par(doc, texto, style = "heading 1")
   doc <- officer::body_add_fpar(doc, officer::fpar(officer::ftext("Planejamento do monitoramento",
     officer::fp_text(font.family = "Cambria", font.size = 20, bold = TRUE, color = "#0F3B5F"))))
-  paragrafo("CatalyseR · Minuta para revisão antes da coleta. Este documento reúne as definições da série, a metodologia prevista e os pontos do protocolo que ainda precisam ser completados.")
+  paragrafo("Trilha · Minuta para revisão antes da coleta. Este documento reúne as definições da série, a metodologia prevista e os pontos do protocolo que ainda precisam ser completados.")
   titulo("Metodologia prevista")
   for (texto in conteudo$paragrafos) paragrafo(texto)
   titulo("Resumo do plano")

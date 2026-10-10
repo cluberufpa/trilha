@@ -54,7 +54,7 @@ for (multiplas in c(FALSE, TRUE)) {
     saidas_disponiveis = e$saidas_disponiveis)
   manifesto <- comunicacao_manifesto(estado, registro,
     stats::setNames(as.list(rep("Atualizada", length(registro))), names(registro)),
-    list(introducao = "Exemplo fictício para conferir o Projeto R exportado pela CatalyseR. Não representa uma conclusão científica sobre as espécies.",
+    list(introducao = "Exemplo fictício para conferir o Projeto R exportado pela Trilha. Não representa uma conclusão científica sobre as espécies.",
       conclusao = "Documento de validação da geração do projeto."))
   zip <- file.path(destino, paste0(nome, ".zip"))
   exportacao_empacotar_projeto(zip, nome_projeto = nome, dados_brutos = brutos,

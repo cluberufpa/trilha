@@ -160,7 +160,7 @@ mod_mapa_server <- function(id, data_rv, import_info) {
                       "    install.packages(c('sf','geobr'))\n\n",
                       "Atencao: sf e geobr dependem de bibliotecas de fonte. No Windows pode ",
                       "ser necessario instalar o Rtools antes (https://cran.r-project.org/bin/windows/Rtools/ ",
-                      "ou o tutorial do curso). As demais analises da CatalyseR NAO precisam desses pacotes."
+                      "ou o tutorial do curso). As demais analises da Trilha NAO precisam desses pacotes."
                     )))
       out <- tryCatch(geobr::read_state(code_state = "all", year = 2020, showProgress = FALSE),
                       error = function(e) e)
@@ -300,7 +300,7 @@ mod_mapa_server <- function(id, data_rv, import_info) {
         title_val <- if (nzchar(input$custom_title)) input$custom_title else "Mapa coroplético"
 
         code <- c(
-          "# --- MAPA COROPLÉTICO DO BRASIL (CatalyseR) ---",
+          "# --- MAPA COROPLÉTICO DO BRASIL (Trilha) ---",
           "# install.packages(c('geobr','sf','ggplot2','ggspatial'))",
           "library(geobr); library(sf); library(ggplot2)",
           "",
@@ -326,7 +326,7 @@ mod_mapa_server <- function(id, data_rv, import_info) {
         writeLines(code, file.path(sc, "mapa.R"))
         writeLines(c("Version: 1.0", "RestoreWorkspace: Default", "SaveWorkspace: Default", "Encoding: UTF-8"),
                    file.path(pd, "projeto_analise.Rproj"))
-        writeLines(c("PACOTE DE ESTUDO: MAPA COROPLÉTICO (CatalyseR)",
+        writeLines(c("PACOTE DE ESTUDO: MAPA COROPLÉTICO (Trilha)",
                      "- dados/    : dados limpos (.rda, .csv, .xlsx).",
                      "- scripts/mapa.R : código geobr + ggplot2 do mapa."),
                    file.path(pd, "README.txt"))

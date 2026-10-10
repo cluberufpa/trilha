@@ -1,4 +1,4 @@
-# Registro de bases derivadas da CatalyseR — Fases 3A a 3B
+# Registro de bases derivadas da Trilha — Fases 3A a 3B
 # ---------------------------------------------------------------------------
 # Contrato puro para o modelo base/ramos em estrela. Toda base derivada nasce
 # DIRETAMENTE de `dados_analise`; não existe ramo de ramo. As etapas usam o

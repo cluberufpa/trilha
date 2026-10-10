@@ -2,7 +2,7 @@
 % Please edit documentation in R/analises.R
 \name{trilha_executar}
 \alias{trilha_executar}
-\title{Executar uma analise registrada na CatalyseR}
+\title{Executar uma analise registrada na Trilha}
 \usage{
 trilha_executar(execucao, dados = NULL)
 }
@@ -19,7 +19,7 @@ metodo; na ANOVA, por exemplo: \code{narrativa}, \code{descritivos}, \code{tabel
 modelo do R, para quem quiser inspecionar).
 }
 \description{
-Cada vez que voce clica em "Adicionar aos resultados" na CatalyseR, a
+Cada vez que voce clica em "Adicionar aos resultados" na Trilha, a
 configuracao daquela analise e congelada: qual base, quais variaveis, qual
 nivel de confianca. Esta funcao pega essa configuracao e refaz a analise,
 devolvendo tudo pronto para o relatorio.

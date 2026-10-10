@@ -16,7 +16,7 @@ Lista com \code{dados} (o subconjunto completo), \code{n} e \code{descartadas}.
 }
 \description{
 Remove as linhas que tem dado faltante em qualquer uma das colunas indicadas e
-devolve, junto, quantas ficaram e quantas sairam. E o habito que a CatalyseR
+devolve, junto, quantas ficaram e quantas sairam. E o habito que a Trilha
 adota em todas as analises: \strong{nenhuma linha e descartada em silencio}.
 }
 \examples{

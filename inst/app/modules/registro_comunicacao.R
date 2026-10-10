@@ -3,13 +3,13 @@
 # O registro analítico continua sendo a fonte da verdade do que foi executado.
 # Este arquivo guarda apenas decisões editoriais do relatório: ordem, inclusão
 # e componentes escolhidos (os campos ainda se chamam incluir_word/saidas_word,
-# de quando a CatalyseR gerava o Word; hoje o relatório nasce no Projeto R).
+# de quando a Trilha gerava o Word; hoje o relatório nasce no Projeto R).
 # Desmarcar um item nunca remove a execução do Projeto R.
 
 comunicacao_rotulos_saidas <- execucoes_rotulos_saidas
 
 # O console cru NAO entra no relatorio. Ele continua existindo na interface,
-# para o aluno reconhecer a saida do R sem a camada da CatalyseR, e continua no
+# para o aluno reconhecer a saida do R sem a camada da Trilha, e continua no
 # objeto do replay para quem quiser inspecionar. Mas nao e oferecido como
 # conteudo do Word: relatorio de artigo e tese nao leva despejo de console.
 #

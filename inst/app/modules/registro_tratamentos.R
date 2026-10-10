@@ -1,4 +1,4 @@
-# Registro de tratamentos + pipeline de preparo para a CatalyseR
+# Registro de tratamentos + pipeline de preparo para a Trilha
 # ---------------------------------------------------------------------------
 # A ESPINHA do preparo de dados: uma trilha ORDENADA e capturavel de etapas.
 # Cada TIPO de tratamento e uma entrada do registro `tratamentos`, com quatro
@@ -640,7 +640,7 @@ replay_pipeline <- function(base, pipeline, reg = tratamentos) {
 gerar_script_preparo <- function(pipeline, info, reg = tratamentos, base_extra = NULL) {
   if (!is.null(base_extra) && nzchar(base_extra)) {
     linhas <- c(
-      "# Script gerado pela CatalyseR - Preparacao dos dados (trilha)",
+      "# Script gerado pela Trilha - Preparacao dos dados (trilha)",
       "# --- Base preparada externamente (Arrumar) ---",
       base_extra,
       "dados <- dados_arrumados   # a base ja vem arrumada",
@@ -661,7 +661,7 @@ gerar_script_preparo <- function(pipeline, info, reg = tratamentos, base_extra =
       usa_readxl <- TRUE
     }
     linhas <- c(
-      "# Script gerado pela CatalyseR - Preparacao dos dados (trilha)",
+      "# Script gerado pela Trilha - Preparacao dos dados (trilha)",
       "library(tidyverse)",
       if (usa_readxl) "library(readxl)" else NULL,
       "",

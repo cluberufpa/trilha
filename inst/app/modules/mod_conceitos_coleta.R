@@ -33,7 +33,7 @@ conceitos_coleta <- function() {
       titulo = "Organize os tratamentos antes de medir", chamada = "O desenho do experimento muda a análise.",
       texto = "O delineamento define como os tratamentos são distribuídos e quais diferenças devem ser controladas. O croqui torna essa decisão visível antes da coleta.",
       exemplo = "Num DIC, as unidades recebem tratamentos por sorteio. Num DBC, blocos ajudam a lidar com uma diferença conhecida entre locais ou lotes. Parcelas subdivididas exigem atenção a duas escalas de unidade experimental.",
-      cuidado = "A CatalyseR já desenha DIC, DBC, quadrado latino e parcelas subdivididas, mas a análise correspondente aos três últimos ainda não está completa no estúdio.",
+      cuidado = "A Trilha já desenha DIC, DBC, quadrado latino e parcelas subdivididas, mas a análise correspondente aos três últimos ainda não está completa no estúdio.",
       esquema = c("Unidade + fatores", "Sorteio e croqui", "Análise compatível"),
       proximo = "Abra o delineamento do seu caso (DIC, DBC, DQL, Fatorial ou Parcelas Subdivididas), no grupo “Delineamentos experimentais”, para criar o croqui e, na aba “Variáveis do experimento”, estruturar a coleta."
     ),
@@ -96,7 +96,7 @@ painel_conceito_coleta <- function(tema) {
       bslib::card(bslib::card_header("Exemplo em pesca e aquicultura"), bslib::card_body(tema$exemplo)),
       bslib::card(bslib::card_header("Antes de seguir"), bslib::card_body(tema$cuidado))
     ),
-    shiny::div(class = "coleta-proximo", shiny::tags$b("Na CatalyseR: "), tema$proximo)
+    shiny::div(class = "coleta-proximo", shiny::tags$b("Na Trilha: "), tema$proximo)
   )
 }
 
@@ -260,7 +260,7 @@ mod_conceitos_coleta_ui <- function(id) {
           shiny::h3(class = "coleta-bloco-titulo", "O caminho da pesquisa"),
           # Apresenta o mapa, no mesmo estilo da introdução da coluna da esquerda.
           shiny::p(class = "coleta-bloco-intro",
-            "Da pergunta à decisão, cada etapa da pesquisa tem o seu lugar. Veja a ordem do caminho e em que menu da CatalyseR cada parte acontece."),
+            "Da pergunta à decisão, cada etapa da pesquisa tem o seu lugar. Veja a ordem do caminho e em que menu da Trilha cada parte acontece."),
           fluxograma_caminho_pesquisa(raiz)
         )
       )

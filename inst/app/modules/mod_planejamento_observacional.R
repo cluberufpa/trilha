@@ -1,4 +1,4 @@
-# Módulo de Planejamento de Delineamentos Observacionais — CatalyseR
+# Módulo de Planejamento de Delineamentos Observacionais — Trilha
 # Unificação: Transversal Comparativo com tratamento de Amostras Compostas (Pool).
 # Abas: Definições → Desenho → Ficha do delineamento →
 # Metodologia para artigo → Modelo e cuidados → Resumo.
@@ -558,7 +558,7 @@ escrever_word_transversal <- function(arquivo, pergunta, metodologia, resumo, di
   doc <- officer::body_add_fpar(doc, officer::fpar(officer::ftext(
     if (!is.null(titulo_documento)) titulo_documento else if (longitudinal) "Planejamento longitudinal comparativo" else "Planejamento — Transversal comparativo", officer::fp_text(
       font.family = "Cambria", font.size = 20, bold = TRUE, color = "#0F3B5F"))))
-  paragrafo("CatalyseR · Minuta de metodologia para revisão antes da coleta")
+  paragrafo("Trilha · Minuta de metodologia para revisão antes da coleta")
   titulo("Pergunta do estudo")
   paragrafo(pergunta)
   titulo("Material e métodos previstos")
@@ -813,7 +813,7 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
                       selected = "igual",
                       inline = FALSE
                     ),
-                    # No modo gerado, a CatalyseR distribui os valores com seq().
+                    # No modo gerado, a Trilha distribui os valores com seq().
                     # Início, fim e número de estações dividem uma única linha.
                     shiny::conditionalPanel(
                       condition = sprintf("input['%s'] != 'livre'", ns("modo_estacoes")),
@@ -979,7 +979,7 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
                   shiny::h5(shiny::icon("layer-group"), " 3. Composição da estação (Pool)"),
                   # Mesma regra do Transversal, com a estação como unidade amostral.
                   shiny::p(class = "small text-muted mb-2",
-                    shiny::tags$b("Regra da CatalyseR: "),
+                    shiny::tags$b("Regra da Trilha: "),
                     "cada estação ocupa exatamente uma linha na planilha. Quando indivíduos pequenos são misturados para gerar massa de análise, essa mistura é uma amostra composta e os itens viram um número na coluna pool."
                   ),
                   shiny::uiOutput(ns("ui_pools_grupos")),
@@ -1050,7 +1050,7 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
                     if (identical(tipo_resolvido, "longitudinal")) " 3. Composição da Unidade Amostral (Pool)" else " 2. Composição da Unidade Amostral (Pool)")
                 },
                 shiny::p(class = "small text-muted mb-2",
-                  shiny::tags$b("Regra da CatalyseR: "),
+                  shiny::tags$b("Regra da Trilha: "),
                   "cada UA ocupa exatamente uma linha na planilha. Quando indivíduos pequenos são misturados para gerar massa de análise, essa mistura é uma amostra composta e os itens viram um número na coluna pool."
                 ),
                 shiny::radioButtons(
@@ -2082,7 +2082,7 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
       names(df)[names(df) == "fator"] <- fator_col
       # Quando o plano pede localização, cada UA recebe as coordenadas previstas
       # e a precisão exigida. Os valores ficam em branco até a definição em mapa
-      # ou em campo; não são coordenadas inventadas pela CatalyseR.
+      # ou em campo; não são coordenadas inventadas pela Trilha.
       if (identical(tipo_resolvido, "transversal_comparativo") &&
           isTRUE(ou_vazio(input$registrar_coordenadas, FALSE))) {
         df$latitude_wgs84 <- ""
@@ -3066,7 +3066,7 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
         qmd_lines <- c(
           "---",
           sprintf("title: \"%s\"", titulo_doc),
-          "author: \"CatalyseR — Estatística Aplicada à Pesca e Aquicultura\"",
+          "author: \"Trilha — Estatística Aplicada à Pesca e Aquicultura\"",
           sprintf("date: \"%s\"", format(Sys.Date(), "%d/%m/%Y")),
           "format:",
           "  docx: default",
@@ -3125,7 +3125,7 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
         
         # Script modelo R
         r_script <- c(
-          "# Planejamento de Delineamento Observacional — CatalyseR",
+          "# Planejamento de Delineamento Observacional — Trilha",
           "# Importação e Análise Preliminar",
           "",
           "library(readxl)",

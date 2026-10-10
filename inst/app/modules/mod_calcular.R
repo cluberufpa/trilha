@@ -1,4 +1,4 @@
-# Módulo Calcular / Reescalar variável para a CatalyseR
+# Módulo Calcular / Reescalar variável para a Trilha
 # ---------------------------------------------------------------------------
 # Duas operações de PREPARO que criam colunas novas a partir das existentes:
 #   (1) Variável calculada  — nova coluna = expressão sobre outras colunas.
@@ -150,7 +150,7 @@ calc_gerar_codigo <- function(passos, info) {
   }
 
   linhas <- c(
-    "# Script gerado pela CatalyseR — Calcular / Reescalar variáveis",
+    "# Script gerado pela Trilha — Calcular / Reescalar variáveis",
     "library(tidyverse)",
     if (usa_readxl) "library(readxl)" else NULL,
     "",

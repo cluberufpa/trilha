@@ -41,7 +41,7 @@
   if (!coluna_data %in% names(dados) || !coluna_valor %in% names(dados)) {
     stop("Escolha uma coluna de tempo e uma variável numérica existentes.", call. = FALSE)
   }
-  # Converta as duas colunas sem alterar a base compartilhada da CatalyseR.
+  # Converta as duas colunas sem alterar a base compartilhada da Trilha.
   data <- .serie_converter_data(dados[[coluna_data]])
   valor <- suppressWarnings(as.numeric(dados[[coluna_valor]]))
   valido <- !is.na(data) & is.finite(valor)
@@ -301,7 +301,7 @@ mod_series_temporais_server <- function(id, data_rv, import_info) {
         dir.create(pasta_scripts, showWarnings = FALSE)
         utils::write.csv(serie$dados, file.path(pasta_dados, "serie_regular.csv"), row.names = FALSE)
         codigo <- c(
-          "# Séries Temporais exploratórias, gerado pela CatalyseR.",
+          "# Séries Temporais exploratórias, gerado pela Trilha.",
           "# install.packages(c('ggplot2', 'ggfortify'))",
           "library(ggfortify)",
           "",

@@ -1,4 +1,4 @@
-# Módulo de Arrumação (Largo -> Longo) para a CatalyseR
+# Módulo de Arrumação (Largo -> Longo) para a Trilha
 # ---------------------------------------------------------------------------
 # Genérico: empilha colunas de MEDIDA (pivot_longer), extrai metadados do nome
 # da coluna via regex com grupos de captura e, opcionalmente, alarga uma métrica
@@ -455,7 +455,7 @@ arrumar_gerar_codigo <- function(passos, info, renomear = character(0),
   }
 
   linhas <- c(
-    "# Script gerado pela CatalyseR — Arrumacao dos dados",
+    "# Script gerado pela Trilha — Arrumacao dos dados",
     "library(tidyverse)",
     if (usa_readxl) "library(readxl)" else NULL,
     "",

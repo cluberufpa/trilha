@@ -3,7 +3,7 @@
 # Consome as execuções registradas na Fase 3C. A Fase 3D organiza a seleção
 # editorial; o relatório do Projeto R obedece ao manifesto e o Projeto R
 # preserva todas as execuções registradas. Desde a Fase D (set/2026) a
-# CatalyseR não gera o Word: só o Projeto R, e o Word nasce no RStudio.
+# Trilha não gera o Word: só o Projeto R, e o Word nasce no RStudio.
 
 library(shiny)
 library(bslib)

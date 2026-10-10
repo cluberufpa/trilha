@@ -341,7 +341,7 @@ readme_welch <- readLines(file.path(projeto_welch, "README.md"), encoding = "UTF
 stopifnot(!any(grepl("{{", c(script_welch, relatorio_welch, readme_welch), fixed = TRUE)),
   any(grepl("variancias_iguais = FALSE)  # FALSE: ANOVA de Welch; TRUE: ANOVA clássica", script_welch, fixed = TRUE)),
   any(grepl("variancias_iguais = FALSE)", relatorio_welch, fixed = TRUE)),
-  any(grepl("escolha automática da CatalyseR", script_welch, fixed = TRUE)),
+  any(grepl("escolha automática da Trilha", script_welch, fixed = TRUE)),
   any(grepl("games_howell        = resultado$pares,", script_welch, fixed = TRUE)),
   !any(grepl("Tukey|SQ: soma", c(script_welch, relatorio_welch))),
   any(grepl("Games-Howell", relatorio_welch, fixed = TRUE)),

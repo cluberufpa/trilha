@@ -43,7 +43,7 @@ testServer(mod_preparar_compartilhada_server, args = list(dados_analise = final,
  eval(parse(text = codigo()), envir = ambiente)
  stopifnot(isTRUE(all.equal(unname(as.list(ambiente$dados_analise)), unname(as.list(final())))))
 })
-# O código do exportador reproduz a nova etapa sem depender da CatalyseR.
+# O código do exportador reproduz a nova etapa sem depender da Trilha.
 local({
  manifesto <- list(execucoes = list(e = list(incluir_relatorio = TRUE, base_tipo = "compartilhada")))
  # Usa diretamente os fragmentos que o exportador incorpora ao relatório.

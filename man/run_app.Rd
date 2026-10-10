@@ -2,12 +2,12 @@
 % Please edit documentation in R/run_app.R
 \name{run_app}
 \alias{run_app}
-\title{Abrir a aplicação Shiny da CatalyseR}
+\title{Abrir a aplicação Shiny da Trilha}
 \usage{
 run_app(launch.browser = TRUE, ...)
 }
 \arguments{
-\item{launch.browser}{\code{TRUE} para abrir a CatalyseR automaticamente no
+\item{launch.browser}{\code{TRUE} para abrir a Trilha automaticamente no
 navegador padrão; \code{FALSE} para apenas iniciar o servidor e mostrar o
 endereço local no console. Também aceita uma função compatível com
 \code{\link[shiny:runApp]{shiny::runApp()}}.}
@@ -16,7 +16,7 @@ endereço local no console. Também aceita uma função compatível com
 e \code{host}.}
 }
 \description{
-Abrir a aplicação Shiny da CatalyseR
+Abrir a aplicação Shiny da Trilha
 }
 \examples{
 \dontrun{

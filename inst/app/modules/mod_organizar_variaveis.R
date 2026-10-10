@@ -15,7 +15,7 @@ organizar_variaveis_codigo <- function(renomear = character(0),
                                        selecionar = NULL) {
   esc <- function(s) encodeString(as.character(s), quote = '"')
   linhas <- c(
-    "# Organização de variáveis — gerada pela CatalyseR",
+    "# Organização de variáveis — gerada pela Trilha",
     "# A entrada desta etapa é a Base Compartilhada ativa.",
     "dados_organizados <- dados"
   )

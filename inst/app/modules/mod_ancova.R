@@ -206,7 +206,7 @@ mod_ancova_server <- function(id, data_rv, import_info) {
       }
       y <- input$var_y; f <- input$var_fator; cv <- input$var_cov
       paste(c(
-        "# Script gerado pela CatalyseR — ANCOVA (boas praticas)",
+        "# Script gerado pela Trilha — ANCOVA (boas praticas)",
         "library(car); library(emmeans); library(effectsize); library(ggplot2)",
         leitura, "",
         sprintf('dados[["%s"]] <- factor(dados[["%s"]])', f, f),

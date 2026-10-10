@@ -288,7 +288,7 @@ mod_mapa_pontos_server <- function(id, data_rv, import_info, modo = "bolhas") {
         latc <- if (input$source == "exemplo") "latitude" else input$lat_col
         lonc <- if (input$source == "exemplo") "longitude" else input$lon_col
         code <- c(
-          "# --- MAPA DE PONTOS/ESTAÇÕES (CatalyseR) ---",
+          "# --- MAPA DE PONTOS/ESTAÇÕES (Trilha) ---",
           "# install.packages(c('sf','geobr','ggplot2','ggspatial'))",
           "library(sf); library(ggplot2)",
           "",
@@ -312,7 +312,7 @@ mod_mapa_pontos_server <- function(id, data_rv, import_info, modo = "bolhas") {
         writeLines(code, file.path(sc, "mapa_pontos.R"))
         writeLines(c("Version: 1.0", "RestoreWorkspace: Default", "SaveWorkspace: Default", "Encoding: UTF-8"),
                    file.path(pd, "projeto_analise.Rproj"))
-        writeLines(c("PACOTE DE ESTUDO: MAPA DE PONTOS/ESTAÇÕES (CatalyseR)",
+        writeLines(c("PACOTE DE ESTUDO: MAPA DE PONTOS/ESTAÇÕES (Trilha)",
                      "- dados/estacoes.csv : coordenadas e variáveis.",
                      "- scripts/mapa_pontos.R : código sf + ggplot2 do mapa."),
                    file.path(pd, "README.txt"))

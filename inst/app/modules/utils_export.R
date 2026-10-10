@@ -181,7 +181,7 @@ exportar_projeto_zip <- function(file, prefix, qmd_name, funcoes_name, df_clean,
   writeLines(c("Version: 1.0", "RestoreWorkspace: Default", "SaveWorkspace: Default", "Encoding: UTF-8"),
              file.path(pd, "projeto_analise.Rproj"))
   if (is.null(readme)) readme <- c(
-    paste0("PACOTE DE ESTUDO: ", toupper(prefix), " (CatalyseR)"),
+    paste0("PACOTE DE ESTUDO: ", toupper(prefix), " (Trilha)"),
     "- projeto_analise.Rproj: duplo clique para abrir no RStudio.",
     "- dados/     : dados limpos em .rda, .csv e .xlsx.",
     "- scripts/   : script da analise e funcoes de apoio.",

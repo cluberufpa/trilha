@@ -467,7 +467,7 @@ mod_planejamento_variaveis_server <- function(id, delineamento_rv = NULL,
           secao_sorteio,
           "# Dicionário de dados", "", "```{r}", "#| echo: false", "dicionario <- read.csv('dicionario.csv', check.names = FALSE)", "knitr::kable(dicionario)", "```", "",
           "# Modelo da planilha tidy", "", "```{r}", "#| echo: false", "planilha <- read.csv('planilha.csv', check.names = FALSE)", "knitr::kable(utils::head(planilha, 20))", "```", "",
-          "# Próximos passos", "", "Use o guia do dicionário para localizar, na CatalyseR, o caminho de análise adequado a cada variável."
+          "# Próximos passos", "", "Use o guia do dicionário para localizar, na Trilha, o caminho de análise adequado a cada variável."
         ), file.path(pasta, "relatorio.qmd"), useBytes = TRUE)
         setwd(pasta)
         system2("quarto", c("render", "relatorio.qmd", "--to", "docx"))
@@ -489,7 +489,7 @@ mod_planejamento_variaveis_server <- function(id, delineamento_rv = NULL,
         utils::write.csv(planilha(), file.path(pasta, "dados", "planilha_coleta.csv"), row.names = FALSE, fileEncoding = "UTF-8")
         writexl::write_xlsx(abas_planilha(), file.path(pasta, "dados", "planilha_coleta.xlsx"))
         utils::write.csv(dicionario_completo(), file.path(pasta, "dados", "dicionario_variaveis.csv"), row.names = FALSE, fileEncoding = "UTF-8")
-        leia_me <- c("# Planejamento de variáveis", "", "Abra `dados/planilha_coleta.xlsx` para registrar a coleta.", "", "A primeira coluna identifica a unidade amostral. Cada linha é uma réplica definida pelo delineamento.", "Consulte `dados/dicionario_variaveis.csv` antes de importar a planilha na CatalyseR.")
+        leia_me <- c("# Planejamento de variáveis", "", "Abra `dados/planilha_coleta.xlsx` para registrar a coleta.", "", "A primeira coluna identifica a unidade amostral. Cada linha é uma réplica definida pelo delineamento.", "Consulte `dados/dicionario_variaveis.csv` antes de importar a planilha na Trilha.")
         # Com sorteio, o projeto leva o marco, a função e o script que refazem o mesmo sorteio.
         s <- if (is.null(contexto_experimental())) sorteio_atual() else NULL
         if (!is.null(s)) {

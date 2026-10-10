@@ -1,4 +1,4 @@
-# Testes para dados pareados que completam as grades de decisão da CatalyseR.
+# Testes para dados pareados que completam as grades de decisão da Trilha.
 # -----------------------------------------------------------------------------
 # Friedman compara k condições nos mesmos blocos. McNemar compara duas respostas
 # binárias nas mesmas unidades. Os cálculos e a validação vivem em R/analises.R.

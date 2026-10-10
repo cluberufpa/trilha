@@ -1,5 +1,5 @@
 # =============================================================================
-# Suíte de testes automatizados da CatalyseR
+# Suíte de testes automatizados da Trilha
 # -----------------------------------------------------------------------------
 # Comando oficial (a partir da raiz do pacote):
 #

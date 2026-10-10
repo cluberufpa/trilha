@@ -15,11 +15,11 @@ entrada <- c(
   "dados <- dados |> dplyr::mutate(grupo = trat_moda(grupo))",
   "dados <- dados |> dplyr::mutate(quando = converter_data(quando))",
   "trilha_conferir_base(dados, here(\"dados\", \"processados\", \"base_compartilhada.rds\"), rotulo = \"Base\")",
-  "# A CatalyseR também exportou uma fotografia de `dados_analise`. A função",
-  "# Houve mudança estrutural promovida na CatalyseR (Pivotar/Separar ou",
+  "# A Trilha também exportou uma fotografia de `dados_analise`. A função",
+  "# Houve mudança estrutural promovida na Trilha (Pivotar/Separar ou",
   "# viu na tela, o script carrega a fotografia materializada na exportação.",
   "# Escolhas da importação e reestruturações, na ordem registrada na IDE.",
-  "# a receita registrada na CatalyseR. Sai dados_da_analise, lido adiante.",
+  "# a receita registrada na Trilha. Sai dados_da_analise, lido adiante.",
   "dados <- EAPADados::isoproteica_bagre",
   "dados <- trilha::funcao_que_nao_existe(dados)"
 )

@@ -430,7 +430,7 @@ zip_saida <- file.path(raiz, "projeto.zip")
 do.call(exportacao_empacotar_projeto, c(list(file = zip_saida), argumentos))
 stopifnot(
   file.exists(zip_saida), file.info(zip_saida)$size > 0,
-  # A CatalyseR não gera mais o Word: o Render é do pesquisador, no RStudio.
+  # A Trilha não gera mais o Word: o Render é do pesquisador, no RStudio.
   !exists("exportacao_renderizar_word")
 )
 

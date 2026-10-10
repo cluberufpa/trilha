@@ -607,7 +607,7 @@ mod_sortear_amostra_server <- function(id, ficha_destino_rv = NULL) {
         # Estrato e outra: níveis (destaque) ou valor livre.
         shiny::conditionalPanel(sprintf("['estrato', 'outra'].includes(input['%s'])", ns("nc_papel")),
           shiny::radioButtons(ns("nc_modo"), NULL, width = "100%",
-            choices = c("Com níveis: liste os níveis e quantas vezes cada um se repete; a CatalyseR preenche" = "niveis",
+            choices = c("Com níveis: liste os níveis e quantas vezes cada um se repete; a Trilha preenche" = "niveis",
                         "Valor livre: a coluna nasce vazia, para preencher à mão" = "livre")),
           shiny::conditionalPanel(sprintf("input['%s'] === 'niveis'", ns("nc_modo")),
             shiny::numericInput(ns("nc_n_niveis"), "Quantos níveis?", value = 2, min = 1, max = 30, step = 1, width = "160px"),

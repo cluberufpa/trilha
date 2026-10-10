@@ -1,4 +1,4 @@
-# Módulo de Planejamento Experimental e Geração de Croqui - CatalyseR
+# Módulo de Planejamento Experimental e Geração de Croqui - Trilha
 library(shiny)
 library(bslib)
 library(ggplot2)

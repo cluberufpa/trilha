@@ -18,7 +18,7 @@ Lista com \code{grafico} (objeto ggplot) e \code{observacoes} (quantas entraram
 e quantas foram descartadas).
 }
 \description{
-Monta um grafico de linhas com o visual da CatalyseR. Antes de desenhar,
+Monta um grafico de linhas com o visual da Trilha. Antes de desenhar,
 descarta as observacoes sem valor em X ou em Y e informa quantas foram: o
 ggplot2 faria isso com um aviso discreto, e aqui a exclusao fica explicita.
 }

@@ -174,7 +174,7 @@ mod_mapa_raster_server <- function(id, data_rv, import_info) {
                            sprintf("  scale_fill_viridis_c(option = '%s') +",
                                    switch(input$palette, magma = "A", cividis = "E", "D")))
         code <- c(
-          "# --- MAPA AMBIENTAL EM GRADE (CatalyseR) ---",
+          "# --- MAPA AMBIENTAL EM GRADE (Trilha) ---",
           "# install.packages('ggplot2')",
           "library(ggplot2)",
           "",
@@ -193,7 +193,7 @@ mod_mapa_raster_server <- function(id, data_rv, import_info) {
         writeLines(unlist(code), file.path(sc, "mapa_ambiente.R"))
         writeLines(c("Version: 1.0", "RestoreWorkspace: Default", "SaveWorkspace: Default", "Encoding: UTF-8"),
                    file.path(pd, "projeto_analise.Rproj"))
-        writeLines(c("PACOTE DE ESTUDO: MAPA AMBIENTAL EM GRADE (CatalyseR)",
+        writeLines(c("PACOTE DE ESTUDO: MAPA AMBIENTAL EM GRADE (Trilha)",
                      "- dados/grade.csv : grade x, y, valor.",
                      "- scripts/mapa_ambiente.R : código ggplot2 (raster + contorno)."),
                    file.path(pd, "README.txt"))

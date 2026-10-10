@@ -1,6 +1,6 @@
-#' Abrir a aplicação Shiny da CatalyseR
+#' Abrir a aplicação Shiny da Trilha
 #'
-#' @param launch.browser `TRUE` para abrir a CatalyseR automaticamente no
+#' @param launch.browser `TRUE` para abrir a Trilha automaticamente no
 #'   navegador padrão; `FALSE` para apenas iniciar o servidor e mostrar o
 #'   endereço local no console. Também aceita uma função compatível com
 #'   [shiny::runApp()].
