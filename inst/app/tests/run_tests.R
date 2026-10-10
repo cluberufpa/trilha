@@ -254,7 +254,7 @@ if (identical(q$estado, "ok")) {
   lacunas[[length(lacunas) + 1L]] <- list(
     o_que = "Render do relatório (Word/HTML) no RStudio",
     porque = "o Quarto existe no disco mas não está no PATH nem em QUARTO_PATH",
-    onde = "nenhum teste depende do Quarto; só o Render do Projeto R exportado",
+    onde = "test_clara_projeto_render.R falha: ele renderiza o Word do projeto da rota ClaRa",
     solucao = sprintf("defina QUARTO_PATH=%s e reabra o terminal", q$caminho)
   )
 } else {
@@ -265,7 +265,7 @@ if (identical(q$estado, "ok")) {
   lacunas[[length(lacunas) + 1L]] <- list(
     o_que = "Render do relatório (Word/HTML) no RStudio",
     porque = "o Quarto CLI não foi encontrado em lugar nenhum",
-    onde = "nenhum teste depende do Quarto; só o Render do Projeto R exportado",
+    onde = "test_clara_projeto_render.R falha: ele renderiza o Word do projeto da rota ClaRa",
     solucao = "instale o Quarto (https://quarto.org/docs/get-started/) e reabra o terminal"
   )
 }
@@ -390,6 +390,8 @@ testes <- c(
   "test_regressao_roteiro.R",
   "test_regressao_interface.R",
   "test_anova_preparo_projeto.R",
+  "test_anova_clara_projeto.R",
+  "test_clara_projeto_render.R",
   "test_grafico_linhas_troca_y.R"
 )
 
