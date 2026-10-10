@@ -178,7 +178,7 @@ if (!length(pacotes)) {
   if (length(ausentes)) {
     cat("\n    NÃO INSTALADOS:\n")
     for (p in ausentes) cat("      - ", p$nome, "\n", sep = "")
-    do_cran <- setdiff(vapply(ausentes, `[[`, character(1), "nome"), "EAPADados")
+    do_cran <- setdiff(vapply(ausentes, `[[`, character(1), "nome"), c("EAPADados", "clara"))
     cat("\n    Solução — cole no Console do R:\n")
     if (length(do_cran)) {
       cat("      install.packages(c(", paste(sprintf('"%s"', do_cran), collapse = ", "), "))\n", sep = "")
@@ -188,6 +188,10 @@ if (!length(pacotes)) {
       cat("      remotes::install_github(\"astuciasnor/EAPADados\")\n")
       cat("      # ou, a partir do .tar.gz que acompanha o projeto:\n")
       cat("      # install.packages(\"EAPADados_x.y.z.tar.gz\", repos = NULL, type = \"source\")\n")
+    }
+    if ("clara" %in% vapply(ausentes, `[[`, character(1), "nome")) {
+      cat("      # A ClaRa ainda não está no CRAN:\n")
+      cat("      remotes::install_github(\"cluberufpa/ClaRa\")\n")
     }
     problemas <- c(problemas, sprintf("%d pacote(s) ausente(s)", length(ausentes)))
   }

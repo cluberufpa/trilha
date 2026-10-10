@@ -1,5 +1,5 @@
 # =============================================================================
-#  CatalyseR - Instalador oficial  (EAPADados + trilha)
+#  CatalyseR - Instalador oficial  (EAPADados + clara + trilha)
 #  Estatistica Aplicada a Pesca e Aquicultura com R
 # -----------------------------------------------------------------------------
 #  COMO USAR (super simples):
@@ -85,14 +85,20 @@ instalar_trilha <- function(iniciar = FALSE) {
   falhas_cran <- cran[!vapply(cran, garante, logical(1))]
 
   # --- 4. Dados e IDE (GitHub) ----------------------------------------------
-  secao("3/4  Dados e IDE (GitHub)")
-  ok_dados <- ok_ide <- FALSE
+  secao("3/4  Dados, ClaRa e IDE (GitHub)")
+  ok_dados <- ok_clara <- ok_ide <- FALSE
   if (!tem_remotes) {
     cat(sprintf("  %s 'remotes' nao instalou -> nao da para baixar do GitHub.\n", FALHA))
   } else {
     ok_dados <- garante(
       "EAPADados", github = "astuciasnor/EAPADados",
       versao_minima = "0.1.10"
+    )
+    # A ClaRa roda as análises da tela e dos projetos exportados
+    # (library(clara)). Enquanto não estiver no CRAN, vem do GitHub.
+    ok_clara <- garante(
+      "clara", github = "cluberufpa/ClaRa",
+      versao_minima = "0.10.0"
     )
     # A IDE é sempre atualizada: assim executar novamente este instalador
     # realmente traz o conteúdo mais recente da branch main.
@@ -116,7 +122,8 @@ instalar_trilha <- function(iniciar = FALSE) {
 
   # --- Resumo ---------------------------------------------------------------
   secao("Resumo")
-  falhou <- c(falhas_cran, if (!ok_dados) "EAPADados", if (!ok_ide) "trilha")
+  falhou <- c(falhas_cran, if (!ok_dados) "EAPADados", if (!ok_clara) "clara",
+              if (!ok_ide) "trilha")
   if (length(falhou) == 0) {
     cat(sprintf("\n  %s Tudo pronto! Para abrir a CatalyseR, rode:\n\n", OK))
     cat("      trilha::run_app(launch.browser = TRUE)\n\n")

@@ -60,7 +60,8 @@ Imports:
     ggcorrplot,
     missMDA,
     patchwork,
-    EAPADados (>= 0.1.10)
+    EAPADados (>= 0.1.10),
+    clara (>= 0.10.0)
 Suggests:
     here,
     knitr,
@@ -74,7 +75,8 @@ Suggests:
     PMCMRplus,
     viridisLite
 Remotes:
-    astuciasnor/EAPADados
+    astuciasnor/EAPADados,
+    cluberufpa/ClaRa
 Depends: R (>= 4.3.0)
 Roxygen: list(markdown = TRUE)
 Config/roxygen2/version: 8.1.0
