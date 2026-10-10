@@ -44,6 +44,19 @@ for (area in names(descricao_catalogo())) {
               grepl("col_widths = c(7, 5)", paste(deparse(body(mod_conhecer_variaveis_ui)), collapse = " "), fixed = TRUE))
     next
   }
+  # Explorar Dataset também tem tela própria: o título e a base compacta no
+  # topo, e as abas do panorama, sem a barra lateral das outras perguntas.
+  if (identical(area, "explorar")) {
+    doc <- xml2::read_html(html)
+    titulo_h2 <- xml2::xml_text(xml2::xml_find_first(doc, "//h2"))
+    stopifnot(identical(trimws(titulo_h2), unname(titulos[["explorar"]])),
+              grepl("Painel de retratos", html, fixed = TRUE),
+              grepl("Mapa de ausentes", html, fixed = TRUE),
+              grepl("Ficha de variáveis", html, fixed = TRUE),
+              grepl("Inserir análise", html, fixed = TRUE),
+              grepl("catalyser-base-selector-compact", html, fixed = TRUE))
+    next
+  }
   # O título é o primeiro elemento, fora das sub-abas e antes da base.
   # Assim ele também permanece presente na aba Inserir análise, sem dados.
   stopifnot(identical(ui_area[[1]]$name, "h2"),
@@ -72,7 +85,7 @@ for (area in names(descricao_catalogo())) {
 # A janela gráfica compartilhada mantém todos os gráficos menores e centralizados.
 codigo_servidor <- paste(deparse(body(mod_descrevendo_dados_server)), collapse = " ")
 stopifnot(grepl("descricao-grafico-compacto", codigo_servidor, fixed = TRUE),
-          grepl('height = "320px"', codigo_servidor, fixed = TRUE))
+          grepl('"360px"', codigo_servidor, fixed = TRUE))
 shiny::testServer(mod_descrevendo_dados_server, args = list(
   area = "descrever", dados_rv = base_teste, registro_bases_rv = bases_teste,
   cache_bases_rv = cache_teste, revisao_origem_rv = revisao_teste,
@@ -98,8 +111,8 @@ cat("OK: cinco seções, ordem dos menus e retrato consolidado de variáveis.\n"
 reg_base <- bases_adicionar(bases_vazio(), bases_novo_registro("amostra", "200 por sexo", "base_amostra", "geral"))
 reg_base <- bases_adicionar_etapa(reg_base, "amostra", "sortear_amostra",
   list(coluna = "sexo", n = 200L, semente = 42L), abalone_adultos)
-cache_base <- list(amostra = bases_recalcular_cache(abalone_adultos, bases_obter(reg_base, "amostra"), 2L))
-reg_base <- bases_finalizar(reg_base, "amostra", cache_base, 2L)
+cache_base <- list(amostra = bases_recalcular_cache(abalone_adultos, bases_obter(reg_base, "amostra"), shiny::isolate(revisao_teste())))
+reg_base <- bases_finalizar(reg_base, "amostra", cache_base, shiny::isolate(revisao_teste()))
 bases_teste(reg_base); cache_teste(cache_base)
 for (area_teste in setdiff(names(descricao_catalogo()), "descrever")) {
   shiny::testServer(mod_descrevendo_dados_server, args = list(
@@ -127,8 +140,16 @@ for (area_teste in setdiff(names(descricao_catalogo()), "descrever")) {
       paste0("outro_", area_teste), "Outro ramo", paste0("base_outro_", area_teste), "geral")))
     session$flushReact()
     stopifnot(length(historico()) == length(descricao_catalogo()[[area_teste]]))
+    # Trocar a base apaga as fotografias da base anterior. No Explorar, o
+    # panorama se refaz sozinho com a base nova; nas outras áreas, nada fica.
     session$setInputs(`base-base_id` = "dados_analise")
-    stopifnot(length(historico()) == 0L)
+    if (identical(area_teste, "explorar")) {
+      stopifnot(length(historico()) == 1L,
+                identical(historico()[[1]]$parametros$analise, "panorama"),
+                nrow(seletor$dados()) == nrow(abalone_adultos))
+    } else {
+      stopifnot(length(historico()) == 0L)
+    }
   })
 }
 cat("OK: seis retratos e checagens Shiny na base de 400 adultos e isolamento entre ramos.\n")

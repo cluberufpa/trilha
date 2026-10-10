@@ -39,10 +39,13 @@ codigo_regressao <- paste(
   readLines("modules/mod_regression.R", encoding = "UTF-8"),
   collapse = "\n"
 )
+# Os rótulos da reta valem em qualquer aba (test_regressao_interface.R
+# confere isso navegando pelas abas); na logística, sem rótulo escrito, o
+# eixo y é a probabilidade estimada.
 stopifnot(
-  grepl("personalizar_ajuste <- identical(input$active_tab, aba_ajuste)",
+  grepl("Os rótulos da reta são preservados, qualquer que seja a aba em exibição",
         codigo_regressao, fixed = TRUE),
-  grepl("y_label <- if (personalizar_ajuste", codigo_regressao, fixed = TRUE),
+  grepl('"Probabilidade estimada"', codigo_regressao, fixed = TRUE),
   grepl("l50_na_faixa <- is.finite(x50)", codigo_regressao, fixed = TRUE),
   grepl("data.frame(x50 = if (l50_na_faixa) x50 else numeric(0))",
         codigo_regressao, fixed = TRUE),

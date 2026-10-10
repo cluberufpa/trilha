@@ -180,7 +180,9 @@ testServer(
 testServer(mod_pca_server, args = list(data_rv = dados_rv, import_info = info_rv), {
   session$setInputs(
     vars_selected = c("captura_t", "esforco_h", "cpue"),
-    scale = TRUE, show_labels = FALSE, graph_theme = "minimal"
+    scale = TRUE, show_labels = FALSE, graph_theme = "minimal",
+    # A semente da permutação, com o valor padrão da tela.
+    seed = 2026, quanti_sup = character(0), quali_sup = "", comparar_imputacao = FALSE
   )
   session$setInputs(executar_analise = 1)
   estado <- estado_execucao()
