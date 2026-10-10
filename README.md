@@ -1,8 +1,8 @@
-# CatalyseR
+# Trilha
 
 <div style="display:flex;align-items:center;margin-bottom:1em">
 <p style="font-size:1.2em;line-height:1.4;">
-<strong>CatalyseR</strong> é uma IDE R Científica baseada em Shiny desenvolvida para facilitar a análise de dados estatísticos de forma interativa e visual. O aplicativo foi projetado para apoiar estudantes, professores e pesquisadores na aplicação de métodos bioestatísticos e análises multivariadas.
+<strong>Trilha</strong> é uma IDE R Científica baseada em Shiny desenvolvida para facilitar a análise de dados estatísticos de forma interativa e visual. O aplicativo foi projetado para apoiar estudantes, professores e pesquisadores na aplicação de métodos bioestatísticos e análises multivariadas.
 </p>
 </div>
 
@@ -26,19 +26,19 @@ A plataforma é dividida em módulos analíticos completos e independentes:
 
 ## 🛠️ Instalação
 
-Antes de atualizar uma CatalyseR que já foi usada nesta sessão, reinicie o R
+Antes de atualizar a Trilha, se ela já foi usada nesta sessão, reinicie o R
 (no RStudio: **Session > Restart R**, ou **Ctrl+Shift+F10**). Se você já atualizou
 sem reiniciar e aparece “objeto não encontrado” ao abrir, reinicie o R e execute
 `trilha::run_app(launch.browser = TRUE)` novamente. A reinstalação atualiza os
 arquivos no computador; uma sessão aberta pode continuar com o pacote antigo na memória.
 
-A forma **recomendada para os alunos** instala os dados (EAPADados) e a CatalyseR diretamente do código R, com dependências CRAN em **binário no Windows**, sem precisar de Rtools. O instalador apenas instala e mostra o comando de abertura. No console do R/RStudio, rode:
+A forma **recomendada para os alunos** instala os dados (EAPADados) e a Trilha diretamente do código R, com dependências CRAN em **binário no Windows**, sem precisar de Rtools. O instalador apenas instala e mostra o comando de abertura. No console do R/RStudio, rode:
 
 ```r
 source("https://raw.githubusercontent.com/cluberufpa/trilha/main/instalar_trilha.R")
 ```
 
-Ou, pela interface do RStudio: baixe o arquivo `instalar_trilha.R`, abra-o e clique em **Source** (canto superior direito do editor). Pode rodar novamente quando quiser: o instalador atualiza a CatalyseR pela branch `main` e preserva os pacotes CRAN compatíveis. A instalação fica no computador. Para abrir a IDE quando quiser, execute:
+Ou, pela interface do RStudio: baixe o arquivo `instalar_trilha.R`, abra-o e clique em **Source** (canto superior direito do editor). Pode rodar novamente quando quiser: o instalador atualiza a Trilha pela branch `main` e preserva os pacotes CRAN compatíveis. A instalação fica no computador. Para abrir a IDE quando quiser, execute:
 
 ```r
 trilha::run_app(launch.browser = TRUE)
@@ -63,11 +63,11 @@ trilha::run_app(launch.browser = TRUE)
 
 Para instalar também os extras opcionais (mapas, hexágonos, teste de Nemenyi), acrescente `dependencies = TRUE` à chamada de `install_github()`.
 
-O caminho com `pak::pkg_install()` não é recomendado para os alunos: foi observado um erro de ferramentas de compilação na etapa de construção da CatalyseR no Windows com R 4.6.1, mesmo com `NeedsCompilation: no`. Se aparecer “Could not find tools necessary to compile a package”, reinicie o R e use o instalador recomendado acima.
+O caminho com `pak::pkg_install()` não é recomendado para os alunos: foi observado um erro de ferramentas de compilação na etapa de construção da Trilha no Windows com R 4.6.1, mesmo com `NeedsCompilation: no`. Se aparecer “Could not find tools necessary to compile a package”, reinicie o R e use o instalador recomendado acima.
 
-A CatalyseR é escrita só em R e não precisa de Rtools. Se aparecer um aviso sobre o Rtools ao instalar a partir da pasta local (`install.packages(..., repos = NULL, type = "source")`), ele pode ser ignorado.
+A Trilha é escrita só em R e não precisa de Rtools. Se aparecer um aviso sobre o Rtools ao instalar a partir da pasta local (`install.packages(..., repos = NULL, type = "source")`), ele pode ser ignorado.
 
-> **Menu Mapear e Analisar (opcional):** os mapas usam `sf`, `geobr` e `ggspatial`. No Windows e no macOS eles vêm em binário do CRAN; no Linux, `sf` pede bibliotecas do sistema (GDAL, GEOS, PROJ). As demais análises da CatalyseR **não** precisam desses pacotes.
+> **Menu Mapear e Analisar (opcional):** os mapas usam `sf`, `geobr` e `ggspatial`. No Windows e no macOS eles vêm em binário do CRAN; no Linux, `sf` pede bibliotecas do sistema (GDAL, GEOS, PROJ). As demais análises da Trilha **não** precisam desses pacotes.
 
 ---
 
