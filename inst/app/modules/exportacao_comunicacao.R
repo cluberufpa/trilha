@@ -2384,7 +2384,7 @@ exportacao_anova_marcadores_readme <- function(item, nome_projeto, import_info) 
   )
 }
 
-# ---- ANOVA em ClaRa (opção experimental) ------------------------------------
+# ---- ANOVA em ClaRa -------------------------------------------------------
 # A rota ClaRa escreve R/analise.R e o relatório com as funções da ClaRa
 # (o pacote clara, carregado com library(clara)), em vez do roteiro passo a
 # passo. Vale para a ANOVA de um fator nos três métodos da tela: clássica,
@@ -2396,10 +2396,9 @@ exportacao_anova_clara_aceita <- function(manifesto) {
     return(FALSE)
   }
   item <- exportacao_execucoes_incluidas(manifesto)[[1]]
-  # Com dois grupos, comparar_medias() faz o teste t, e o molde da rota ClaRa
-  # é o da ANOVA (tabela da ANOVA, letras, figura dos pares). Até o teste t
-  # ganhar a sua rota ClaRa, esse caso sai pelo molde da ANOVA, que dá o
-  # mesmo p. Execuções sem a contagem registrada seguem na rota ClaRa.
+  # Com dois grupos, comparar_medias() faz o teste t, e o projeto sai pela
+  # rota ClaRa do teste t (exportacao_teste_t_clara_aceita()). A contagem é a
+  # que exportacao_criar_projeto() faz na base; sem ela, segue a ANOVA.
   grupos <- suppressWarnings(as.integer(item$resultado_resumo$grupos %||% NA_integer_))
   if (length(grupos) == 1L && !is.na(grupos) && grupos < 3L) return(FALSE)
   !is.na(exportacao_anova_clara_metodo(item))
