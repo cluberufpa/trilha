@@ -2599,6 +2599,45 @@ exportacao_anova_clara_marcadores_readme <- function(item, nome_projeto, import_
     list(VERSAO_CLARA = exportacao_versao_clara()))
 }
 
+# ---- A chamada de uma função da ClaRa, nas três formas ----------------------
+# Uma chamada como `resultado <- base |> funcao(arg = valor, ...)`, com os
+# mesmos argumentos e valores nas três formas; mudam só os comentários:
+#   "tela"      sem comentários: a tela avalia este texto;
+#   "script"    R/analise.R, com a nota de cada argumento ao lado dele, todas
+#               na mesma coluna;
+#   "relatorio" relatorio.qmd, com a nota na linha de cima do argumento.
+# argumentos: lista nomeada com os valores já escritos como código R, na
+# ordem da chamada; notas: textos nomeados pelos argumentos que levam nota.
+exportacao_clara_chamada <- function(funcao, argumentos, notas = character(),
+                                     forma = c("tela", "script", "relatorio")) {
+  forma <- match.arg(forma)
+  largura <- max(nchar(names(argumentos)))
+  linhas <- sprintf(paste0("%-", largura, "s = %s"), names(argumentos),
+                    vapply(argumentos, as.character, character(1)))
+  names(linhas) <- names(argumentos)
+  ultima <- length(linhas)
+  linhas[-ultima] <- paste0(linhas[-ultima], ",")
+  linhas[ultima] <- paste0(linhas[ultima], ")")
+  notas <- notas[nzchar(notas) & is.element(names(notas), names(linhas))]
+  linhas <- switch(forma,
+    tela = linhas,
+    script = {
+      if (length(notas)) {
+        coluna <- max(nchar(linhas[names(notas)])) + 2L
+        linhas[names(notas)] <- paste0(formatC(linhas[names(notas)], width = -coluna),
+                                       "# ", notas)
+      }
+      linhas
+    },
+    relatorio = unlist(lapply(names(linhas), function(nome) {
+      c(if (is.element(nome, names(notas))) paste0("# ", notas[[nome]], ":"), linhas[[nome]])
+    })))
+  recuo <- strrep(" ", nchar(funcao) + 3L)
+  c("resultado <- base |>",
+    paste0("  ", funcao, "(", linhas[[1]]),
+    paste0(recuo, unname(linhas[-1])))
+}
+
 # ---- Teste t em ClaRa -------------------------------------------------------
 # A rota ClaRa do teste t de duas amostras independentes. Serve à tela do
 # teste t (tipo teste_t_two_ind) e à ANOVA de um fator com só dois grupos,
@@ -2658,45 +2697,26 @@ exportacao_teste_t_clara_aceita <- function(manifesto) {
 # mesmos argumentos. A alternativa vai sempre escrita, mesmo bilateral: é a
 # hipótese do estudo, decidida no planejamento.
 exportacao_teste_t_clara_chamada <- function(item, forma = c("tela", "script", "relatorio")) {
-  forma <- match.arg(forma)
   q <- exportacao_teste_t_clara_parametros(item)
-  recuo <- strrep(" ", nchar("  comparar_medias("))
-  argumento <- function(nome, valor) sprintf("%-17s = %s", nome, valor)
-  linhas <- c(
-    rotulo_resposta = paste0(argumento("rotulo_resposta", encodeString(q$rotulo_resposta, quote = '"')), ","),
-    rotulo_grupos = paste0(argumento("rotulo_grupos", encodeString(q$rotulo_grupos, quote = '"')), ","),
-    confianca = paste0(argumento("confianca", format(q$confianca, digits = 15, decimal.mark = ".")), ","),
-    variancias = paste0(argumento("variancias_iguais", if (q$variancias_iguais) "TRUE" else "FALSE"), ","),
-    alternativa = paste0(argumento("alternativa", encodeString(q$alternativa, quote = '"')), ")")
-  )
-  notas <- c(
-    rotulo_resposta = paste0("no texto e na figura", if (!q$rotulo_y_escrito) ', ex.: "Peso final (g)"'),
-    rotulo_grupos = paste0("no texto e na figura", if (!q$rotulo_x_escrito) ', ex.: "Ração"'),
-    variancias = if (q$variancias_iguais) "TRUE: teste t de Student; FALSE: de Welch" else
-      "FALSE: teste t de Welch; TRUE: de Student",
-    alternativa = '"bilateral", "maior" ou "menor" (1º grupo contra o 2º)'
-  )
-  linhas <- switch(forma,
-    tela = linhas,
-    script = {
-      # Os comentários ao lado dos argumentos, todos na mesma coluna.
-      largura <- max(nchar(linhas[names(notas)])) + 2L
-      com_nota <- names(notas)
-      linhas[com_nota] <- paste0(formatC(linhas[com_nota], width = -largura), "# ", notas[com_nota])
-      linhas
-    },
-    relatorio = {
-      saida <- character()
-      for (nome in names(linhas)) {
-        if (is.element(nome, names(notas))) saida <- c(saida, paste0("# ", notas[[nome]], ":"))
-        saida <- c(saida, linhas[[nome]])
-      }
-      saida
-    })
-  c("resultado <- base |>",
-    paste0("  comparar_medias(", argumento("resposta", exportacao_nome_clara(q$resposta)), ","),
-    paste0(recuo, argumento("grupos", exportacao_nome_clara(q$grupo)), ","),
-    paste0(recuo, unname(linhas)))
+  exportacao_clara_chamada(
+    "comparar_medias",
+    argumentos = list(
+      resposta          = exportacao_nome_clara(q$resposta),
+      grupos            = exportacao_nome_clara(q$grupo),
+      rotulo_resposta   = encodeString(q$rotulo_resposta, quote = '"'),
+      rotulo_grupos     = encodeString(q$rotulo_grupos, quote = '"'),
+      confianca         = format(q$confianca, digits = 15, decimal.mark = "."),
+      variancias_iguais = if (q$variancias_iguais) "TRUE" else "FALSE",
+      alternativa       = encodeString(q$alternativa, quote = '"')
+    ),
+    notas = c(
+      rotulo_resposta   = paste0("no texto e na figura", if (!q$rotulo_y_escrito) ', ex.: "Peso final (g)"'),
+      rotulo_grupos     = paste0("no texto e na figura", if (!q$rotulo_x_escrito) ', ex.: "Ração"'),
+      variancias_iguais = if (q$variancias_iguais) "TRUE: teste t de Student; FALSE: de Welch" else
+        "FALSE: teste t de Welch; TRUE: de Student",
+      alternativa       = '"bilateral", "maior" ou "menor" (1º grupo contra o 2º)'
+    ),
+    forma = forma)
 }
 
 # Os textos padrão das seções do relatório do teste t em ClaRa. Métodos:
@@ -2864,41 +2884,23 @@ exportacao_regressao_clara_simples <- function(item) {
 # mesmos argumentos. avaliar_autocorrelacao vai sempre escrito: é uma decisão
 # sobre o delineamento.
 exportacao_regressao_clara_chamada <- function(item, forma = c("tela", "script", "relatorio")) {
-  forma <- match.arg(forma)
   q <- exportacao_regressao_clara_parametros(item)
-  recuo <- strrep(" ", nchar("  relacionar_variaveis("))
-  argumento <- function(nome, valor) sprintf("%-22s = %s", nome, valor)
-  linhas <- c(
-    rotulo_resposta = paste0(argumento("rotulo_resposta", encodeString(q$rotulo_resposta, quote = '"')), ","),
-    rotulo_preditor = paste0(argumento("rotulo_preditor", encodeString(q$rotulo_preditor, quote = '"')), ","),
-    confianca = paste0(argumento("confianca", format(q$confianca, digits = 15, decimal.mark = ".")), ","),
-    autocorrelacao = paste0(argumento("avaliar_autocorrelacao", if (q$autocorrelacao) "TRUE" else "FALSE"), ")")
-  )
-  notas <- c(
-    rotulo_resposta = paste0("no texto e na figura", if (!q$rotulo_resposta_escrito) ', ex.: "Peso (g)"'),
-    rotulo_preditor = paste0("no texto e na figura", if (!q$rotulo_preditor_escrito) ', ex.: "Comprimento (cm)"'),
-    autocorrelacao = "TRUE só se a ordem das linhas for a da coleta"
-  )
-  linhas <- switch(forma,
-    tela = linhas,
-    script = {
-      largura <- max(nchar(linhas[names(notas)])) + 2L
-      com_nota <- names(notas)
-      linhas[com_nota] <- paste0(formatC(linhas[com_nota], width = -largura), "# ", notas[com_nota])
-      linhas
-    },
-    relatorio = {
-      saida <- character()
-      for (nome in names(linhas)) {
-        if (is.element(nome, names(notas))) saida <- c(saida, paste0("# ", notas[[nome]], ":"))
-        saida <- c(saida, linhas[[nome]])
-      }
-      saida
-    })
-  c("resultado <- base |>",
-    paste0("  relacionar_variaveis(", argumento("resposta", exportacao_nome_clara(q$resposta)), ","),
-    paste0(recuo, argumento("preditor", exportacao_nome_clara(q$preditor)), ","),
-    paste0(recuo, unname(linhas)))
+  exportacao_clara_chamada(
+    "relacionar_variaveis",
+    argumentos = list(
+      resposta               = exportacao_nome_clara(q$resposta),
+      preditor               = exportacao_nome_clara(q$preditor),
+      rotulo_resposta        = encodeString(q$rotulo_resposta, quote = '"'),
+      rotulo_preditor        = encodeString(q$rotulo_preditor, quote = '"'),
+      confianca              = format(q$confianca, digits = 15, decimal.mark = "."),
+      avaliar_autocorrelacao = if (q$autocorrelacao) "TRUE" else "FALSE"
+    ),
+    notas = c(
+      rotulo_resposta        = paste0("no texto e na figura", if (!q$rotulo_resposta_escrito) ', ex.: "Peso (g)"'),
+      rotulo_preditor        = paste0("no texto e na figura", if (!q$rotulo_preditor_escrito) ', ex.: "Comprimento (cm)"'),
+      avaliar_autocorrelacao = "TRUE só se a ordem das linhas for a da coleta"
+    ),
+    forma = forma)
 }
 
 # A chamada de grafico_reta(), a figura principal. "script": todas as escolhas
