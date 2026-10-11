@@ -2,9 +2,127 @@
 
 > Cole tudo abaixo da linha numa sessão nova, aberta na pasta-mãe
 > `D:\Claude\EAPA-Ecossistema` (para enxergar `EAPADados/`, `ClaRa/` e `TRILHA/`).
-> Escrito em 11/10/2026.
+> Escrito em 11/10/2026. A seção "Mudança de plano", logo abaixo, foi
+> acrescentada no fim do mesmo dia e vence o resto do prompt onde houver
+> conflito.
 
 ---
+
+## Mudança de plano (11/10/2026): integrar todos agora, ajustar depois
+
+O professor parou o fluxo de um conjunto por vez. A migração passa a ter duas
+passadas, e esta sessão faz só a primeira.
+
+### Passada 1 (agora): todos os conjuntos na ClaRa, como estão
+
+Integre **todos** os conjuntos da aba **Núcleo 60** da planilha
+`balanco_fase2_60_conjuntos.xlsx`, sem parar a cada um para proposta e
+aprovação. O objetivo é que, ao fim, todos estejam disponíveis para a ClaRa e
+a Trilha fazerem qualquer análise. A arrumação fina vem depois, com o
+professor.
+
+**O que você aplica nesta passada:**
+
+- **O nome do objeto, definitivo.** Decida-o agora: depois que a Trilha passar
+  a ler da ClaRa, ele não muda mais. Use o nome já decidido na curadoria
+  (`curadoria_eapadados_revisao.xlsx`, `decisoes_lidas.json`, planilha dos 60);
+  se não houver decisão, o nome atual do EAPADados, desde que siga a regra
+  `<organismo ou tema>_<assunto>`. Nome duvidoso vai para a lista de
+  pendências (abaixo), com a sua sugestão, e o conjunto entra com ela.
+- **As decisões que o professor já tomou** sobre colunas e categorias nas
+  planilhas de curadoria. Não reabra nenhuma.
+- **A tradução mínima dos dados de pacotes R** (colunas e categorias em inglês
+  para `snake_case` em português, ASCII), porque sem ela o conjunto não serve
+  ao aluno. O de-para vai na ficha.
+- **A convenção do D01** para acentos nas categorias e para o texto do
+  catálogo.
+- **As decisões já tomadas nesta migração.** O sintético `artemia` foi recusado
+  pelo professor e não entra; a fonte real (`artemia_fitoesterois`) entra como
+  conjunto próprio, com os nomes dela. A Trilha ajusta o seu conjunto padrão.
+
+**O que você não aplica:** mudanças novas em nomes de colunas e categorias dos
+conjuntos do EAPADados. Ficam como estão. Sugestões vão para a seção
+"Pendências para a curadoria" da ficha.
+
+**Ficha enxuta.** Na passada 1, a `FICHA.md` precisa de: identidade (código,
+registro, nome do objeto, rótulo, título, unidade amostral, dimensões),
+natureza, origem e licença, de-para (só do que mudou), linhas (preservadas ou
+o filtro aplicado), uso didático (análises da Trilha) e "Pendências para a
+curadoria". O resto do modelo da ficha se completa na passada 2.
+
+**Catálogo.** Cada conjunto entra no `catalogo_dados` com as colunas que o D01
+já usa, inclusive `registro`, `nome_eapadados` e `situacao`. Na passada 1,
+`situacao` começa por `"provisório"`, seguida das pendências que importam ao
+aluno (por exemplo, `"provisório; autorização dos autores pendente"`). O D01,
+já revisado, fica como está.
+
+**Pare e pergunte só quando:**
+
+- a licença impedir a cópia;
+- o objeto do EAPADados não bater com a fonte original;
+- o conjunto for sintético e não houver autorização explícita para ele;
+- faltar algo sem o qual o conjunto não pode entrar.
+
+Nos demais casos, anote na lista de pendências de `data-raw/LEIA-ME.md` e siga
+para o próximo. Leve a lista ao professor ao fim de cada bloco.
+
+**Conferência.** A cada conjunto, o `preparar.R` termina com `stopifnot()` nas
+dimensões, e `roxygen2::roxygenise()` e `devtools::test()` passam. O `R CMD
+check` completo roda ao fim de cada bloco de cerca de dez conjuntos, com a meta
+do `ClaRa/CLAUDE.md`. Os produtos da verificação (`clara.Rcheck/`, o
+`.tar.gz`, bibliotecas temporárias) ficam fora de `data-raw/`, numa pasta
+temporária fora do repositório.
+
+**Tamanho: no máximo 3 MB para a pasta `data/` inteira** (meta do professor,
+cerca de 20 a 50 KB por conjunto). Meça com `tools::checkRdaFiles("data")`
+depois de cada conjunto, sempre com `compress = "xz"`. Um conjunto acima de
+100 KB só entra depois de o professor ver o tamanho; diga o que o faz grande
+(linhas, colunas de texto longas) e se há como reduzir sem perder o uso
+didático. Ao fim de cada bloco, informe o total.
+
+**Git.** Agora só uma IA trabalha por vez, então o fluxo fica mais leve: um
+commit por conjunto na branch `dados`, com a mensagem
+`dados: Dxx <nome> (de EAPADados::<antigo>)`, e o merge na `main` ao fim de
+cada bloco, com as conferências de "Seu espaço de trabalho" (a `main` parada e
+a `ClaRa/` limpa). O `push`, só quando o professor pedir.
+
+**Ordem.**
+
+1. Os presos ao código da Trilha: `bagre_racao_isoproteica` (já é o D01),
+   `morfometria_barbo`, `cpue_tubarao` e `doubs_ambiente`.
+2. Os usados pelos testes da Trilha: `abalone_adultos`,
+   `salvelino_formalina_remocao`, `camarao_vannamei_biometria` e `pinguins`.
+3. Os demais, na ordem da aba Núcleo 60.
+
+Os detalhes do que a Trilha lê em cada um estão em
+`TRILHA/docs/PEDIDO_DADOS_TRILHA_PARA_CLARA.md`.
+
+**Ao terminar**, avise o professor. A sessão da Trilha revisa a integração
+inteira e só então troca a fonte da Trilha para a ClaRa.
+
+### Passada 2 (depois, com o professor): a curadoria
+
+Um conjunto por vez, seguindo "O fluxo de um conjunto", mais abaixo: nomes de
+colunas, categorias, ficha completa. Ao terminar, `situacao` passa a
+`"revisado"`. Mudança de coluna nos quatro conjuntos presos ao código da
+Trilha precisa de aviso, para a Trilha acompanhar.
+
+### Registro: `Dxx_duas_palavras`
+
+Decisão do professor (11/10/2026), que substitui o formato de três dígitos:
+
+- **Código:** `D01`, `D02`, ..., `D99`: dois dígitos, pela ordem de chegada,
+  sem renumerar.
+- **Registro:** o código, um `_` e **no máximo duas palavras** em
+  `snake_case`, sem acento: `D01_bagre_racao`, `D02_barbo_morfometria`. É o
+  nome da pasta em `data-raw/` e vai na coluna `registro` do catálogo e na
+  ficha.
+- **Nome do objeto:** sem número, por extenso e definitivo
+  (`bagre_racao_isoproteica`).
+- **O que já existe muda para o formato novo:** `D001` vira `D01`, e
+  `D001_bagre_racao` vira `D01_bagre_racao` (pasta, ficha, `preparar.R`,
+  catálogo, título da ajuda, `LEIA-ME.md` e a planilha de acompanhamento). Os
+  commits antigos ficam como estão.
 
 ## Quem você é nesta tarefa
 
@@ -229,7 +347,8 @@ a decisão no `ClaRa/CLAUDE.md`, na seção de estrutura.
 - **Nome e número de registro: duas coisas separadas.**
   - O **nome do objeto** (`bagre_racao_isoproteica`) é o que o aluno digita no
     R. Não tem número, não lista análises e nunca muda depois de publicado.
-  - O **número de registro** (`D01`, `D02`, …, `D61`…) funciona como uma
+  - O **número de registro** (`D01`, `D02`, …, `D99`; pasta no formato
+    `Dxx_duas_palavras`, ver "Mudança de plano") funciona como uma
     matrícula. O conjunto recebe o próximo número livre **quando entra** na
     ClaRa, e o número é dele para sempre. Não indica posição, capítulo nem
     análise, só a ordem de chegada; por isso nunca se renumera. Um conjunto
@@ -321,9 +440,10 @@ se lê em voz alta, e a primeira análise sai em uma linha.**
 8. **Dependências.** A ClaRa só pode depender de pacotes do CRAN. Dados não
    criam dependência: o `.rda` é autossuficiente. Pacotes usados só no
    `preparar.R` (`readxl`, `janitor`, `FSAdata`…) não entram no `DESCRIPTION`.
-9. **Tamanho.** O CRAN aceita até ~5 MB de dados. O núcleo de 60 foi estimado em
-   0,66 MB, mas confira após cada conjunto com `tools::checkRdaFiles("data")` e
-   use `compress = "xz"`. Registre o tamanho no catálogo da ficha.
+9. **Tamanho.** A meta do professor é no máximo 3 MB para toda a pasta
+   `data/` (o CRAN aceita até ~5 MB). O núcleo de 60 foi estimado em 0,66 MB,
+   mas confira após cada conjunto com `tools::checkRdaFiles("data")` e use
+   `compress = "xz"`. Registre o tamanho na ficha.
 
 ## Dados que vêm de outros pacotes R — entram na ClaRa, traduzidos
 
