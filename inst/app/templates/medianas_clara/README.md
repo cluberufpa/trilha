@@ -1,7 +1,7 @@
 # {{TITULO}}
 
-Este Projeto R foi gerado pela Trilha para estudar e comunicar um teste de
-Mann-Whitney, escrito em **ClaRa**, o R escrito com clareza. Abra
+Este Projeto R foi gerado pela Trilha para estudar e comunicar um
+{{NOME_TESTE}}, escrito em **ClaRa**, o R escrito com clareza. Abra
 **{{PROJETO_RPROJ}}** no RStudio. O projeto funciona com a base local,
 pacotes do CRAN e o pacote `clara` (a ClaRa, versão {{VERSAO_CLARA}} na
 exportação); não precisa da Trilha instalada.
@@ -120,19 +120,9 @@ Trilha não conhece a proveniência dos seus dados e não a declara no lugar
 do pesquisador. A planilha original fica em `dados/{{ARQUIVO_BRUTO}}` e
 não é alterada.
 
-## Método do teste de Mann-Whitney
+## Método do {{NOME_TESTE}}
 
-Este roteiro usa o {{NOME_TESTE}}, com a hipótese {{HIPOTESE_README}}. O
-teste ordena todas as observações, da menor para a maior, e compara as
-posições (postos) de cada grupo, sem supor distribuição normal. O
-deslocamento é a mediana das diferenças entre uma observação do primeiro
-grupo (na ordem dos níveis) e uma do segundo (estimativa de Hodges-Lehmann).
-Com dispersões parecidas nos grupos (teste de Fligner-Killeen), o teste
-compara as medianas; com dispersões diferentes, compara as distribuições
-inteiras, e as frases dizem isso. A hipótese unilateral (`"maior"` ou
-`"menor"`) só vale se foi decidida no planejamento, antes de olhar os
-dados; nela, o intervalo do deslocamento fica aberto de um lado (+∞ ou -∞).
-Qualquer troca vai no script e no relatório.
+{{METODO_README}}
 
 ## Como ler a figura principal
 

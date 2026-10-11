@@ -1218,7 +1218,14 @@ ui <- page_navbar(
     nav_panel(
       title = "Kruskal-Wallis (k grupos)",
       icon = icon("arrows-up-down"),
-      mod_nonparametric_ui("np_kw", "kruskal")
+      mod_analise_registravel_ui(
+        "fluxo_np_kw",
+        tagList(
+          mod_seletor_base_analise_ui("base_np_kw"),
+          mod_nonparametric_ui("np_kw", "kruskal")
+        ),
+        mod_registrar_execucao_ui("registrar_np_kw")
+      )
     ),
     nav_panel(
       title = "Friedman (k grupos pareados)",
@@ -3231,6 +3238,10 @@ trilha::run_app(launch.browser = TRUE)</pre>
     "base_np_mw", dados_analise, registro_bases_rv, cache_bases_rv,
     revisao_dados_analise_rv, nome_analise = "O Mann-Whitney"
   )
+  seletor_np_kw <- mod_seletor_base_analise_server(
+    "base_np_kw", dados_analise, registro_bases_rv, cache_bases_rv,
+    revisao_dados_analise_rv, nome_analise = "O Kruskal-Wallis"
+  )
   seletor_anova <- mod_seletor_base_analise_server(
     "base_anova", dados_analise, registro_bases_rv, cache_bases_rv,
     revisao_dados_analise_rv, finalidade_preferida = "anova",
@@ -3424,7 +3435,7 @@ trilha::run_app(launch.browser = TRUE)</pre>
   qui_quadrado <- mod_nonparametric_server("np_qui", seletor_np_qui$dados, import_info, contingency_shared, "quiquadrado")
   mann_whitney <- mod_nonparametric_server("np_mw", seletor_np_mw$dados, import_info, contingency_shared, "mannwhitney")
   mod_nonparametric_server("np_wil", dados_analise, import_info, contingency_shared, "wilcoxon")
-  mod_nonparametric_server("np_kw",  dados_analise, import_info, contingency_shared, "kruskal")
+  kruskal_wallis <- mod_nonparametric_server("np_kw", seletor_np_kw$dados, import_info, contingency_shared, "kruskal")
   mod_pareados_categoricos_server(
     "friedman", "friedman", dados_analise, registro_bases_rv, cache_bases_rv,
     revisao_dados_analise_rv, registro_execucoes_rv, contador_execucoes_rv
@@ -3463,6 +3474,11 @@ trilha::run_app(launch.browser = TRUE)</pre>
     "registrar_np_mw", mann_whitney$estado_execucao, seletor_np_mw$contexto,
     registro_execucoes_rv, contador_execucoes_rv, revisao_dados_analise_rv,
     registro_bases_rv, cache_bases_rv, "np_mann_whitney", "O Mann-Whitney"
+  )
+  registro_np_kw <- mod_registrar_execucao_server(
+    "registrar_np_kw", kruskal_wallis$estado_execucao, seletor_np_kw$contexto,
+    registro_execucoes_rv, contador_execucoes_rv, revisao_dados_analise_rv,
+    registro_bases_rv, cache_bases_rv, "np_kruskal_wallis", "O Kruskal-Wallis"
   )
   registro_anova <- mod_registrar_execucao_server(
     "registrar_anova", anova_resultado$estado_execucao, seletor_anova$contexto,

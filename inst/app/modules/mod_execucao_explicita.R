@@ -153,6 +153,9 @@ execucao_explicita_server <- function(input, output, session, assinatura_rv,
       if (!isTRUE(sucesso) && tentativa < max_tentativas_internas) {
         tentativa_execucao_rv(tentativa + 1L)
         later::later(function() {
+          # A sessão pode ter terminado nesse intervalo (a aba fechada logo
+          # depois de um erro): sem ela, não há o que tentar de novo.
+          if (isTRUE(session$isClosed())) return(invisible(NULL))
           gatilho_rv(as.integer(isolate(gatilho_rv())) + 1L)
         }, delay = 0.15)
       }

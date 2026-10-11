@@ -4,15 +4,14 @@
 # Funções canônicas dos testes NÃO PARAMÉTRICOS da Trilha (ecossistema EAPA):
 #   - Qui-quadrado de independência  (a partir de uma matriz de contagens)
 #   - Teste exato de Fisher          (alternativa para tabelas esparsas)
-#   (o Mann-Whitney saiu daqui: a tela e o projeto usam comparar_medianas(), da ClaRa)
 #   - Wilcoxon dos postos sinalizados(amostras pareadas)
-#   - Kruskal-Wallis                 (k amostras independentes)
+#   (Mann-Whitney e Kruskal-Wallis saíram daqui: as telas e os projetos usam
+#   comparar_medianas(), da ClaRa)
 #
 # Padrão de cada análise (do mouse ao código):
 #   calcular_*() -> lista com as estatísticas do teste
 #   arrumar_*()  -> data.frame enxuto em português (imprime em qualquer lugar)
 #   relatar_*()  -> frase-relatório em português (p-valor e interpretação)
-#   flextable_ocean_np() -> tabela no tema Ocean Gradient para o relatório .docx
 # =============================================================================
 
 library(flextable)
@@ -197,101 +196,4 @@ relatar_wilcoxon <- function(r) {
     fmt_np(r$mediana_dif, 2), ", indicando ", sig,
     " [V = ", fmt_np(r$statistic, 2), "; ", p_txt_np(r$p), "].", efeito_txt
   )
-}
-
-# =============================================================================
-# 3. KRUSKAL-WALLIS (k amostras independentes)
-# =============================================================================
-calcular_kruskal <- function(df, var_y, var_x) {
-  d <- df[, c(var_y, var_x)]
-  d <- na.omit(d)
-  d[[var_x]] <- as.factor(d[[var_x]])
-  f <- as.formula(paste0("`", var_y, "` ~ `", var_x, "`"))
-  k <- kruskal.test(f, data = d)
-  med <- tapply(d[[var_y]], d[[var_x]], median)
-
-  # Tamanho de efeito: epsilon² = H / (n - 1). Varia de 0 a 1.
-  n_obs <- nrow(d)
-  epsilon2 <- if (n_obs > 1) unname(k$statistic) / (n_obs - 1) else NA_real_
-
-  list(
-    statistic = unname(k$statistic), df = unname(k$parameter), p = k$p.value,
-    method = k$method, medianas = med, niveis = levels(d[[var_x]]),
-    epsilon2 = epsilon2, efeito = interpretar_epsilon2(epsilon2),
-    var_y = var_y, var_x = var_x, n = n_obs
-  )
-}
-
-arrumar_kruskal <- function(r) {
-  base <- data.frame(
-    Métrica = c("Qui-quadrado (H)", "Graus de liberdade (gl)", "p-valor", "N (válidos)",
-                "Epsilon² (efeito)", "Tamanho do efeito"),
-    Valor = c(fmt_np(r$statistic, 4), as.character(r$df), p_txt_np(r$p), as.character(r$n),
-              fmt_np(r$epsilon2, 3), r$efeito),
-    stringsAsFactors = FALSE, check.names = FALSE
-  )
-  medianas <- data.frame(
-    Métrica = paste0("Mediana (", names(r$medianas), ")"),
-    Valor = sapply(r$medianas, function(x) fmt_np(x, 3)),
-    stringsAsFactors = FALSE, check.names = FALSE
-  )
-  rbind(base, medianas)
-}
-
-relatar_kruskal <- function(r) {
-  sig <- if (r$p < 0.05) {
-    "pelo menos um grupo difere significativamente dos demais"
-  } else {
-    "nenhuma diferença estatisticamente significativa entre os grupos"
-  }
-  efeito_txt <- if (!is.na(r$epsilon2))
-    paste0(" O tamanho do efeito (epsilon²) foi ", fmt_np(r$epsilon2, 3),
-           ", um efeito ", r$efeito, ".") else ""
-  paste0(
-    "O teste de Kruskal-Wallis comparou a distribuição de '", r$var_y, "' entre os ",
-    length(r$niveis), " níveis de '", r$var_x, "' (N = ", r$n,
-    "). O resultado indica que ", sig,
-    " [H = ", fmt_np(r$statistic, 2), "; gl = ", r$df, "; ", p_txt_np(r$p), "].", efeito_txt
-  )
-}
-
-#' Pós-teste de Dunn + letras de significância (CLD) para o Kruskal-Wallis.
-#' Devolve um data.frame(grupo, letra) — grupos com a MESMA letra não diferem —
-#' ou NULL se os pacotes rstatix/rcompanion não estiverem instalados.
-letras_dunn <- function(df, var_y, var_x, metodo = "bonferroni") {
-  if (!requireNamespace("rstatix", quietly = TRUE) ||
-      !requireNamespace("rcompanion", quietly = TRUE)) return(NULL)
-  d <- df[, c(var_y, var_x)]
-  d <- na.omit(d)
-  d[[var_x]] <- as.factor(d[[var_x]])
-  if (nlevels(d[[var_x]]) < 2) return(NULL)
-  f <- stats::as.formula(paste0("`", var_y, "` ~ `", var_x, "`"))
-  dunn <- tryCatch(rstatix::dunn_test(d, f, p.adjust.method = metodo), error = function(e) NULL)
-  if (is.null(dunn) || nrow(dunn) == 0) return(NULL)
-  dunn$comparison <- paste(dunn$group1, dunn$group2, sep = " - ")
-  # remove.zero = FALSE é ESSENCIAL: senão o cldList apaga zeros dos rótulos
-  # (2000 -> "2", 2001 -> "21"...) e cria grupos fantasmas.
-  cld <- tryCatch(
-    rcompanion::cldList(p.adj ~ comparison, data = dunn, threshold = 0.05, remove.zero = FALSE),
-    error = function(e) NULL)
-  if (is.null(cld)) return(NULL)
-  data.frame(grupo = as.character(cld$Group), letra = as.character(cld$Letter),
-             stringsAsFactors = FALSE)
-}
-
-# =============================================================================
-# Formatação Ocean Gradient para o relatório .docx
-# =============================================================================
-flextable_ocean_np <- function(tab) {
-  flextable::flextable(tab) |>
-    flextable::theme_booktabs() |>
-    flextable::bg(part = "header", bg = "#0F3B5F") |>
-    flextable::color(part = "header", color = "white") |>
-    flextable::bold(part = "header") |>
-    flextable::font(fontname = "Times New Roman", part = "all") |>
-    flextable::fontsize(size = 10, part = "all") |>
-    flextable::align(align = "center", part = "all") |>
-    flextable::align(j = 1, align = "left", part = "all") |>
-    flextable::padding(padding = 5, part = "all") |>
-    flextable::autofit()
 }

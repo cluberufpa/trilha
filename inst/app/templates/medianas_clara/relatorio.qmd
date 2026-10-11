@@ -66,11 +66,11 @@ textos <- resultado |>
 
 # Resultados
 
-`r textos$amostra` `r textos$teste` `r textos$efeito`
+{{FRASES_RESULTADOS}}
 
 `r textos$pressupostos`
 
-<!-- Tabela do teste: opcional num artigo, porque o W já está no texto.
+<!-- Tabela do teste: opcional num artigo, porque a estatística já está no texto.
 Para tirá-la, apague o chunk. -->
 
 ```{r}

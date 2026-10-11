@@ -78,6 +78,15 @@ item_mw <- function(alternativa) {
     parametros = list(resposta = "taxa_crescimento_mg_dia", grupo = "racao",
       alternativa = alternativa, nivel_confianca = .95))
 }
+# Kruskal-Wallis: as quatro rações dos bagres, com o ajuste do p do Dunn.
+item_kw <- function(ajuste_p) {
+  list(id = "execucao_0001", tipo = "kruskal_wallis", titulo = "Kruskal-Wallis: peso por ração",
+    incluir_word = TRUE, estado_dependencia = "Atualizada", base_tipo = "compartilhada",
+    base_id = "dados_analise", base_objeto = "dados_analise",
+    parametros = list(resposta = "peso_g", grupo = "racao", ajuste_p = ajuste_p,
+      nivel_confianca = .95))
+}
+h_kruskal <- function() unname(kruskal.test(peso_g ~ racao, data = bagres)$statistic)
 # O deslocamento de Hodges-Lehmann, com a aproximação normal que a ClaRa usa
 # quando há empates.
 deslocamento_mw <- function(alternativa) {
@@ -140,7 +149,15 @@ casos <- list(
       import_info = list(source = "package", package_dataset = "artemia")),
     mw_maior = list(dados = artemias, item = item_mw("greater"), tela = medianas_clara_rodar,
       esperado = function() deslocamento_mw("greater"),
-      import_info = list(source = "package", package_dataset = "artemia"))
+      import_info = list(source = "package", package_dataset = "artemia")),
+    # O Kruskal-Wallis sai pela mesma rota; a estatística conferida é o H, e
+    # o Word diz o ajuste do Dunn.
+    kw_holm = list(dados = bagres, item = item_kw("holm"),
+      tela = function(df, p) medianas_clara_rodar(df, p, "kruskal_wallis"), tabela = "GL",
+      esperado = h_kruskal, estatistica = "resultado$teste$h", no_word = "Holm"),
+    kw_bonferroni = list(dados = bagres, item = item_kw("bonferroni"),
+      tela = function(df, p) medianas_clara_rodar(df, p, "kruskal_wallis"), tabela = "GL",
+      esperado = h_kruskal, estatistica = "resultado$teste$h", no_word = "Bonferroni")
   )
 )
 
@@ -170,6 +187,10 @@ verificados <- character()
 for (entrada in rotas) for (nome_caso in names(casos[[entrada$pasta]])) {
   caso <- casos[[entrada$pasta]][[nome_caso]]
   info <- rotas_info[[entrada$pasta]]
+  # Um caso pode conferir outra estatística ou outra coluna da tabela que a
+  # da rota (o Kruskal-Wallis, que sai pela rota das medianas, confere o H).
+  info$estatistica <- caso$estatistica %||% info$estatistica
+  info$tabela <- caso$tabela %||% info$tabela
   rotulo <- paste(entrada$pasta, nome_caso)
   manifesto <- list(execucoes = list(execucao_0001 = caso$item), secoes_globais = list(),
                     codigo_clara = TRUE)
@@ -246,6 +267,8 @@ for (entrada in rotas) for (nome_caso in names(casos[[entrada$pasta]])) {
     grepl(info$resumo %||% "Média ± DP", xml, fixed = TRUE),
     grepl(valor_texto, xml, fixed = TRUE),
     !grepl("Error in|Erro em", xml))
+  # Um texto que o caso exige no Word (o ajuste do p do Dunn, por exemplo).
+  if (!is.null(caso$no_word)) stopifnot(grepl(caso$no_word, xml, fixed = TRUE))
   # No unilateral, o Word diz que o intervalo é aberto.
   if (identical(caso$item$parametros$alternativa, "greater")) {
     stopifnot(grepl("unilateral", xml, fixed = TRUE), grepl("+∞", xml, fixed = TRUE))

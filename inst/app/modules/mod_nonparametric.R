@@ -9,16 +9,22 @@ if (file.exists("templates/funcoes_nonparametric.R")) {
 # Coalescência de nulos (uso interno)
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
-# ---- Mann-Whitney pela ClaRa ------------------------------------------------
-# A tela do Mann-Whitney roda a análise como o projeto vai rodar: monta o
-# texto da chamada de comparar_medianas() com a mesma função do exportador e
-# o avalia com a base da tela. Devolve a chamada, o resultado, o efeito e as
-# frases. Qui-quadrado, Wilcoxon e Kruskal-Wallis seguem sem a ClaRa.
-medianas_clara_rodar <- function(df, parametros) {
-  item <- list(tipo = "mann_whitney", parametros = parametros)
+# ---- Medianas pela ClaRa: Mann-Whitney e Kruskal-Wallis ---------------------
+# As telas do Mann-Whitney e do Kruskal-Wallis rodam a análise como o projeto
+# vai rodar: montam o texto da chamada de comparar_medianas() com a mesma
+# função do exportador e o avaliam com a base da tela. Devolvem a chamada, o
+# resultado, o efeito e as frases. Qui-quadrado e Wilcoxon seguem sem a ClaRa.
+
+# O tipo de execução de cada tela das medianas (o que o exportador lê).
+np_tipos_clara <- c(mannwhitney = "mann_whitney", kruskal = "kruskal_wallis")
+np_usa_clara <- function(fixed_test) is.element(fixed_test, names(np_tipos_clara))
+
+medianas_clara_rodar <- function(df, parametros, tipo = "mann_whitney") {
+  item <- list(tipo = tipo, parametros = parametros)
   chamada <- exportacao_medianas_clara_chamada(item, "tela")
   resultado <- exportacao_clara_avaliar(chamada, list(base = df))
   list(
+    tipo = tipo,
     parametros = parametros,
     chamada = chamada,
     resultado = resultado,
@@ -31,7 +37,7 @@ medianas_clara_rodar <- function(df, parametros) {
 # A figura principal da tela: a mesma chamada de grafico_medianas() que o
 # roteiro escreve, avaliada sobre o resultado da tela.
 medianas_clara_figura <- function(r) {
-  item <- list(tipo = "mann_whitney", parametros = r$parametros)
+  item <- list(tipo = r$tipo, parametros = r$parametros)
   exportacao_clara_avaliar(c("resultado |>", exportacao_medianas_clara_figura(item, "tela")),
                            list(resultado = r$resultado))
 }
@@ -87,7 +93,7 @@ np_titulo <- function(fixed_test) {
 # Os testes que calculam só no clique em "Executar análise" e podem ir para
 # o Projeto R (os demais calculam a cada mudança, sem registro).
 np_execucao_explicita <- function(fixed_test) {
-  is.element(fixed_test, c("quiquadrado", "mannwhitney"))
+  is.element(fixed_test, c("quiquadrado", names(np_tipos_clara)))
 }
 
 # Corpo de configuração conforme o teste fixado pelo item de menu
@@ -144,14 +150,13 @@ np_config_ui <- function(ns, fixed_test) {
   } else {
     tagList(
       selectInput(ns("kw_y"), "Variável Numérica (resposta):", choices = NULL),
-      selectInput(ns("kw_x"), "Variável de Agrupamento (categórica):", choices = NULL),
-      checkboxInput(ns("kw_posthoc"), "Pós-teste de Dunn + letras (quais grupos diferem)", value = TRUE),
-      conditionalPanel(
-        condition = sprintf("input['%s']", ns("kw_posthoc")),
-        selectInput(ns("kw_padjust"), "Ajuste de p (pós-teste):",
-                    choices = c("Bonferroni" = "bonferroni", "Holm" = "holm", "BH (FDR)" = "BH"),
-                    selected = "bonferroni")
-      )
+      selectInput(ns("kw_x"), "Variável de Agrupamento (3 ou mais níveis):", choices = NULL),
+      # O Dunn e as letras sempre saem; aqui se escolhe só o ajuste do p.
+      selectInput(ns("kw_padjust"), "Ajuste do p nas comparações de Dunn:",
+                  choices = c("Holm" = "holm", "Bonferroni" = "bonferroni",
+                              "Benjamini-Hochberg (BH)" = "bh"),
+                  selected = "holm"),
+      helpText("Holm controla o erro como Bonferroni, com mais poder; BH controla a proporção de falsas descobertas.")
     )
   }
 }
@@ -207,7 +212,7 @@ mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
           title = "Resultado do Teste",
           icon = icon("table"),
           card_body(
-            if (identical(fixed_test, "mannwhitney")) uiOutput(ns("clara_ui")) else tagList(
+            if (np_usa_clara(fixed_test)) uiOutput(ns("clara_ui")) else tagList(
               uiOutput(ns("chi_table_ui")),
               div(style = "margin-bottom: -10px;", DTOutput(ns("results_table"), height = "auto")),
               uiOutput(ns("fisher_ui")),
@@ -251,12 +256,30 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
     revisao_execucao <- if (modo_explicito) execucao_revisao_dados(data_rv) else reactive(0L)
     gatilho_execucao <- reactiveVal(0L)
 
-    # As escolhas da tela do Mann-Whitney numa lista só: é ela que vai para o
+    # As escolhas das telas das medianas numa lista só: é ela que vai para o
     # registro da execução e para a chamada da ClaRa.
-    parametros_mw <- reactive({
-      list(resposta = input$mw_y, grupo = input$mw_x,
-           alternativa = input$mw_alt %||% "two.sided", nivel_confianca = 0.95)
+    parametros_clara <- reactive({
+      if (identical(fixed_test, "kruskal")) {
+        list(resposta = input$kw_y, grupo = input$kw_x,
+             ajuste_p = input$kw_padjust %||% "holm", nivel_confianca = 0.95)
+      } else {
+        list(resposta = input$mw_y, grupo = input$mw_x,
+             alternativa = input$mw_alt %||% "two.sided", nivel_confianca = 0.95)
+      }
     })
+    # Quantos grupos o teste exige: dois no Mann-Whitney, três ou mais no
+    # Kruskal-Wallis. A tela confere antes de chamar a ClaRa.
+    conferir_grupos_clara <- function(df, parametros) {
+      completos <- !is.na(df[[parametros$resposta]]) & !is.na(df[[parametros$grupo]])
+      quantos <- length(unique(df[[parametros$grupo]][completos]))
+      if (identical(fixed_test, "kruskal")) {
+        validate(need(quantos >= 3L,
+          "O Kruskal-Wallis compara três ou mais grupos com dados. Com dois, use o Mann-Whitney."))
+      } else {
+        validate(need(quantos == 2L,
+          "A variável de agrupamento precisa ter exatamente 2 grupos com dados. Para três ou mais, use o Kruskal-Wallis."))
+      }
+    }
 
     # Atualiza os seletores de variáveis
     observe({
@@ -446,9 +469,10 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
 
     assinatura_execucao <- reactive({
       req(modo_explicito)
-      if (identical(fixed_test, "mannwhitney")) {
-        req(input$mw_y, input$mw_x)
-        return(list(revisao_dados = as.integer(revisao_execucao()), parametros = parametros_mw()))
+      if (np_usa_clara(fixed_test)) {
+        p <- parametros_clara()
+        req(p$resposta, p$grupo)
+        return(list(revisao_dados = as.integer(revisao_execucao()), parametros = p))
       }
       ci <- chi_input()
       fonte <- input$chi_source %||% "vars"
@@ -480,14 +504,13 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
         list(type = "quiquadrado", r = r, arr = arrumar_qui_quadrado(r),
              relato = relatar_qui_quadrado(r), fisher = fisher, tab = ci$tab)
 
-      } else if (tt == "mannwhitney") {
-        df <- data_rv(); req(df, input$mw_y, input$mw_x)
-        completos <- !is.na(df[[input$mw_y]]) & !is.na(df[[input$mw_x]])
-        validate(need(length(unique(df[[input$mw_x]][completos])) == 2L,
-                      "A variável de agrupamento precisa ter exatamente 2 grupos com dados. Para três ou mais, use o Kruskal-Wallis."))
-        r <- tryCatch(medianas_clara_rodar(df, parametros_mw()), error = function(e) e)
+      } else if (np_usa_clara(tt)) {
+        # Mann-Whitney e Kruskal-Wallis: a ClaRa, com a chamada do projeto.
+        df <- data_rv(); p <- parametros_clara(); req(df, p$resposta, p$grupo)
+        conferir_grupos_clara(df, p)
+        r <- tryCatch(medianas_clara_rodar(df, p, np_tipos_clara[[tt]]), error = function(e) e)
         validate(need(!inherits(r, "error"), if (inherits(r, "error")) conditionMessage(r) else ""))
-        list(type = "mannwhitney", clara = r)
+        list(type = tt, clara = r)
 
       } else if (tt == "wilcoxon") {
         df <- data_rv(); req(df, input$wil_1, input$wil_2)
@@ -495,21 +518,6 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
                       error = function(e) e)
         validate(need(!inherits(r, "error"), if (inherits(r, "error")) conditionMessage(r) else ""))
         list(type = "wilcoxon", r = r, arr = arrumar_wilcoxon(r), relato = relatar_wilcoxon(r))
-
-      } else if (tt == "kruskal") {
-        df <- data_rv(); req(df, input$kw_y, input$kw_x)
-        r <- tryCatch(calcular_kruskal(df, input$kw_y, input$kw_x), error = function(e) e)
-        validate(need(!inherits(r, "error"), if (inherits(r, "error")) conditionMessage(r) else ""))
-        metodo <- if (!is.null(input$kw_padjust) && nzchar(input$kw_padjust)) input$kw_padjust else "bonferroni"
-        letras <- if (isTRUE(input$kw_posthoc)) letras_dunn(df, input$kw_y, input$kw_x, metodo) else NULL
-        relato <- relatar_kruskal(r)
-        if (!is.null(letras) && nrow(letras) > 0) {
-          rot <- paste(paste0(letras$grupo, " (", letras$letra, ")"), collapse = "; ")
-          relato <- paste0(relato, " Pós-teste de Dunn — grupos com a mesma letra não diferem (α = 0,05): ", rot, ".")
-        } else if (isTRUE(input$kw_posthoc)) {
-          relato <- paste0(relato, " (Para o pós-teste de Dunn e as letras, instale os pacotes rstatix e rcompanion.)")
-        }
-        list(type = "kruskal", r = r, arr = arrumar_kruskal(r), relato = relato, letras = letras)
       }
     }
 
@@ -522,7 +530,8 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
     exec_ctrl <- if (modo_explicito) {
       execucao_explicita_server(
         input, output, session, assinatura_execucao, test_results,
-        nome_analise = if (identical(fixed_test, "mannwhitney")) "O Mann-Whitney" else "O qui-quadrado",
+        nome_analise = switch(fixed_test, mannwhitney = "O Mann-Whitney",
+                              kruskal = "O Kruskal-Wallis", "O qui-quadrado"),
         gatilho_rv = gatilho_execucao
       )
     } else {
@@ -547,8 +556,9 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
       )
     })
 
-    # O painel do Mann-Whitney: a narrativa, as tabelas, o efeito e o
-    # pressuposto da ClaRa, no tema cinza.
+    # O painel das medianas (Mann-Whitney e Kruskal-Wallis): a narrativa, as
+    # tabelas, o efeito e o pressuposto da ClaRa, no tema cinza; no
+    # Kruskal-Wallis, também as comparações de Dunn.
     tabela_clara <- function(tabela) {
       flextable::htmltools_value(clara::exibir_tabela(tabela, tema = "cinza"))
     }
@@ -557,18 +567,20 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
     }
     output$clara_ui <- renderUI({
       res <- test_results()
-      req(res, identical(res$type, "mannwhitney"))
+      req(res, np_usa_clara(res$type))
       r <- res$clara
       resultado <- r$resultado
+      kruskal <- identical(res$type, "kruskal")
+      q <- exportacao_medianas_clara_parametros(list(tipo = r$tipo, parametros = r$parametros))
       textos <- unclass(r$textos)
-      frases <- unlist(textos[c("amostra", "teste", "efeito")], use.names = FALSE)
+      frases <- unlist(textos[c("amostra", "teste", "efeito", if (kruskal) "comparacoes")],
+                       use.names = FALSE)
       efeito <- r$efeito
       pressupostos <- resultado$pressupostos
       tagList(
         div(class = "small text-muted mb-2",
-            sprintf("Análise feita pela ClaRa %s: %s (comparar_medianas()).", r$versao_clara,
-                    if (identical(resultado$nomes$alternativa, "bilateral")) "teste de Mann-Whitney" else
-                      "teste de Mann-Whitney unilateral")),
+            sprintf("Análise feita pela ClaRa %s: %s%s (comparar_medianas()).", r$versao_clara,
+                    q$nome_teste, if (kruskal) paste0(", com Dunn ajustado por ", q$nome_ajuste) else "")),
         titulo_secao("Narrativa automática"),
         div(class = "alert alert-secondary", style = "font-size: 0.9rem; line-height: 1.45;",
             paste(frases[nzchar(frases)], collapse = " ")),
@@ -582,8 +594,17 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
         titulo_secao("Resumo por grupo"),
         flextable::htmltools_value(clara::exibir_resumo(resultado, tema = "cinza",
                                                         nota = textos$nota_tabela)),
-        titulo_secao("Teste de Mann-Whitney"),
+        titulo_secao(if (kruskal) "Teste de Kruskal-Wallis" else "Teste de Mann-Whitney"),
         flextable::htmltools_value(clara::exibir_teste(resultado, tema = "cinza")),
+        if (kruskal) tagList(
+          titulo_secao(paste0("Comparações de Dunn (p ajustado por ", q$nome_ajuste, ")")),
+          tabela_clara(data.frame(
+            Par = resultado$pares$comparacao,
+            `Diferença dos postos médios` = clara::formatar_numero(resultado$pares$diferenca_postos),
+            z = clara::formatar_numero(resultado$pares$z),
+            `p ajustado` = clara::formatar_p(resultado$pares$p_ajustado),
+            check.names = FALSE))
+        ),
         titulo_secao("Tamanho de efeito"),
         tabela_clara(data.frame(
           Medida = efeito$medida,
@@ -671,28 +692,9 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
           labs(title = sprintf("Comparação pareada: %s vs %s", res$r$var1, res$r$var2), x = NULL, y = "Valores") +
           theme(plot.title = element_text(face = "bold", color = "#0F3B5F"), legend.position = "none")
 
-      } else if (res$type == "kruskal") {
-        # Kruskal-Wallis: boxplot por grupo + média (losango) + letras (CLD) no topo
-        df <- data_rv(); req(df)
-        vy <- res$r$var_y; vx <- res$r$var_x
-        d <- na.omit(df[, c(vy, vx)])
-        d[[vx]] <- as.factor(d[[vx]])
-        p <- ggplot(d, aes(x = .data[[vx]], y = .data[[vy]], fill = .data[[vx]], color = .data[[vx]])) +
-          geom_boxplot(outlier.shape = NA, alpha = 0.45, linewidth = 0.5) +
-          geom_jitter(position = position_jitter(width = 0.2), alpha = 0.55, size = 1.6) +
-          stat_summary(fun = mean, geom = "point", shape = 23, size = 2.7, fill = "black", color = "black") +
-          labs(title = sprintf("%s por %s (Kruskal-Wallis)", vy, vx), x = vx, y = vy) +
-          theme_classic(base_size = 14) +
-          theme(legend.position = "none", panel.grid.major.x = element_blank(),
-                plot.title = element_text(face = "bold", color = "#0F3B5F"))
-        if (!is.null(res$letras) && nrow(res$letras) > 0) {
-          ytop <- max(d[[vy]], na.rm = TRUE) * 1.06
-          p <- p + geom_text(data = res$letras, aes(x = grupo, y = ytop, label = letra),
-                             inherit.aes = FALSE, fontface = "bold", color = "grey20", size = 5)
-        }
-        p
       } else {
-        # Mann-Whitney: a figura principal da ClaRa, a mesma do roteiro.
+        # Mann-Whitney e Kruskal-Wallis: a figura principal da ClaRa, a
+        # mesma do roteiro.
         medianas_clara_figura(res$clara)
       }
     })
@@ -727,14 +729,14 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
 
     # Código R reprodutível
     r_code_np <- reactive({
-      # Mann-Whitney: o código é o da ClaRa, as mesmas chamadas do Projeto R,
-      # seguidas do R comum que roda por trás de comparar_medianas().
-      if (identical(fixed_test, "mannwhitney")) {
+      # Mann-Whitney e Kruskal-Wallis: o código é o da ClaRa, as mesmas chamadas
+      # do Projeto R, seguidas do R comum que roda por trás de comparar_medianas().
+      if (np_usa_clara(fixed_test)) {
         res <- test_results()
         req(res$clara)
-        item <- list(tipo = "mann_whitney", parametros = res$clara$parametros)
+        item <- list(tipo = res$clara$tipo, parametros = res$clara$parametros)
         return(paste(c(
-          "# O Mann-Whitney em ClaRa: as mesmas chamadas do R/analise.R do Projeto R.",
+          paste0("# O ", np_titulo(fixed_test), " em ClaRa: as mesmas chamadas do R/analise.R do Projeto R."),
           "# `base` é a base que a tela usou (no projeto, ela nasce da planilha).",
           "library(clara)",
           "",
@@ -779,10 +781,6 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
           code <- c(code,
             sprintf("r <- calcular_wilcoxon(dados, '%s', '%s', alternative = '%s')", pp$var1, pp$var2, pp$alternative),
             "print(arrumar_wilcoxon(r)); cat(relatar_wilcoxon(r))")
-        } else if (tt == "kruskal") {
-          code <- c(code,
-            sprintf("r <- calcular_kruskal(dados, '%s', '%s')", pp$var_y, pp$var_x),
-            "print(arrumar_kruskal(r)); cat(relatar_kruskal(r))")
         }
       }
       paste(code, collapse = "\n")
@@ -804,23 +802,26 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
       )
       parametros <- c(pp, list(fonte = fonte))
       if (identical(fixed_test, "quiquadrado")) parametros$tabela <- res$tab
-      # O Mann-Whitney registra as escolhas com os nomes que o exportador da
-      # ClaRa lê (resposta, grupo, alternativa, nivel_confianca).
-      if (identical(fixed_test, "mannwhitney")) {
-        parametros <- c(res$clara$parametros, list(fonte = fonte))
-        teste <- res$clara$resultado$teste
+      # Mann-Whitney e Kruskal-Wallis registram as escolhas com os nomes que o
+      # exportador da ClaRa lê (resposta, grupo, alternativa ou ajuste_p,
+      # nivel_confianca).
+      if (np_usa_clara(fixed_test)) {
+        resultado <- res$clara$resultado
+        teste <- resultado$teste
+        kruskal <- identical(fixed_test, "kruskal")
         return(list(
-          analise_id = "np_mann_whitney",
-          tipo = "mann_whitney",
+          analise_id = paste0("np_", res$clara$tipo),
+          tipo = res$clara$tipo,
           titulo = titulo,
-          parametros = parametros,
+          parametros = c(res$clara$parametros, list(fonte = fonte)),
           saidas_disponiveis = c("narrativa", "tabela", "grafico", "diagnosticos", "console"),
-          resultado_resumo = list(
-            estatistica = unname(teste$w),
-            p_valor = unname(teste$p),
-            deslocamento = unname(teste$deslocamento),
-            n = as.integer(res$clara$resultado$amostra$usadas),
-            grupos = 2L
+          resultado_resumo = c(
+            list(estatistica = unname(if (kruskal) teste$h else teste$w),
+                 p_valor = unname(teste$p),
+                 n = as.integer(resultado$amostra$usadas),
+                 grupos = nrow(resultado$resumo)),
+            if (kruskal) list(graus_liberdade = unname(teste$gl)) else
+              list(deslocamento = unname(teste$deslocamento))
           ),
           codigo_r = paste(r_code_np(), collapse = "\n")
         ))

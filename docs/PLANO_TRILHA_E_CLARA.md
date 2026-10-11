@@ -343,8 +343,20 @@ com dois grupos, e a Trilha passa a pedir `clara (>= 0.11.0)`.
   "reconstruível" (`trilha_executar()`), que é do caminho antigo.
   `test_clara_projeto_render.R` ganhou dois casos (bilateral e "maior") e
   `test_mann_whitney_clara_tela.R` confere a tela nas três hipóteses.
-- Falta na onda 1: o Kruskal-Wallis (a tela dele oferece Bonferroni, Holm e
-  BH para o Dunn; a ClaRa usa só Holm, decisão a tomar).
+- **Kruskal-Wallis feito (11/10/2026). Onda 1 completa.** Decisões do
+  professor: a ClaRa ganha `ajuste_p = c("holm", "bonferroni", "bh")` (ClaRa
+  0.14.0, Holm como padrão; a Trilha pede `clara (>= 0.14.0)`, versão
+  0.2.5), e o Dunn sempre roda (a caixa "Pós-teste de Dunn" saiu da tela;
+  fica só o ajuste, com Holm como padrão). A tela ganhou seletor de base,
+  execução explícita e "Adicionar ao Projeto R", como o Mann-Whitney, e as
+  duas usam o mesmo caminho da ClaRa (`medianas_clara_rodar()`,
+  `parametros_clara()`); o projeto sai pelo molde `medianas_clara/`, com
+  marcadores para o que muda entre os dois testes. Saíram as funções antigas
+  do Kruskal-Wallis e `flextable_ocean_np()` de `funcoes_nonparametric.R`.
+  A nova tentativa automática da execução explícita deixa de mexer numa
+  sessão já encerrada. `test_clara_projeto_render.R` ganhou dois casos (Holm
+  e Bonferroni) e `test_medianas_clara_tela.R` (antes
+  `test_mann_whitney_clara_tela.R`) confere as duas telas.
 Mapas, planejamento amostral e o Laboratório de Conceitos não precisam da
 ClaRa: não são análises com relatório estatístico.
 

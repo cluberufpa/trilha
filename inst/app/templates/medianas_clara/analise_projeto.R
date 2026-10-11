@@ -33,7 +33,7 @@ glimpse(base)
 
 resultado                     # um pequeno relatório no console
 
-# Tamanho de efeito: correlação bisserial dos postos, com intervalo e a leitura.
+# Tamanho de efeito: {{EFEITO_COMENTARIO}}, com intervalo e a leitura.
 efeito <- resultado |>
   medir_efeito()
 
@@ -41,7 +41,7 @@ efeito
 
 # 5. Tabelas ---------------------------------------------------------------
 resultado$resumo              # n, mediana, quartis e letras por grupo
-resultado$teste               # o {{NOME_TESTE}}: deslocamento, IC, W e p
+{{TABELAS_TESTE}}
 resultado$pressupostos        # Fligner-Killeen: dispersão parecida nos grupos
 
 # 6. Gráficos --------------------------------------------------------------
