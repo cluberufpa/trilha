@@ -98,7 +98,11 @@ exportacao_validar_manifesto <- function(manifesto, exigir_word = FALSE) {
     mensagens <- c(mensagens, "Registre ao menos uma execução antes de exportar.")
   }
   execucoes <- manifesto$execucoes %||% list()
-  sem_replay <- which(!vapply(execucoes, function(x)
+  # Uma rota ClaRa refaz a análise com a ClaRa, sem trilha_executar(): o
+  # tipo não precisa estar entre os reconstruíveis do caminho antigo.
+  rota_clara <- length(execucoes) > 0L &&
+    isTRUE(exportacao_molde_projeto_entrada(manifesto)$clara)
+  sem_replay <- if (rota_clara) integer() else which(!vapply(execucoes, function(x)
     execucoes_tipo_reconstruivel(x$tipo), logical(1)))
   if (length(sem_replay)) {
     ids <- names(execucoes)
@@ -2638,6 +2642,27 @@ exportacao_clara_chamada <- function(funcao, argumentos, notas = character(),
     paste0(recuo, unname(linhas[-1])))
 }
 
+# As telas rodam a chamada que o projeto escreve: avaliam o texto num
+# ambiente que enxerga a ClaRa, com os objetos que ele cita (base, ou
+# resultado nas figuras), e devolvem o valor da expressão.
+exportacao_clara_avaliar <- function(chamada, objetos) {
+  ambiente <- list2env(objetos, parent = asNamespace("clara"))
+  eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)
+}
+
+# O R comum por trás de uma chamada da ClaRa: a mesma chamada, com
+# mostrar_codigo = TRUE no fim, alinhado aos outros argumentos. Devolve as
+# linhas que a ClaRa imprime.
+exportacao_clara_codigo <- function(chamada, base) {
+  recuo <- strrep(" ", regexpr("(", chamada[2], fixed = TRUE)[[1]])
+  nomes <- sub("^\\s*(?:[a-z_]+\\()?([a-z_]+)\\s*=.*$", "\\1", chamada[-1], perl = TRUE)
+  largura <- max(nchar(c(nomes, "mostrar_codigo")))
+  ultima <- length(chamada)
+  chamada[ultima] <- sub("[)]$", ",", chamada[ultima])
+  chamada <- c(chamada, sprintf("%s%-*s = TRUE)", recuo, largura, "mostrar_codigo"))
+  utils::capture.output(invisible(exportacao_clara_avaliar(chamada, list(base = base))))
+}
+
 # ---- Teste t em ClaRa -------------------------------------------------------
 # A rota ClaRa do teste t de duas amostras independentes. Serve à tela do
 # teste t (tipo teste_t_two_ind) e à ANOVA de um fator com só dois grupos,
@@ -3044,6 +3069,194 @@ exportacao_regressao_clara_marcadores_readme <- function(item, nome_projeto, imp
   )
 }
 
+# ---- Medianas em ClaRa ------------------------------------------------------
+# A rota ClaRa de comparar_medianas(). Hoje serve ao Mann-Whitney (tipo
+# mann_whitney, dois grupos, com a hipótese alternativa da tela); o
+# Kruskal-Wallis usa a mesma função da ClaRa e entra aqui quando a tela dele
+# for ligada. Os parâmetros da tela viram uma lista só, de onde saem a
+# chamada, os marcadores e os textos.
+exportacao_medianas_clara_parametros <- function(item) {
+  p <- item$parametros
+  rotulo <- function(x, padrao) {
+    x <- trimws(as.character(x %||% ""))
+    if (nzchar(x)) x else padrao
+  }
+  resposta <- as.character(p$resposta %||% "resposta")
+  grupo <- as.character(p$grupo %||% "grupo")
+  alternativa_r <- as.character(p$alternativa %||% "two.sided")
+  alternativa <- c(two.sided = "bilateral", greater = "maior", less = "menor")[[alternativa_r]]
+  list(
+    resposta = resposta,
+    grupo = grupo,
+    rotulo_resposta = rotulo(p$rotulo_resposta, resposta),
+    rotulo_grupos = rotulo(p$rotulo_grupos, grupo),
+    rotulo_resposta_escrito = nzchar(trimws(as.character(p$rotulo_resposta %||% ""))),
+    rotulo_grupos_escrito = nzchar(trimws(as.character(p$rotulo_grupos %||% ""))),
+    confianca = p$nivel_confianca %||% .95,
+    alternativa = alternativa,
+    nome_teste = paste0("teste de Mann-Whitney", if (alternativa != "bilateral") " unilateral")
+  )
+}
+
+# A rota ClaRa das medianas vale para um projeto com uma execução só: um
+# Mann-Whitney com uma das três hipóteses.
+exportacao_medianas_clara_aceita <- function(manifesto) {
+  if (isFALSE(manifesto$codigo_clara)) return(FALSE)
+  itens <- manifesto$execucoes %||% list()
+  incluidos <- exportacao_execucoes_incluidas(manifesto)
+  if (length(itens) != 1L || length(incluidos) != 1L) return(FALSE)
+  item <- incluidos[[1]]
+  identical(item$tipo, "mann_whitney") &&
+    is.element(as.character(item$parametros$alternativa %||% "two.sided"),
+               c("two.sided", "greater", "less"))
+}
+
+# A chamada de comparar_medianas(), nas três formas (exportacao_clara_chamada()).
+# A alternativa vai sempre escrita, mesmo bilateral: é a hipótese do estudo.
+exportacao_medianas_clara_chamada <- function(item, forma = c("tela", "script", "relatorio")) {
+  q <- exportacao_medianas_clara_parametros(item)
+  exportacao_clara_chamada(
+    "comparar_medianas",
+    argumentos = list(
+      resposta        = exportacao_nome_clara(q$resposta),
+      grupos          = exportacao_nome_clara(q$grupo),
+      rotulo_resposta = encodeString(q$rotulo_resposta, quote = '"'),
+      rotulo_grupos   = encodeString(q$rotulo_grupos, quote = '"'),
+      confianca       = format(q$confianca, digits = 15, decimal.mark = "."),
+      alternativa     = encodeString(q$alternativa, quote = '"')
+    ),
+    notas = c(
+      rotulo_resposta = paste0("no texto e na figura", if (!q$rotulo_resposta_escrito) ', ex.: "CPUE (kg)"'),
+      rotulo_grupos   = paste0("no texto e na figura", if (!q$rotulo_grupos_escrito) ', ex.: "Petrecho"'),
+      alternativa     = '"bilateral", "maior" ou "menor" (1º grupo contra o 2º)'
+    ),
+    forma = forma)
+}
+
+# A chamada de grafico_medianas(), a figura principal: no script, com as
+# escolhas e as opções ao lado; no relatório, sem a explicação do topo (ela
+# vai para a legenda) e com a fonte serifada do Word.
+exportacao_medianas_clara_figura <- function(item, forma = c("script", "relatorio", "tela")) {
+  forma <- match.arg(forma)
+  relatorio <- identical(forma, "relatorio")
+  argumentos <- list(
+    explicacao     = if (relatorio) "FALSE" else "TRUE",
+    mostrar_pontos = "TRUE",
+    mostrar_letras = "TRUE",
+    cores          = '"ocean"',
+    tamanho_texto  = "12",
+    fonte          = if (relatorio) '"serif"' else '"sans"'
+  )
+  notas <- if (identical(forma, "script")) c(
+    explicacao = "FALSE tira a explicação do topo",
+    cores      = '"ocean", "cinza" ou um vetor',
+    fonte      = '"sans" (Arial) ou "serif" (Times)') else character()
+  linhas <- exportacao_clara_chamada("grafico_medianas", argumentos, notas,
+                                     forma = if (identical(forma, "script")) "script" else "tela")
+  # Sem a linha "resultado <- base |>": a figura parte do resultado.
+  linhas[-1]
+}
+
+# Os textos padrão das seções do relatório das medianas em ClaRa.
+exportacao_medianas_clara_textos <- function(item) {
+  q <- exportacao_medianas_clara_parametros(item)
+  ic <- format(100 * q$confianca, trim = TRUE, decimal.mark = ",")
+  alfa <- format(1 - q$confianca, trim = TRUE, decimal.mark = ",")
+  hipotese <- switch(q$alternativa,
+    bilateral = "A hipótese alternativa foi bilateral (os grupos diferem, em qualquer sentido).",
+    maior = "A hipótese alternativa, definida no planejamento, foi unilateral: as observações do primeiro grupo tendem a valores maiores que as do segundo.",
+    menor = "A hipótese alternativa, definida no planejamento, foi unilateral: as observações do primeiro grupo tendem a valores menores que as do segundo.")
+  list(
+    introducao = c(
+      "*Sugestão de redação: adapte a pergunta e acrescente referências do seu tema antes de compartilhar o relatório.*", "",
+      "O teste de Mann-Whitney compara dois grupos pelas posições (postos) das observações, sem supor distribuição normal. Ele é útil quando a resposta é assimétrica ou tem valores extremos, situações em que a média representa mal o grupo.", "",
+      sprintf("Neste estudo, comparou-se %s entre os dois grupos de %s.", q$rotulo_resposta, q$rotulo_grupos)),
+    metodos = c(
+      "*Sugestão de redação: complete a origem dos dados, o período, o local, a unidade amostral, as unidades de medida e os critérios de seleção.*", "",
+      paste(sprintf("As análises foram feitas no R [@rcore2025]. Os dois grupos de %s foram comparados quanto a %s pelo %s, com nível de significância de %s; o deslocamento entre os grupos foi estimado pela mediana de Hodges-Lehmann, com intervalo de confiança de %s%%.",
+                    q$rotulo_grupos, q$rotulo_resposta, q$nome_teste, alfa, ic), hipotese), "",
+      paste("A dispersão parecida nos grupos foi avaliada pelo teste de Fligner-Killeen: com",
+            "dispersões parecidas, o teste compara as medianas; com dispersões diferentes, as",
+            "distribuições inteiras. O tamanho de efeito foi descrito pela correlação bisserial dos",
+            "postos, com intervalo de confiança, pelo pacote `effectsize` [@benshachar2020]. As figuras",
+            "foram construídas com o `ggplot2` [@wickham2016]."), "",
+      "A independência das observações depende do delineamento e deve ser justificada pela unidade amostral."),
+    discussao = c(
+      "*Sugestão para desenvolver a discussão: interprete o deslocamento entre os grupos e o tamanho do efeito no contexto do estudo, com as referências consultadas.*", "",
+      "Uma diferença estatisticamente significativa indica que os grupos diferem além do esperado pelo acaso, mas não descreve, sozinha, o mecanismo. O deslocamento diz o tamanho típico da diferença entre uma observação de cada grupo, na unidade da resposta."),
+    conclusao = c(
+      "*Sugestão de redação: retome a pergunta da introdução e revise esta síntese depois de examinar o pressuposto.*", "")
+  )
+}
+
+exportacao_medianas_clara_marcadores_script <- function(item) {
+  q <- exportacao_medianas_clara_parametros(item)
+  list(
+    TITULO_COMENTARIO = toupper(q$nome_teste),
+    PERGUNTA_COMENTARIO = switch(q$alternativa,
+      bilateral = sprintf("%s difere entre os dois grupos de %s?", q$rotulo_resposta, q$rotulo_grupos),
+      maior = sprintf("%s tende a valores maiores no primeiro grupo de %s que no segundo?", q$rotulo_resposta, q$rotulo_grupos),
+      menor = sprintf("%s tende a valores menores no primeiro grupo de %s que no segundo?", q$rotulo_resposta, q$rotulo_grupos)),
+    CHAMADA_COMPARAR = exportacao_medianas_clara_chamada(item, "script"),
+    COMENTARIO_COMPARAR = c(
+      sprintf("# Resumo, %s, pressuposto e letras, numa função só.", q$nome_teste),
+      "# O deslocamento é a mediana das diferenças entre uma observação do",
+      "# primeiro grupo (na ordem dos níveis) e uma do segundo. Os rótulos ficam",
+      "# no resultado: gráficos e textos os usam.",
+      if (q$alternativa != "bilateral") c(
+        "# A hipótese é unilateral: o intervalo do deslocamento fica aberto de um",
+        "# lado (+∞ ou -∞). Ela precisa ter sido decidida antes de olhar os dados.")),
+    NOME_TESTE = q$nome_teste,
+    FIGURA_MEDIANAS = exportacao_medianas_clara_figura(item, "script")
+  )
+}
+
+exportacao_medianas_clara_marcadores_qmd <- function(item, manifesto, import_info) {
+  q <- exportacao_medianas_clara_parametros(item)
+  globais <- manifesto$secoes_globais %||% list()
+  sugestoes <- exportacao_medianas_clara_textos(item)
+  secao <- function(nome, padrao) {
+    texto <- paste(as.character(globais[[nome]] %||% ""), collapse = "\n")
+    if (nzchar(trimws(texto))) texto else padrao
+  }
+  list(
+    INTRODUCAO = secao("introducao", sugestoes$introducao),
+    METODOS = secao("metodos", sugestoes$metodos),
+    DISCUSSAO = secao("discussao", sugestoes$discussao),
+    CONCLUSAO = secao("conclusao", sugestoes$conclusao),
+    TRECHO_PREPARO_QMD = manifesto$clara$qmd,
+    CHAMADA_COMPARAR = exportacao_medianas_clara_chamada(item, "relatorio"),
+    FIGURA_MEDIANAS = exportacao_medianas_clara_figura(item, "relatorio"),
+    TITULO_RELATORIO = "Título do trabalho (preencher)",
+    NOME_TESTE = q$nome_teste,
+    TBL_TESTE_CAP = paste0(
+      toupper(substr(q$nome_teste, 1, 1)), substring(q$nome_teste, 2),
+      ": deslocamento entre os grupos (primeiro menos o segundo, pela mediana de ",
+      "Hodges-Lehmann). IC: intervalo de confiança",
+      if (q$alternativa != "bilateral") ", aberto de um lado", ".")
+  )
+}
+
+exportacao_medianas_clara_marcadores_readme <- function(item, nome_projeto, import_info) {
+  q <- exportacao_medianas_clara_parametros(item)
+  planilha <- exportacao_nome_planilha(import_info)
+  list(
+    TITULO = nome_projeto,
+    PROJETO_RPROJ = paste0(nome_projeto, ".Rproj"),
+    ARQUIVO_BRUTO = planilha,
+    ARQUIVO_BRUTO_ARVORE = formatC(planilha, width = -max(27L, nchar(planilha) + 2L)),
+    RESPOSTA = q$rotulo_resposta,
+    GRUPO = q$rotulo_grupos,
+    IC = format(100 * q$confianca, trim = TRUE, decimal.mark = ","),
+    NOME_TESTE = q$nome_teste,
+    HIPOTESE_README = switch(q$alternativa,
+      bilateral = "bilateral (`alternativa = \"bilateral\"`): os grupos diferem, em qualquer sentido",
+      maior = "unilateral (`alternativa = \"maior\"`): o primeiro grupo tende a valores maiores que o segundo",
+      menor = "unilateral (`alternativa = \"menor\"`): o primeiro grupo tende a valores menores que o segundo"),
+    VERSAO_CLARA = exportacao_versao_clara()
+  )
+}
+
 # Funções auxiliares da receita, na rota ClaRa. O projeto não leva R/funcoes.R:
 # quando a receita de preparo usa moda() (imputar a moda) ou converter_datas(),
 # a definição delas entra no próprio roteiro, logo antes da receita, copiada
@@ -3303,6 +3516,15 @@ exportacao_clara_receita <- function(manifesto, import_info, pipeline, registro_
   list(script = script, qmd = exportacao_sanitizar_molde(qmd))
 }
 
+# O prefixo das rotas ClaRa: a leitura da planilha (seção 2) e a receita
+# com o carimbo (seção 3), que exportacao_clara_receita() já deixou pronta
+# no manifesto. É o mesmo para todas as análises em ClaRa.
+exportacao_clara_prefixo <- function(manifesto, nome_projeto, registro_bases, pipeline,
+                                     base_externa, import_info, templates_dir) {
+  list(importar = exportacao_clara_importar(import_info),
+       preparo = manifesto$clara$script)
+}
+
 # ---- Registro do molde ------------------------------------------------------
 # Uma entrada por análise migrada: seletor (quando o manifesto usa a árvore
 # nova), pasta de templates, pasta dos arquivos de apoio, prefixo do script e
@@ -3393,11 +3615,7 @@ molde_projeto_registro <- list(
     clara = TRUE,
     documentos = c(relatorio.qmd = "relatorio.qmd"),
     seleciona = exportacao_regressao_clara_aceita,
-    prefixo = function(manifesto, nome_projeto, registro_bases, pipeline,
-                       base_externa, import_info, templates_dir) {
-      list(importar = exportacao_clara_importar(import_info),
-           preparo = manifesto$clara$script)
-    },
+    prefixo = exportacao_clara_prefixo,
     marcadores_script = exportacao_regressao_clara_marcadores_script,
     marcadores_qmd = exportacao_regressao_clara_marcadores_qmd,
     marcadores_readme = exportacao_regressao_clara_marcadores_readme
@@ -3417,6 +3635,19 @@ molde_projeto_registro <- list(
     marcadores_qmd = exportacao_regressao_marcadores_qmd,
     marcadores_readme = exportacao_regressao_marcadores_readme
   ),
+  # Medianas em ClaRa: o Mann-Whitney (comparar_medianas(), dois grupos).
+  medianas_clara = list(
+    tipo = "mann_whitney",
+    pasta = "medianas_clara",
+    apoio = "regressao_linear",
+    clara = TRUE,
+    documentos = c(relatorio.qmd = "relatorio.qmd"),
+    seleciona = exportacao_medianas_clara_aceita,
+    prefixo = exportacao_clara_prefixo,
+    marcadores_script = exportacao_medianas_clara_marcadores_script,
+    marcadores_qmd = exportacao_medianas_clara_marcadores_qmd,
+    marcadores_readme = exportacao_medianas_clara_marcadores_readme
+  ),
   # Teste t em ClaRa: o teste t de duas amostras e a ANOVA com dois grupos.
   # Vem antes das entradas da ANOVA e do teste t, para aceitar primeiro.
   teste_t_clara = list(
@@ -3426,11 +3657,7 @@ molde_projeto_registro <- list(
     clara = TRUE,
     documentos = c(relatorio.qmd = "relatorio.qmd"),
     seleciona = exportacao_teste_t_clara_aceita,
-    prefixo = function(manifesto, nome_projeto, registro_bases, pipeline,
-                       base_externa, import_info, templates_dir) {
-      list(importar = exportacao_clara_importar(import_info),
-           preparo = manifesto$clara$script)
-    },
+    prefixo = exportacao_clara_prefixo,
     marcadores_script = exportacao_teste_t_clara_marcadores_script,
     marcadores_qmd = exportacao_teste_t_clara_marcadores_qmd,
     marcadores_readme = exportacao_teste_t_clara_marcadores_readme
@@ -3445,12 +3672,7 @@ molde_projeto_registro <- list(
     # Um só QMD: o relatório Word. O caderno de estudo é o próprio R/analise.R.
     documentos = c(relatorio.qmd = "relatorio.qmd"),
     seleciona = exportacao_anova_clara_aceita,
-    # A receita e o carimbo já vêm prontos no manifesto (exportacao_clara_receita).
-    prefixo = function(manifesto, nome_projeto, registro_bases, pipeline,
-                       base_externa, import_info, templates_dir) {
-      list(importar = exportacao_clara_importar(import_info),
-           preparo = manifesto$clara$script)
-    },
+    prefixo = exportacao_clara_prefixo,
     marcadores_script = function(item) c(exportacao_anova_clara_marcadores(item),
       list(CHAMADA_COMPARAR = exportacao_anova_clara_chamada(item, "script"))),
     marcadores_qmd = exportacao_anova_clara_marcadores_qmd,

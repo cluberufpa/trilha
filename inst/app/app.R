@@ -1200,7 +1200,14 @@ ui <- page_navbar(
     nav_panel(
       title = "Mann-Whitney (2 grupos)",
       icon = icon("arrows-left-right"),
-      mod_nonparametric_ui("np_mw", "mannwhitney")
+      mod_analise_registravel_ui(
+        "fluxo_np_mw",
+        tagList(
+          mod_seletor_base_analise_ui("base_np_mw"),
+          mod_nonparametric_ui("np_mw", "mannwhitney")
+        ),
+        mod_registrar_execucao_ui("registrar_np_mw")
+      )
     ),
     nav_panel(
       title = "Wilcoxon (pareado)",
@@ -3220,6 +3227,10 @@ trilha::run_app(launch.browser = TRUE)</pre>
     revisao_dados_analise_rv, finalidade_preferida = "qui_quadrado",
     nome_analise = "O Qui-quadrado"
   )
+  seletor_np_mw <- mod_seletor_base_analise_server(
+    "base_np_mw", dados_analise, registro_bases_rv, cache_bases_rv,
+    revisao_dados_analise_rv, nome_analise = "O Mann-Whitney"
+  )
   seletor_anova <- mod_seletor_base_analise_server(
     "base_anova", dados_analise, registro_bases_rv, cache_bases_rv,
     revisao_dados_analise_rv, finalidade_preferida = "anova",
@@ -3411,7 +3422,7 @@ trilha::run_app(launch.browser = TRUE)</pre>
 
   # --- MÓDULOS DE TESTES NÃO PARAMÉTRICOS (um por item de menu; qui-quadrado usa a tabela preparada) ---
   qui_quadrado <- mod_nonparametric_server("np_qui", seletor_np_qui$dados, import_info, contingency_shared, "quiquadrado")
-  mod_nonparametric_server("np_mw",  dados_analise, import_info, contingency_shared, "mannwhitney")
+  mann_whitney <- mod_nonparametric_server("np_mw", seletor_np_mw$dados, import_info, contingency_shared, "mannwhitney")
   mod_nonparametric_server("np_wil", dados_analise, import_info, contingency_shared, "wilcoxon")
   mod_nonparametric_server("np_kw",  dados_analise, import_info, contingency_shared, "kruskal")
   mod_pareados_categoricos_server(
@@ -3447,6 +3458,11 @@ trilha::run_app(launch.browser = TRUE)</pre>
     "registrar_np_qui", qui_quadrado$estado_execucao, seletor_np_qui$contexto,
     registro_execucoes_rv, contador_execucoes_rv, revisao_dados_analise_rv,
     registro_bases_rv, cache_bases_rv, "np_qui_quadrado", "O Qui-quadrado"
+  )
+  registro_np_mw <- mod_registrar_execucao_server(
+    "registrar_np_mw", mann_whitney$estado_execucao, seletor_np_mw$contexto,
+    registro_execucoes_rv, contador_execucoes_rv, revisao_dados_analise_rv,
+    registro_bases_rv, cache_bases_rv, "np_mann_whitney", "O Mann-Whitney"
   )
   registro_anova <- mod_registrar_execucao_server(
     "registrar_anova", anova_resultado$estado_execucao, seletor_anova$contexto,

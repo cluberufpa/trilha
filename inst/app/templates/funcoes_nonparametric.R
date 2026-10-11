@@ -4,7 +4,7 @@
 # Funções canônicas dos testes NÃO PARAMÉTRICOS da Trilha (ecossistema EAPA):
 #   - Qui-quadrado de independência  (a partir de uma matriz de contagens)
 #   - Teste exato de Fisher          (alternativa para tabelas esparsas)
-#   - Mann-Whitney                   (duas amostras independentes)
+#   (o Mann-Whitney saiu daqui: a tela e o projeto usam comparar_medianas(), da ClaRa)
 #   - Wilcoxon dos postos sinalizados(amostras pareadas)
 #   - Kruskal-Wallis                 (k amostras independentes)
 #
@@ -146,63 +146,7 @@ relatar_qui_quadrado <- function(r) {
 }
 
 # =============================================================================
-# 2. MANN-WHITNEY (duas amostras independentes)
-# =============================================================================
-calcular_mann_whitney <- function(df, var_y, var_x, alternative = "two.sided") {
-  d <- df[, c(var_y, var_x)]
-  d <- na.omit(d)
-  d[[var_x]] <- as.factor(d[[var_x]])
-  niveis <- levels(d[[var_x]])
-  if (length(niveis) != 2) {
-    stop("A variável de agrupamento precisa ter exatamente 2 níveis.")
-  }
-  f <- as.formula(paste0("`", var_y, "` ~ `", var_x, "`"))
-  w <- suppressWarnings(wilcox.test(f, data = d, alternative = alternative))
-  med <- tapply(d[[var_y]], d[[var_x]], median)
-
-  # Tamanho de efeito: correlação bisserial de postos = 1 - 2U/(n1*n2),
-  # em que U é a estatística W do wilcox.test. Varia de -1 a 1.
-  n_por_grupo <- table(d[[var_x]])
-  n1 <- as.numeric(n_por_grupo[niveis[1]]); n2 <- as.numeric(n_por_grupo[niveis[2]])
-  r_rb <- if (n1 > 0 && n2 > 0) 1 - (2 * unname(w$statistic)) / (n1 * n2) else NA_real_
-
-  list(
-    statistic = unname(w$statistic), p = w$p.value, method = w$method,
-    niveis = niveis, medianas = med, alternative = alternative,
-    r_rb = r_rb, efeito = interpretar_r_np(r_rb),
-    var_y = var_y, var_x = var_x, n = nrow(d)
-  )
-}
-
-arrumar_mann_whitney <- function(r) {
-  data.frame(
-    Métrica = c("Estatística W", "p-valor",
-                paste0("Mediana (", r$niveis[1], ")"),
-                paste0("Mediana (", r$niveis[2], ")"), "N (válidos)",
-                "r (bisserial de postos)", "Tamanho do efeito"),
-    Valor = c(fmt_np(r$statistic, 4), p_txt_np(r$p),
-              fmt_np(r$medianas[1], 3), fmt_np(r$medianas[2], 3), as.character(r$n),
-              fmt_np(r$r_rb, 3), r$efeito),
-    stringsAsFactors = FALSE, check.names = FALSE
-  )
-}
-
-relatar_mann_whitney <- function(r) {
-  sig <- if (r$p < 0.05) "diferença estatisticamente significativa" else "nenhuma diferença estatisticamente significativa"
-  efeito_txt <- if (!is.na(r$r_rb))
-    paste0(" O tamanho do efeito (correlação bisserial de postos) foi r = ",
-           fmt_np(r$r_rb, 3), ", um efeito ", r$efeito, ".") else ""
-  paste0(
-    "O teste de Mann-Whitney comparou a distribuição de '", r$var_y, "' entre os grupos '",
-    r$niveis[1], "' (mediana = ", fmt_np(r$medianas[1], 2), ") e '",
-    r$niveis[2], "' (mediana = ", fmt_np(r$medianas[2], 2), "), com N = ", r$n,
-    ". Há ", sig, " entre os grupos [W = ", fmt_np(r$statistic, 2), "; ", p_txt_np(r$p), "].",
-    efeito_txt
-  )
-}
-
-# =============================================================================
-# 3. WILCOXON DOS POSTOS SINALIZADOS (amostras pareadas)
+# 2. WILCOXON DOS POSTOS SINALIZADOS (amostras pareadas)
 # =============================================================================
 calcular_wilcoxon <- function(df, var1, var2, alternative = "two.sided") {
   d <- df[, c(var1, var2)]
@@ -256,7 +200,7 @@ relatar_wilcoxon <- function(r) {
 }
 
 # =============================================================================
-# 4. KRUSKAL-WALLIS (k amostras independentes)
+# 3. KRUSKAL-WALLIS (k amostras independentes)
 # =============================================================================
 calcular_kruskal <- function(df, var_y, var_x) {
   d <- df[, c(var_y, var_x)]

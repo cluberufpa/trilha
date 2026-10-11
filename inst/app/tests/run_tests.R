@@ -390,6 +390,7 @@ testes <- c(
   "test_clara_projeto_render.R",
   "test_teste_t_clara_tela.R",
   "test_regressao_clara_tela.R",
+  "test_mann_whitney_clara_tela.R",
   "test_grafico_linhas_troca_y.R"
 )
 

@@ -9,6 +9,33 @@ if (file.exists("templates/funcoes_nonparametric.R")) {
 # Coalescência de nulos (uso interno)
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
 
+# ---- Mann-Whitney pela ClaRa ------------------------------------------------
+# A tela do Mann-Whitney roda a análise como o projeto vai rodar: monta o
+# texto da chamada de comparar_medianas() com a mesma função do exportador e
+# o avalia com a base da tela. Devolve a chamada, o resultado, o efeito e as
+# frases. Qui-quadrado, Wilcoxon e Kruskal-Wallis seguem sem a ClaRa.
+medianas_clara_rodar <- function(df, parametros) {
+  item <- list(tipo = "mann_whitney", parametros = parametros)
+  chamada <- exportacao_medianas_clara_chamada(item, "tela")
+  resultado <- exportacao_clara_avaliar(chamada, list(base = df))
+  list(
+    parametros = parametros,
+    chamada = chamada,
+    resultado = resultado,
+    efeito = clara::medir_efeito(resultado),
+    textos = clara::escrever_resultados(resultado),
+    versao_clara = as.character(utils::packageVersion("clara"))
+  )
+}
+
+# A figura principal da tela: a mesma chamada de grafico_medianas() que o
+# roteiro escreve, avaliada sobre o resultado da tela.
+medianas_clara_figura <- function(r) {
+  item <- list(tipo = "mann_whitney", parametros = r$parametros)
+  exportacao_clara_avaliar(c("resultado |>", exportacao_medianas_clara_figura(item, "tela")),
+                           list(resultado = r$resultado))
+}
+
 np_contingencia_tidy_matriz <- function(df, linha, coluna, frequencia = "n") {
   faltantes <- setdiff(c(linha, coluna, frequencia), names(df))
   if (length(faltantes))
@@ -55,6 +82,12 @@ np_titulo <- function(fixed_test) {
          wilcoxon    = "Wilcoxon (pareado)",
          kruskal     = "Kruskal-Wallis",
          "Teste não paramétrico")
+}
+
+# Os testes que calculam só no clique em "Executar análise" e podem ir para
+# o Projeto R (os demais calculam a cada mudança, sem registro).
+np_execucao_explicita <- function(fixed_test) {
+  is.element(fixed_test, c("quiquadrado", "mannwhitney"))
 }
 
 # Corpo de configuração conforme o teste fixado pelo item de menu
@@ -125,6 +158,9 @@ np_config_ui <- function(ns, fixed_test) {
 
 mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
   ns <- NS(id)
+  # O qui-quadrado e o Mann-Whitney calculam só no clique em "Executar
+  # análise" e podem ir para o Projeto R.
+  explicito <- np_execucao_explicita(fixed_test)
   tagList(
     layout_columns(
       col_widths = c(1, 1, 1),
@@ -143,9 +179,7 @@ mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
           card_body(
             style = "padding: 12px 15px;",
             np_config_ui(ns, fixed_test),
-            execucao_explicita_controles_ui(
-              ns, ativo = identical(fixed_test, "quiquadrado")
-            )
+            execucao_explicita_controles_ui(ns, ativo = explicito)
           )
         ),
         card(
@@ -159,7 +193,7 @@ mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
               "Baixe o Projeto R em ",
               strong("Comunicação de Resultados"), ". Execute a análise, clique em ",
               strong("Adicionar ao Projeto R"), " e escolha lá os componentes do relatório. ",
-              "No RStudio, abra o projeto e use Render para gerar o caderno HTML e o Word."
+              "No RStudio, abra o projeto e use Render para gerar o relatório em Word."
             )
           )
         )
@@ -173,11 +207,13 @@ mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
           title = "Resultado do Teste",
           icon = icon("table"),
           card_body(
-            uiOutput(ns("chi_table_ui")),
-            div(style = "margin-bottom: -10px;", DTOutput(ns("results_table"), height = "auto")),
-            uiOutput(ns("fisher_ui")),
-            hr(style = "margin: 15px 0; border-color: #dee2e6;"),
-            uiOutput(ns("relato_ui"))
+            if (identical(fixed_test, "mannwhitney")) uiOutput(ns("clara_ui")) else tagList(
+              uiOutput(ns("chi_table_ui")),
+              div(style = "margin-bottom: -10px;", DTOutput(ns("results_table"), height = "auto")),
+              uiOutput(ns("fisher_ui")),
+              hr(style = "margin: 15px 0; border-color: #dee2e6;"),
+              uiOutput(ns("relato_ui"))
+            )
           )
         ),
         nav_panel(
@@ -187,7 +223,7 @@ mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
             plotOutput(ns("test_plot"), height = "450px")
           )
         )
-      ), ativo = identical(fixed_test, "quiquadrado")),
+      ), ativo = explicito),
 
       # COLUNA 3: AJUDA
       card(
@@ -211,9 +247,16 @@ mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
 mod_nonparametric_server <- function(id, data_rv, import_info, contingency_shared = NULL, fixed_test = "quiquadrado") {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    modo_explicito <- identical(fixed_test, "quiquadrado")
+    modo_explicito <- np_execucao_explicita(fixed_test)
     revisao_execucao <- if (modo_explicito) execucao_revisao_dados(data_rv) else reactive(0L)
     gatilho_execucao <- reactiveVal(0L)
+
+    # As escolhas da tela do Mann-Whitney numa lista só: é ela que vai para o
+    # registro da execução e para a chamada da ClaRa.
+    parametros_mw <- reactive({
+      list(resposta = input$mw_y, grupo = input$mw_x,
+           alternativa = input$mw_alt %||% "two.sided", nivel_confianca = 0.95)
+    })
 
     # Atualiza os seletores de variáveis
     observe({
@@ -403,6 +446,10 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
 
     assinatura_execucao <- reactive({
       req(modo_explicito)
+      if (identical(fixed_test, "mannwhitney")) {
+        req(input$mw_y, input$mw_x)
+        return(list(revisao_dados = as.integer(revisao_execucao()), parametros = parametros_mw()))
+      }
       ci <- chi_input()
       fonte <- input$chi_source %||% "vars"
       list(
@@ -435,10 +482,12 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
 
       } else if (tt == "mannwhitney") {
         df <- data_rv(); req(df, input$mw_y, input$mw_x)
-        r <- tryCatch(calcular_mann_whitney(df, input$mw_y, input$mw_x, input$mw_alt),
-                      error = function(e) e)
+        completos <- !is.na(df[[input$mw_y]]) & !is.na(df[[input$mw_x]])
+        validate(need(length(unique(df[[input$mw_x]][completos])) == 2L,
+                      "A variável de agrupamento precisa ter exatamente 2 grupos com dados. Para três ou mais, use o Kruskal-Wallis."))
+        r <- tryCatch(medianas_clara_rodar(df, parametros_mw()), error = function(e) e)
         validate(need(!inherits(r, "error"), if (inherits(r, "error")) conditionMessage(r) else ""))
-        list(type = "mannwhitney", r = r, arr = arrumar_mann_whitney(r), relato = relatar_mann_whitney(r))
+        list(type = "mannwhitney", clara = r)
 
       } else if (tt == "wilcoxon") {
         df <- data_rv(); req(df, input$wil_1, input$wil_2)
@@ -473,7 +522,7 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
     exec_ctrl <- if (modo_explicito) {
       execucao_explicita_server(
         input, output, session, assinatura_execucao, test_results,
-        nome_analise = "O qui-quadrado",
+        nome_analise = if (identical(fixed_test, "mannwhitney")) "O Mann-Whitney" else "O qui-quadrado",
         gatilho_rv = gatilho_execucao
       )
     } else {
@@ -495,6 +544,63 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
           datatable(df_tab, options = list(dom = "t", ordering = FALSE), rownames = FALSE, selection = "none")
         }),
         hr(style = "margin: 12px 0;")
+      )
+    })
+
+    # O painel do Mann-Whitney: a narrativa, as tabelas, o efeito e o
+    # pressuposto da ClaRa, no tema cinza.
+    tabela_clara <- function(tabela) {
+      flextable::htmltools_value(clara::exibir_tabela(tabela, tema = "cinza"))
+    }
+    titulo_secao <- function(texto) {
+      tags$h6(texto, style = "color: #0F3B5F; font-weight: 700; margin: 14px 0 8px;")
+    }
+    output$clara_ui <- renderUI({
+      res <- test_results()
+      req(res, identical(res$type, "mannwhitney"))
+      r <- res$clara
+      resultado <- r$resultado
+      textos <- unclass(r$textos)
+      frases <- unlist(textos[c("amostra", "teste", "efeito")], use.names = FALSE)
+      efeito <- r$efeito
+      pressupostos <- resultado$pressupostos
+      tagList(
+        div(class = "small text-muted mb-2",
+            sprintf("Análise feita pela ClaRa %s: %s (comparar_medianas()).", r$versao_clara,
+                    if (identical(resultado$nomes$alternativa, "bilateral")) "teste de Mann-Whitney" else
+                      "teste de Mann-Whitney unilateral")),
+        titulo_secao("Narrativa automática"),
+        div(class = "alert alert-secondary", style = "font-size: 0.9rem; line-height: 1.45;",
+            paste(frases[nzchar(frases)], collapse = " ")),
+        if (resultado$amostra$excluidas > 0) div(
+          class = "alert alert-warning py-2 small", icon("filter"),
+          sprintf(" %d linha(s) foram excluídas por dados faltantes em '%s' ou '%s'. Restaram %d observações.",
+                  resultado$amostra$excluidas, resultado$nomes$resposta, resultado$nomes$grupos,
+                  resultado$amostra$usadas)),
+        div(class = "alert alert-light border py-2 small", textos$alerta),
+        hr(),
+        titulo_secao("Resumo por grupo"),
+        flextable::htmltools_value(clara::exibir_resumo(resultado, tema = "cinza",
+                                                        nota = textos$nota_tabela)),
+        titulo_secao("Teste de Mann-Whitney"),
+        flextable::htmltools_value(clara::exibir_teste(resultado, tema = "cinza")),
+        titulo_secao("Tamanho de efeito"),
+        tabela_clara(data.frame(
+          Medida = efeito$medida,
+          Valor = clara::formatar_numero(efeito$valor, 3),
+          IC = paste(clara::formatar_numero(efeito$ic_inf, 3), "a", clara::formatar_numero(efeito$ic_sup, 3)),
+          Leitura = efeito$leitura,
+          check.names = FALSE)),
+        hr(),
+        titulo_secao("Pressuposto"),
+        tabela_clara(data.frame(
+          Pressuposto = pressupostos$pressuposto,
+          Teste = pressupostos$teste,
+          Estatística = clara::formatar_numero(pressupostos$estatistica, 3),
+          p = clara::formatar_p(pressupostos$p),
+          Leitura = pressupostos$leitura,
+          check.names = FALSE)),
+        div(class = "alert alert-light border py-2 small mt-2", textos$pressupostos)
       )
     })
 
@@ -586,18 +692,8 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
         }
         p
       } else {
-        # Mann-Whitney: boxplot por grupo
-        df <- data_rv(); req(df)
-        vy <- res$r$var_y; vx <- res$r$var_x
-        d <- na.omit(df[, c(vy, vx)])
-        d[[vx]] <- as.factor(d[[vx]])
-        ggplot(d, aes(x = .data[[vx]], y = .data[[vy]], fill = .data[[vx]])) +
-          geom_boxplot(alpha = 0.8, outlier.color = NA) +
-          geom_jitter(color = "#495057", width = 0.15, alpha = 0.45, size = 2) +
-          scale_fill_manual(values = rep(ocean, length.out = length(levels(d[[vx]])))) +
-          theme_minimal(base_size = 14) +
-          labs(title = sprintf("Distribuição de %s por %s", vy, vx), x = vx, y = vy) +
-          theme(plot.title = element_text(face = "bold", color = "#0F3B5F"), legend.position = "none")
+        # Mann-Whitney: a figura principal da ClaRa, a mesma do roteiro.
+        medianas_clara_figura(res$clara)
       }
     })
 
@@ -631,6 +727,34 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
 
     # Código R reprodutível
     r_code_np <- reactive({
+      # Mann-Whitney: o código é o da ClaRa, as mesmas chamadas do Projeto R,
+      # seguidas do R comum que roda por trás de comparar_medianas().
+      if (identical(fixed_test, "mannwhitney")) {
+        res <- test_results()
+        req(res$clara)
+        item <- list(tipo = "mann_whitney", parametros = res$clara$parametros)
+        return(paste(c(
+          "# O Mann-Whitney em ClaRa: as mesmas chamadas do R/analise.R do Projeto R.",
+          "# `base` é a base que a tela usou (no projeto, ela nasce da planilha).",
+          "library(clara)",
+          "",
+          exportacao_medianas_clara_chamada(item, "script"),
+          "",
+          "resultado",
+          "resultado |>",
+          "  medir_efeito()",
+          "",
+          "resultado |>",
+          exportacao_medianas_clara_figura(item, "script"),
+          "",
+          "textos <- resultado |>",
+          "  escrever_resultados()",
+          "",
+          "# ---- O R comum por trás de comparar_medianas() ----",
+          "# (o mesmo que a chamada imprime com mostrar_codigo = TRUE)",
+          exportacao_clara_codigo(res$clara$chamada, data_rv())
+        ), collapse = "\n"))
+      }
       pp <- export_params()
       tt <- pp$test_type
       code <- c(
@@ -651,11 +775,7 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
           "# Alternativa exata:", "print(calcular_fisher(tab_np))")
       } else {
         code <- c(code, "load('dados/dados_limpos.rda')", "dados <- df_clean", "")
-        if (tt == "mannwhitney") {
-          code <- c(code,
-            sprintf("r <- calcular_mann_whitney(dados, '%s', '%s', alternative = '%s')", pp$var_y, pp$var_x, pp$alternative),
-            "print(arrumar_mann_whitney(r)); cat(relatar_mann_whitney(r))")
-        } else if (tt == "wilcoxon") {
+        if (tt == "wilcoxon") {
           code <- c(code,
             sprintf("r <- calcular_wilcoxon(dados, '%s', '%s', alternative = '%s')", pp$var1, pp$var2, pp$alternative),
             "print(arrumar_wilcoxon(r)); cat(relatar_wilcoxon(r))")
@@ -684,6 +804,27 @@ mod_nonparametric_server <- function(id, data_rv, import_info, contingency_share
       )
       parametros <- c(pp, list(fonte = fonte))
       if (identical(fixed_test, "quiquadrado")) parametros$tabela <- res$tab
+      # O Mann-Whitney registra as escolhas com os nomes que o exportador da
+      # ClaRa lê (resposta, grupo, alternativa, nivel_confianca).
+      if (identical(fixed_test, "mannwhitney")) {
+        parametros <- c(res$clara$parametros, list(fonte = fonte))
+        teste <- res$clara$resultado$teste
+        return(list(
+          analise_id = "np_mann_whitney",
+          tipo = "mann_whitney",
+          titulo = titulo,
+          parametros = parametros,
+          saidas_disponiveis = c("narrativa", "tabela", "grafico", "diagnosticos", "console"),
+          resultado_resumo = list(
+            estatistica = unname(teste$w),
+            p_valor = unname(teste$p),
+            deslocamento = unname(teste$deslocamento),
+            n = as.integer(res$clara$resultado$amostra$usadas),
+            grupos = 2L
+          ),
+          codigo_r = paste(r_code_np(), collapse = "\n")
+        ))
+      }
       override <- NULL
       if (identical(fonte, "prepared")) {
         override <- list(

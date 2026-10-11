@@ -11,13 +11,14 @@ for (arquivo in c("registro_tratamentos.R", "registro_bases.R", "registro_execuc
                   "registro_comunicacao.R", "exportacao_comunicacao.R")) {
   source(file.path("modules", arquivo), encoding = "UTF-8")
 }
-# As telas da ANOVA (anova_clara_rodar), do teste t (teste_t_clara_rodar) e
-# da regressão (regressao_clara_rodar), para conferir que elas rodam a
-# chamada que o projeto escreve.
+# As telas da ANOVA (anova_clara_rodar), do teste t (teste_t_clara_rodar), da
+# regressão (regressao_clara_rodar) e do Mann-Whitney (medianas_clara_rodar),
+# para conferir que elas rodam a chamada que o projeto escreve.
 suppressPackageStartupMessages({
   source(file.path("modules", "mod_anova.R"), encoding = "UTF-8")
   source(file.path("modules", "mod_parametric.R"), encoding = "UTF-8")
   source(file.path("modules", "mod_regression.R"), encoding = "UTF-8")
+  source(file.path("modules", "mod_nonparametric.R"), encoding = "UTF-8")
 })
 
 # O Quarto é a peça que gera o Word. Sem ele, a verificação não acontece, e
@@ -68,6 +69,21 @@ t_inclinacao <- function() {
   ajuste <- lm(altura_maxima_corpo ~ distancia_dorsal_pelvica, data = barbos)
   unname(summary(ajuste)$coefficients[2, "t value"])
 }
+# Artêmias: taxa de crescimento com duas rações, para o Mann-Whitney.
+artemias <- as.data.frame(EAPADados::artemia)
+item_mw <- function(alternativa) {
+  list(id = "execucao_0001", tipo = "mann_whitney", titulo = "Mann-Whitney: crescimento por ração",
+    incluir_word = TRUE, estado_dependencia = "Atualizada", base_tipo = "compartilhada",
+    base_id = "dados_analise", base_objeto = "dados_analise",
+    parametros = list(resposta = "taxa_crescimento_mg_dia", grupo = "racao",
+      alternativa = alternativa, nivel_confianca = .95))
+}
+# O deslocamento de Hodges-Lehmann, com a aproximação normal que a ClaRa usa
+# quando há empates.
+deslocamento_mw <- function(alternativa) {
+  unname(wilcox.test(taxa_crescimento_mg_dia ~ racao, data = artemias, exact = FALSE,
+                     conf.int = TRUE, alternative = alternativa)$estimate)
+}
 f_anova <- function() summary(aov(peso_g ~ racao, data = bagres))[[1]]$`F value`[1]
 t_dois <- function(variancias_iguais, alternativa) {
   unname(t.test(peso_g ~ racao, data = dois, var.equal = variancias_iguais,
@@ -83,7 +99,10 @@ rotas_info <- list(
     estatistica = "resultado$teste$t[1]", tabela = "Diferença"),
   regressao_clara = list(chamada = exportacao_regressao_clara_chamada,
     estatistica = "resultado$coeficientes$t[2]", tabela = "Intercepto",
-    resumo = "R² ajustado")
+    resumo = "R² ajustado"),
+  medianas_clara = list(chamada = exportacao_medianas_clara_chamada,
+    estatistica = "resultado$teste$deslocamento", tabela = "Deslocamento",
+    resumo = "Q1 a Q3")
 )
 
 # Os casos de cada rota: os dados, as escolhas da tela, a tela que roda e o
@@ -114,6 +133,14 @@ casos <- list(
     cor_e_ordem = list(dados = barbos, item = item_reta("populacao", FALSE, TRUE),
       tela = regressao_clara_rodar, esperado = t_inclinacao,
       import_info = list(source = "package", package_dataset = "morfometria_barbo"))
+  ),
+  medianas_clara = list(
+    mw_bilateral = list(dados = artemias, item = item_mw("two.sided"), tela = medianas_clara_rodar,
+      esperado = function() deslocamento_mw("two.sided"),
+      import_info = list(source = "package", package_dataset = "artemia")),
+    mw_maior = list(dados = artemias, item = item_mw("greater"), tela = medianas_clara_rodar,
+      esperado = function() deslocamento_mw("greater"),
+      import_info = list(source = "package", package_dataset = "artemia"))
   )
 )
 

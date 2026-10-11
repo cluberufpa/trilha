@@ -141,7 +141,7 @@ fosse o outro.
 ## Como escrever e adaptar
 
 O relatório traz sugestões em Introdução, Material e métodos, Resultados,
-Discussão e Conclusão, com os resultados esperados em um artigo: a tabela da
+Discussão e Conclusão, com os resultados esperados em um artigo: a tabela do
 teste t, o resumo por grupo e a figura principal. A exploração e os
 diagnósticos ficam no roteiro, onde se conferem. As frases de
 `escrever_resultados()` mudam junto com os dados, mas a discussão e a

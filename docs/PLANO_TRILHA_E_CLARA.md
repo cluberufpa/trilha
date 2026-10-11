@@ -330,9 +330,31 @@ com dois grupos, e a Trilha passa a pedir `clara (>= 0.11.0)`.
   clássica, Welch e automática; teste t de Welch bilateral, de Student
   unilateral e a ANOVA com dois grupos), e `test_teste_t_clara_tela.R`
   confere a tela nas três hipóteses.
-- Faltam na onda 1: Mann-Whitney e Kruskal-Wallis (`comparar_medianas()`).
+- **Mann-Whitney feito (10/10/2026).** A tela oferecia hipótese
+  unilateral, que `comparar_medianas()` não tinha: ClaRa 0.13.0 ganha
+  `alternativa` como no teste t (bilateral é o padrão; unilateral só com dois
+  grupos), e a Trilha passa a pedir `clara (>= 0.13.0)`. A tela do
+  Mann-Whitney ganhou o que lhe faltava para chegar ao Projeto R: seletor de
+  base, execução explícita (botão "Executar análise") e "Adicionar ao
+  Projeto R". Ela roda a chamada de `exportacao_medianas_clara_chamada()` e
+  mostra as frases, as tabelas, o efeito, o pressuposto e a figura da ClaRa.
+  Molde `templates/medianas_clara/`, já pensado para o Kruskal-Wallis, que
+  usa a mesma função da ClaRa. Uma rota ClaRa dispensa a exigência de tipo
+  "reconstruível" (`trilha_executar()`), que é do caminho antigo.
+  `test_clara_projeto_render.R` ganhou dois casos (bilateral e "maior") e
+  `test_mann_whitney_clara_tela.R` confere a tela nas três hipóteses.
+- Falta na onda 1: o Kruskal-Wallis (a tela dele oferece Bonferroni, Holm e
+  BH para o Dunn; a ClaRa usa só Holm, decisão a tomar).
 Mapas, planejamento amostral e o Laboratório de Conceitos não precisam da
 ClaRa: não são análises com relatório estatístico.
+
+**Arrumação no caminho (10/10/2026):** a chamada da ClaRa nas três formas
+(tela, script e relatório) nasce de uma função só,
+`exportacao_clara_chamada()`, usada pelo teste t, pela regressão e pelas
+medianas (a ANOVA mantém a sua, que tem formato próprio); as telas avaliam a
+chamada com `exportacao_clara_avaliar()` e mostram o R comum com
+`exportacao_clara_codigo()`; as entradas ClaRa do registro dos moldes usam
+o mesmo `exportacao_clara_prefixo()`.
 
 **Andamento da onda 2 (10/10/2026): regressão linear simples feita.**
 Decisões do professor no mesmo dia: `relacionar_variaveis(resposta,

@@ -10,10 +10,7 @@
 regressao_clara_rodar <- function(df, parametros) {
   item <- list(tipo = "regressao_linear", parametros = parametros)
   chamada <- exportacao_regressao_clara_chamada(item, "tela")
-  ambiente <- new.env(parent = asNamespace("clara"))
-  ambiente$base <- df
-  eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)
-  resultado <- ambiente$resultado
+  resultado <- exportacao_clara_avaliar(chamada, list(base = df))
   list(
     parametros = parametros,
     chamada = chamada,
@@ -28,21 +25,8 @@ regressao_clara_rodar <- function(df, parametros) {
 # roteiro escreve, avaliada sobre o resultado da tela.
 regressao_clara_figura <- function(r) {
   item <- list(tipo = "regressao_linear", parametros = r$parametros)
-  chamada <- c("resultado |>", exportacao_regressao_clara_figura(item, "tela"))
-  ambiente <- new.env(parent = asNamespace("clara"))
-  ambiente$resultado <- r$resultado
-  eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)
-}
-
-# O R comum por trás da chamada: a mesma chamada, com mostrar_codigo = TRUE.
-regressao_clara_codigo <- function(r, df) {
-  chamada <- r$chamada
-  chamada[length(chamada)] <- sub("[)]$", ",", chamada[length(chamada)])
-  recuo <- strrep(" ", nchar("  relacionar_variaveis("))
-  chamada <- c(chamada, paste0(recuo, "mostrar_codigo         = TRUE)"))
-  ambiente <- new.env(parent = asNamespace("clara"))
-  ambiente$base <- df
-  utils::capture.output(invisible(eval(parse(text = chamada, encoding = "UTF-8")[[1]], envir = ambiente)))
+  exportacao_clara_avaliar(c("resultado |>", exportacao_regressao_clara_figura(item, "tela")),
+                           list(resultado = r$resultado))
 }
 
 # Motor de ajuste não-linear (potência, Von Bertalanffy, logístico).
@@ -1104,7 +1088,7 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
           "",
           "# ---- O R comum por trás de relacionar_variaveis() ----",
           "# (o mesmo que a chamada imprime com mostrar_codigo = TRUE)",
-          regressao_clara_codigo(r, dados_modulo())
+          exportacao_clara_codigo(r$chamada, dados_modulo())
         ), collapse = "\n"))
       }
 
