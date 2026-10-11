@@ -17,8 +17,9 @@ library(bslib)
 library(ggplot2)
 library(DT)
 
-# anova_validar_entrada() e as funções do molde antigo da ANOVA, que o
-# exportador ainda usa quando a opção da ClaRa fica desmarcada.
+# anova_validar_entrada(), que a tela usa, e as funções do molde antigo da
+# ANOVA. Fora daqui, só o exportador geral (flextable_ocean()) e os testes
+# antigos da ANOVA (calcular_anova(), relatar_anova()) ainda as usam.
 if (file.exists("templates/funcoes_anova.R")) {
   source("templates/funcoes_anova.R")
 }
