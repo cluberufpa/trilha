@@ -105,9 +105,10 @@ porque `datasets`, `ade4` e `astsa` não serão fontes.
 
 ## Como deve ficar na Trilha (fase seguinte, sessão da Trilha)
 
-- O seletor de dados de exemplo fica em dois passos: **origem** (ClaRa ou dados de
-  pacotes); a lista de pacotes traz os conjuntos do `FSAdata` e o `crabs` e **conjunto**. Em cada origem aparecem **só os conjuntos do
-  catálogo**, com o nome traduzido e o original ao lado.
+- O seletor de dados de exemplo fica em dois passos: **origem** (ClaRa ou
+  dados de pacotes) e **conjunto**. A lista de dados de pacotes traz os
+  conjuntos do `FSAdata` e o `crabs`. Em cada origem aparecem **só os
+  conjuntos do catálogo**, com o nome traduzido e o original ao lado.
 - O Projeto R exportado escreve a mesma chamada que a tela usa
   (`carregar_dados("snapper_hg")`), e o README diz quando o projeto precisa do
   `FSAdata`. O carimbo com `stopifnot()` nas linhas segue valendo.
