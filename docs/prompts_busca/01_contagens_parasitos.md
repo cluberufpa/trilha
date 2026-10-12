@@ -3,6 +3,10 @@
 Substitui: `InsectSprays` (datasets) e `quine` (MASS). Escrito em 11/10/2026.
 Cole o texto abaixo da linha numa IA com busca na web.
 
+> **Ativa de novo (11/10/2026, noite):** buscar só o substituto do
+> `InsectSprays` (parasitos por peixe); o do `quine` já está em preparo pelo
+> professor.
+
 ---
 
 Preciso encontrar **dois conjuntos de dados reais e abertos** para um pacote R

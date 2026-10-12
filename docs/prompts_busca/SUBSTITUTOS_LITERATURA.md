@@ -1,5 +1,31 @@
 # Substitutos da literatura para os conjuntos de licença restrita
 
+> **Atualização de 11/10/2026 (noite):** a única fonte de fora é o `FSAdata`,
+> lido na hora, sem cópia (`docs/EMENDA_DADOS_DE_PACOTES.md`); os conjuntos do
+> FSAdata saem da busca. Do `datasets` não fica nenhum; do `MASS`, só o `crabs`.
+>
+> **Saem do acervo, sem busca:** `npk`, `oats`, `cars`, `Puromycin`.
+>
+> **A busca que continua:**
+>
+> | Conjunto atual | Substituto buscado |
+> |---|---|
+> | `InsectSprays` | parasitos por peixe, por tratamento |
+> | `wtloss` | perda de umidade na secagem ou salga do pescado |
+> | `PlantGrowth` | DIC em tanques (talvez dispensável) |
+> | `ships` + `Insurance` | um só conjunto de captura com esforço (offset) |
+> | `quakes` | lances de pesca ou estações de coleta com coordenadas |
+> | `Orange` | crescimento de lotes ou peixes marcados ao longo do tempo |
+> | `CO2` | respirometria: o mesmo peixe em várias temperaturas |
+> | `bacteria` | infecção antes e depois do tratamento, no mesmo animal |
+> | `doubs` (ade4) | estações de rio com variáveis de qualidade da água |
+> | `rec` (astsa) | série mensal de 10 a 30 anos |
+> | `crabs` (MASS) | opcional; até lá, lido do MASS na hora |
+> | `quine` (MASS) | substituto já em preparo pelo professor |
+> | origem incerta (seção 2) | resolver na passada 2 |
+>
+> As tabelas abaixo ficam como guia da estrutura de cada substituto.
+
 Lista de trabalho de 11/10/2026, para a busca do professor. Não é decisão de
 corte: um conjunto só sai da ClaRa quando houver substituto aprovado, ou
 quando se decidir pela licença GPL-3 na ClaRa.

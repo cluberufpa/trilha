@@ -447,6 +447,13 @@ se lê em voz alta, e a primeira análise sai em uma linha.**
 
 ## Dados que vêm de outros pacotes R — entram na ClaRa, traduzidos
 
+> **Emenda de 11/10/2026 (noite):** só o `FSAdata` (e o `crabs` do `MASS`)
+> passam a ser lidos do pacote na hora, com a tradução aplicada por código;
+> nada do `datasets`; `npk`, `oats`, `cars` e `Puromycin` saem do acervo; os
+> demais de pacotes saem quando houver substituto.
+> Vale o que está em `EMENDA_DADOS_DE_PACOTES.md`, que prevalece sobre esta
+> seção e sobre o item 8 acima no que divergirem.
+
 Cerca de 21 dos 60 vêm de pacotes R (`datasets`, `MASS`, `FSAdata`, `astsa`,
 `agridat`). **Decisão do professor (11/10/2026): eles entram na ClaRa**, como
 cópia traduzida e arrumada, porque quase sempre é preciso traduzir nomes de
