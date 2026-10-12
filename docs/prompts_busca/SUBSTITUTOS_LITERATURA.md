@@ -6,21 +6,30 @@
 >
 > **Saem do acervo, sem busca:** `npk`, `oats`, `cars`, `Puromycin`.
 >
+> **Lidos na hora do `FSAdata`, sem busca:** `DarterOnt`, `ShadCR`,
+> `SnapperHG1`, `WhiteGrunt2`, `Cabezon`, `RuffeSLRH92`, `BGHRsample` e
+> `BGHRfish` (a seção 1 traz a tabela). `WalleyeErie2` não está entre os oito;
+> ver a nota na mesma seção.
+>
 > **A busca que continua:**
 >
 > | Conjunto atual | Substituto buscado |
 > |---|---|
 > | `InsectSprays` | parasitos por peixe, por tratamento |
-> | `wtloss` | perda de umidade na secagem ou salga do pescado |
+> | `wtloss` | perda de umidade na secagem ou salga do pescado; busca 08 |
 > | `PlantGrowth` | DIC em tanques (talvez dispensável) |
-> | `ships` + `Insurance` | um só conjunto de captura com esforço (offset) |
-> | `quakes` | lances de pesca ou estações de coleta com coordenadas |
-> | `Orange` | crescimento de lotes ou peixes marcados ao longo do tempo |
-> | `CO2` | respirometria: o mesmo peixe em várias temperaturas |
-> | `bacteria` | infecção antes e depois do tratamento, no mesmo animal |
-> | `doubs` (ade4) | estações de rio com variáveis de qualidade da água |
-> | `rec` (astsa) | série mensal de 10 a 30 anos |
+> | `ships` + `Insurance` | um só conjunto de captura com esforço (offset); busca 04 |
+> | `quakes` | lances de pesca ou estações de coleta com coordenadas; busca 06 |
+> | `Orange` | crescimento de lotes ou peixes marcados ao longo do tempo; busca 05 |
+> | `CO2` | respirometria: o mesmo peixe em várias temperaturas; busca 05 |
+> | `bacteria` | infecção antes e depois do tratamento, no mesmo animal; busca 07 |
+> | `doubs` (ade4) | **já substituído (12/10/2026)** por `lago_vitoria` (D04, Dryad, CC0); busca 02 encerrada |
+> | `rec` (astsa) | série mensal de 10 a 30 anos; busca 09 |
 > | `crabs` (MASS) | opcional; até lá, lido do MASS na hora |
+> | `brine_carbonatos` (Davis, 2002) | **já substituído (12/10/2026)** por `solha_baltico_2008_t4` (D17, Dryad, CC0 1.0; 179 linhas; regressão múltipla com R² = 0,646) |
+> | `camaroes_sexo` (D19, tabela de livro sem referência) | **já substituído (12/10/2026)** por `lebistes_parasitos` (D19, Walsman 2022, Dryad, CC0; 4.715 peixes, sexo × parasito); busca 10 encerrada |
+> | `isoproteica_bagre`, `cpue_tubarao`, `cangulo_crescimento` | **decididos:** ficam na v1 (livro, dado próprio inédito, livro antigo); fora desta busca |
+> | `camarao_ecogreen` (D17, provisório) | **substituído (12/10/2026)** por `solha_baltico_2008_t4`; busca 11 encerrada |
 > | `quine` (MASS) | **já substituído** por `molinesias_parasitos` (D50, Dryad, CC0) |
 > | origem incerta (seção 2) | resolver na passada 2 |
 > | `cabritos_acidos_graxos` (licença não localizada) | ácidos graxos de peixes sob dietas (busca 03) |
@@ -73,9 +82,9 @@ busca e conferência), **difícil** (estrutura rara fora da área de origem).
 |---|---|---|---|---|
 | `PlantGrowth` (datasets) | DIC, ANOVA de um fator | 3–5 tratamentos, 5–10 réplicas cada, resposta contínua | ganho de peso por dieta em tanques; talvez dispensável, porque bagre e tilápia já cobrem | fácil |
 | `InsectSprays` (datasets) | contagens; Poisson, binomial negativa, Kruskal-Wallis | contagem por unidade, 4–6 tratamentos, ~10 réplicas | parasitos (piolho-do-mar, monogenéticos) por peixe e por tratamento antiparasitário | fácil |
-| `npk` (datasets) | fatorial 2³ em blocos | três fatores de dois níveis, em blocos | fatorial de dietas (proteína × lipídio × aditivo) com blocos de tanques ou de tempo | difícil |
+| ~~`npk`~~ (datasets) — **saiu do acervo, sem busca** | fatorial 2³ em blocos | três fatores de dois níveis, em blocos | fatorial de dietas (proteína × lipídio × aditivo) com blocos de tanques ou de tempo | difícil |
 | `CO2` (datasets) | medidas repetidas no mesmo indivíduo | indivíduos medidos em 5–7 níveis, com dois fatores entre indivíduos | consumo de oxigênio do mesmo peixe em várias temperaturas; respirometria | média |
-| `oats` (MASS) | parcelas subdivididas | fator na parcela (tanque) e fator na subparcela (gaiola ou rede dentro do tanque), em blocos | temperatura no tanque × dieta nas gaiolas; na ciência animal, baia × ração | difícil |
+| ~~`oats`~~ (MASS) — **saiu do acervo, sem busca** | parcelas subdivididas | fator na parcela (tanque) e fator na subparcela (gaiola ou rede dentro do tanque), em blocos | temperatura no tanque × dieta nas gaiolas; na ciência animal, baia × ração | difícil |
 | `bacteria` (MASS) | McNemar, pares binários | presença ou ausência no mesmo animal antes e depois, 40–100 animais | infecção ou parasito antes e depois do tratamento; cura de mastite | média |
 
 ### Contagens com exposição e superdispersão
@@ -90,10 +99,10 @@ busca e conferência), **difícil** (estrutura rara fora da área de origem).
 
 | Conjunto (origem) | O que ensina | O substituto precisa ter | Ideias de busca | Dificuldade |
 |---|---|---|---|---|
-| `cars` (datasets) | modelo quadrático | 40–100 pares com relação curva | talvez dispensável: o cangulo (peso × comprimento) já mostra curvatura | fácil |
+| ~~`cars`~~ (datasets) — **saiu do acervo, sem busca** | modelo quadrático | 40–100 pares com relação curva | talvez dispensável: o cangulo (peso × comprimento) já mostra curvatura | fácil |
 | `wtloss` (MASS) | curva exponencial | uma série de 30–60 medidas ao longo do tempo, com decaimento | perda de umidade na secagem ou salga de pescado (engenharia de alimentos); perda de peso no jejum | fácil |
 | `Orange` (datasets) | curva logística, dados longitudinais | 4–8 indivíduos ou unidades, cada um medido 6–10 vezes | crescimento de peixes marcados ou de lotes em tanques ao longo de semanas; curvas de crescimento de aves ou suínos | média |
-| `Puromycin` (datasets) | saturação, Michaelis-Menten | taxa em 6–10 concentrações, em duas condições | atividade de enzimas digestivas por concentração de substrato; absorção de nutrientes | média |
+| ~~`Puromycin`~~ (datasets) — **saiu do acervo, sem busca** | saturação, Michaelis-Menten | taxa em 6–10 concentrações, em duas condições | atividade de enzimas digestivas por concentração de substrato; absorção de nutrientes | média |
 
 ### Mapas e séries
 
@@ -102,21 +111,30 @@ busca e conferência), **difícil** (estrutura rara fora da área de origem).
 | `quakes` (datasets) | mapa de pontos e bolhas | 100–1.000 pontos com latitude, longitude e uma ou duas medidas | estações de coleta ou lances de pesca com captura; registros de ocorrência (GBIF, com CC0 ou CC BY) | média |
 | `rec` (astsa) | série mensal, decomposição, ACF | 10–30 anos de dados mensais | desembarques mensais (NOAA, domínio público); temperatura da água mensal | média |
 
-### Já são de pesca, mas vêm do FSAdata (GPL)
+### Já são de pesca e vêm do FSAdata: lidos na hora, sem busca
 
-Estes trazem o contexto certo, então o substituto precisa só de licença aberta
-com a mesma estrutura.
+**Decisão de 11/10/2026** (`docs/EMENDA_DADOS_DE_PACOTES.md`): o `FSAdata` é a
+única fonte de fora. A ClaRa guarda só a receita da tradução (MIT) e lê o dado
+do pacote na hora em que o aluno pede, sob a licença de lá, sem cópia
+redistribuída. Por isso estes oito **não têm substituto a buscar**; as colunas
+"O substituto precisaria ter" valem só se um dia a ClaRa deixar de depender do
+`FSAdata`.
 
-| Conjunto | O que ensina | O substituto precisa ter | Dificuldade |
+| Original | Nome na ClaRa | O que ensina | O substituto precisaria ter |
 |---|---|---|---|
-| `WhiteGrunt2` | tamanho da amostra para a média (piloto) | comprimentos de uma amostra-piloto de uma espécie | fácil |
-| `Cabezon` | tamanho da amostra para uma proporção | maturidade ou sexo (sim/não) numa amostra-piloto | fácil |
-| `RuffeSLRH92` | ficha de coleta, fator ordenado | registros individuais com estágio de maturidade ordenado | média |
-| `BGHRsample` + `BGHRfish` | amostragem por conglomerados, junção de tabelas | tabela de amostras (esforço) e tabela de peixes ligadas por um código | difícil |
-| `darter_ontario` (`DarterOnt`) | Mann-Whitney por rio | uma medida em dois ou três locais, 15–30 por local | fácil |
-| `idades_savel_repetibilidade` (`ShadCR`) | Wilcoxon pareado, concordância entre leitores | a mesma estrutura lida duas vezes (otólitos, escamas), 40–100 peixes | média |
-| `snapper_hg` (`SnapperHG1`) | von Bertalanffy, idade e comprimento | idade e comprimento individuais, 200–1.000 peixes | média |
-| `walleye_erie` (`WalleyeErie2`) | amostragem simples e estratificada | dados individuais com estrato (local, ano); hoje tem 33.734 linhas e teria de ser recortado de qualquer forma | média |
+| `WhiteGrunt2` | `haemulon_crescimento` | tamanho da amostra para a média (piloto) | comprimentos de uma amostra-piloto de uma espécie |
+| `Cabezon` | `cabezon_maturidade` | tamanho da amostra para uma proporção | maturidade ou sexo (sim/não) numa amostra-piloto |
+| `RuffeSLRH92` | `ruffe_biometria` | ficha de coleta, fator ordenado | registros individuais com estágio de maturidade ordenado |
+| `BGHRsample` + `BGHRfish` | `bighill_amostras` + `bighill_peixes` | amostragem por conglomerados, junção de tabelas | tabela de amostras (esforço) e tabela de peixes ligadas por um código (a mais rara de achar) |
+| `DarterOnt` | `darter_ontario` | Mann-Whitney por rio | uma medida em dois ou três locais, 15–30 por local |
+| `ShadCR` | `idades_savel_repetibilidade` | Wilcoxon pareado, concordância entre leitores | a mesma estrutura lida duas vezes (otólitos, escamas), 40–100 peixes |
+| `SnapperHG1` | `snapper_hg` | von Bertalanffy, idade e comprimento | idade e comprimento individuais, 200–1.000 peixes |
+
+**`WalleyeErie2` (`walleye_erie`) fica fora desta decisão.** Não está entre os
+oito da emenda. O professor autorizou mantê-lo completo, e a documentação do
+`FSAdata` registra que a fonte é o Ohio DNR, com uso não educacional sujeito a
+permissão. Há um candidato a substituto em avaliação (Cowichan, Dryad, CC0), em
+`ClaRa/data-raw/propostas_nao_integradas/cowichan_amostragem/AVALIACAO.md`.
 
 ### Outros pacotes GPL
 
@@ -144,12 +162,13 @@ Achar substitutos abertos para eles também ajudaria.
 
 ## 3. Os difíceis
 
-Por enquanto, os candidatos a buscar em outras áreas, ou a ficar sob a
-GPL-3, são estes:
+**Nenhum difícil pendente** (atualização de 12/10/2026). Os três que estavam
+aqui foram resolvidos sem busca:
 
-- `npk`: fatorial 2³ em blocos;
-- `oats`: parcelas subdivididas;
-- `BGHRsample` + `BGHRfish`: conglomerados com duas tabelas ligadas.
+- `npk` (fatorial 2³ em blocos) e `oats` (parcelas subdivididas) saíram do
+  acervo, porque a estrutura é rara fora da agronomia;
+- `BGHRsample` + `BGHRfish` (conglomerados com duas tabelas ligadas) são lidos
+  na hora do `FSAdata`, sem cópia.
 
 A lista cresce conforme a busca não achar substituto para os de dificuldade
 média.
