@@ -23,6 +23,7 @@
 > | `crabs` (MASS) | opcional; até lá, lido do MASS na hora |
 > | `quine` (MASS) | **já substituído** por `molinesias_parasitos` (D50, Dryad, CC0) |
 > | origem incerta (seção 2) | resolver na passada 2 |
+> | `cabritos_acidos_graxos` (licença não localizada) | ácidos graxos de peixes sob dietas (busca 03) |
 >
 > As tabelas abaixo ficam como guia da estrutura de cada substituto.
 
