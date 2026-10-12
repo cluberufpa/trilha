@@ -72,9 +72,13 @@ conjuntos do pacote não são oferecidos.
 | `laranjeiras_crescimento` | `datasets::Orange` | crescimento de lotes ou peixes marcados ao longo do tempo |
 | `plantas_absorcao_co2` | `datasets::CO2` | respirometria: o mesmo peixe em várias temperaturas |
 | `bacterias_tratamento` | `MASS::bacteria` | infecção antes e depois do tratamento, no mesmo animal |
-| `escolares_ausencias` | `MASS::quine` | substituto já em preparo pelo professor |
 | `doubs_ambiente` | `ade4::doubs` | estações de rio com variáveis de qualidade da água |
 | `peixes_recrutamento` | `astsa::rec` | série mensal de 10 a 30 anos |
+
+**Já substituído:** `escolares_ausencias` (`MASS::quine`) saiu da ClaRa em
+11/10/2026. O código D50 passou a ser `molinesias_parasitos` (molinésias e
+carga de parasitos; Sheehy e colaboradores, Dryad, CC0), publicado na `main`
+da ClaRa.
 
 Até o substituto chegar, esses ficam como estão; nenhum ganha leitura na hora,
 porque `datasets`, `ade4` e `astsa` não serão fontes.

@@ -21,7 +21,7 @@
 > | `doubs` (ade4) | estações de rio com variáveis de qualidade da água |
 > | `rec` (astsa) | série mensal de 10 a 30 anos |
 > | `crabs` (MASS) | opcional; até lá, lido do MASS na hora |
-> | `quine` (MASS) | substituto já em preparo pelo professor |
+> | `quine` (MASS) | **já substituído** por `molinesias_parasitos` (D50, Dryad, CC0) |
 > | origem incerta (seção 2) | resolver na passada 2 |
 >
 > As tabelas abaixo ficam como guia da estrutura de cada substituto.
