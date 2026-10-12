@@ -32,8 +32,8 @@ registro ficam, e o aluno continua recebendo o mesmo objeto em português.
 
 Ele segue os mesmos passos abaixo, com `MASS` em `Suggests`, `fonte_dados =
 "MASS"` e `skip_if_not_installed("MASS")`. Como veio pelo EAPADados, também
-pede a conferência do passo 2. Na Trilha, ele aparece na mesma lista dos oito
-do FSAdata.
+pede a conferência do passo 2. Na Trilha, ele aparece em "Outros pacotes",
+junto com os oito do FSAdata, como `crabs_morfometria (MASS)`.
 
 ## Como fazer
 
