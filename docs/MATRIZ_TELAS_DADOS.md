@@ -7,7 +7,7 @@ Gerada em 12/10/2026 a partir do campo `analises`, `analise_principal` e `palavr
 | Uma/duas proporções | 4 | lebistes_parasitos, lagostas_kelp_sexo, cowichan_amostragem, pollock_alasca |
 | Qui-quadrado de aderência | 1 | lebistes_parasitos |
 | Qui-quadrado de independência | 2 | lebistes_parasitos, lagostas_kelp_sexo |
-| McNemar | 1 | bufalos_estrongilos |
+| McNemar | 1 | cabras_toxoplasma |
 | Teste t | 3 | pinguins, artemia_fitoesterois, caranguejos_biometria |
 | ANOVA de um fator | 4 | bagre_racao_isoproteica, pinguins, artemia_fitoesterois, tilapia_microalgas |
 | ANOVA com subamostras | 1 | whitefish_salinidade |

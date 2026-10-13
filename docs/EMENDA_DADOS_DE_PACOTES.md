@@ -59,21 +59,34 @@ conjuntos do pacote não são oferecidos.
 | `carros_frenagem` | `datasets::cars` | o cangulo já mostra curvatura |
 | `puromicina_reacao` | `datasets::Puromycin` | fora do contexto; não será substituído |
 
-**Saem quando o substituto for aprovado** (busca do professor, ver
-`prompts_busca/SUBSTITUTOS_LITERATURA.md`):
+**Substituídos em 12/10/2026** (ClaRa 0.16.0, `main`; o código D se mantém, o
+objeto antigo saiu do pacote e a fonte ficou em `data-raw/substituidos/`):
 
-| Nome na ClaRa | Original | Substituto buscado |
+| Código | Saiu | Entrou | Licença |
+|---|---|---|---|
+| D12 | `bacterias_tratamento` (`MASS::bacteria`) | `cabras_toxoplasma` | CC BY 4.0 |
+| D18 | `cabritos_acidos_graxos` | `truta_acidos_graxos` | CC BY 4.0 |
+| D44 | `plantas_absorcao_co2` (`datasets::CO2`) | `percas_hipoxia` | CC0 |
+| D47 | `terremotos_fiji` (`datasets::quakes`) | `pollock_alasca` | CC0 |
+| D48 | `laranjeiras_crescimento` (`datasets::Orange`) | `molinesias_crescimento` | CC BY 4.0 |
+| D52 | `paciente_peso` (`MASS::wtloss`) | `secagem_beterraba_gengibre` | CC BY 4.0 |
+
+Entraram também, sem trocar nada: D61 `anchova_norte_california` (série
+mensal, no lugar que seria do `astsa::rec`) e D62 `larvas_peixes_captura`
+(contagem com esforço, o conjunto que serviria a `ships` e `Insurance`).
+
+**Ainda no pacote, à espera de decisão do professor** (catálogo com 62
+conjuntos; com estas dez saídas ficariam 52):
+
+| Nome na ClaRa | Original | Situação |
 |---|---|---|
-| `insetos_inseticidas` | `datasets::InsectSprays` | parasitos por peixe, por tratamento |
-| `paciente_peso` | `MASS::wtloss` | perda de umidade na secagem ou salga do pescado |
-| `plantas_crescimento` | `datasets::PlantGrowth` | DIC em tanques (talvez dispensável: bagre e tilápia já cobrem) |
-| `navios_incidentes` e `seguros_sinistros` | `MASS::ships`, `MASS::Insurance` | um só conjunto de captura com esforço (offset) |
-| `terremotos_fiji` | `datasets::quakes` | lances de pesca ou estações de coleta com coordenadas |
-| `laranjeiras_crescimento` | `datasets::Orange` | crescimento de lotes ou peixes marcados ao longo do tempo |
-| `plantas_absorcao_co2` | `datasets::CO2` | respirometria: o mesmo peixe em várias temperaturas |
-| `bacterias_tratamento` | `MASS::bacteria` | infecção antes e depois do tratamento, no mesmo animal |
-| `doubs_ambiente` | `ade4::doubs` | estações de rio com variáveis de qualidade da água |
-| `peixes_recrutamento` | `astsa::rec` | série mensal de 10 a 30 anos |
+| `navios_incidentes` e `seguros_sinistros` | `MASS::ships`, `MASS::Insurance` | o substituto (D62, larvas) já está no pacote; falta decidir a retirada |
+| `peixes_recrutamento` | `astsa::rec` | o substituto (D61, anchova) já está no pacote; falta decidir a retirada |
+| `doubs_ambiente` | `ade4::doubs` | **substituído em 12/10/2026** por `lago_vitoria` (D04; Okechi et al. 2025, Dryad, CC0; 217 leituras × 25 colunas; gaiolas de tilápia e controle em 4 locais do Lago Vitória). Na ClaRa falta só decidir o commit; na Trilha, `papeis_sugeridos_pca` troca `riqueza`/`trecho` por `clorofila_a`/`estacao` |
+| `brine_carbonatos` (D17) | Davis (2002), livro | **substituído em 12/10/2026** por `solha_baltico_2008_t4` (D17; Dryad, CC0 1.0; 179 linhas de 2008, 4º trimestre; regressão de `log_cpue_g` com seis preditores tem R² = 0,646 e VIF máximo 4,21). O `camarao_ecogreen` provisório fica arquivado por ter só 7 perfis de água distintos. |
+| `camaroes_sexo` (D19) | tabela de livro sem referência | busca 10: dados individuais de estudo rigoroso |
+| `insetos_inseticidas`, `plantas_crescimento` | `datasets::InsectSprays`, `datasets::PlantGrowth` | provavelmente dispensáveis |
+| `puromicina_reacao`, `ervilhas_adubacao`, `carros_frenagem`, `aveia_parcelas` | `datasets::Puromycin`, `npk`, `cars`, `MASS::oats` | saem de vez, sem busca; ainda falta retirar do pacote |
 
 **Já substituído:** `escolares_ausencias` (`MASS::quine`) saiu da ClaRa em
 11/10/2026. O código D50 passou a ser `molinesias_parasitos` (molinésias e
