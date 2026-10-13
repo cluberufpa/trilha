@@ -20,6 +20,17 @@ stopifnot(
   inherits(.serie_autoplot(stats::acf(serie$ts, plot = FALSE)), "ggplot")
 )
 
+# O exemplo da tela é a série mensal completa de anchova do EAPADados.
+anchova <- .carrega_anchova_norte_california()
+serie_anchova <- .serie_preparar(anchova, "data", "desembarque_lb", "mensal")
+stopifnot(
+  nrow(anchova) == 252L,
+  identical(range(anchova$data), as.Date(c("1971-01-01", "1991-12-01"))),
+  identical(stats::frequency(serie_anchova$ts), 12L),
+  length(serie_anchova$ts) == 252L,
+  serie_anchova$ausentes_interpolados == 0L
+)
+
 # Cada opção do menu declara seu retrato exploratório e o limite da versão 1.
 html_visualizar <- htmltools::renderTags(mod_series_temporais_ui("serie_visualizar", "visualizar"))$html
 html_decompor <- htmltools::renderTags(mod_series_temporais_ui("serie_decompor", "decompor"))$html

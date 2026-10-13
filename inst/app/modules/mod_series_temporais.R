@@ -3,16 +3,16 @@
 # A ordem no tempo é parte do dado. Este módulo mostra a série, a média móvel,
 # a decomposição e a autocorrelação sem introduzir previsão na versão 1.
 
-# Carregue o exemplo de CPUE apenas quando o pacote de dados estiver disponível.
-.carrega_cpue_tubarao <- function() {
+# Carregue o exemplo mensal de anchova apenas quando o pacote de dados estiver disponível.
+.carrega_anchova_norte_california <- function() {
   if (!requireNamespace("EAPADados", quietly = TRUE)) return(NULL)
   ambiente <- new.env(parent = emptyenv())
   carregou <- tryCatch({
-    utils::data("cpue_tubarao", package = "EAPADados", envir = ambiente)
-    exists("cpue_tubarao", envir = ambiente, inherits = FALSE)
+    utils::data("anchova_norte_california", package = "EAPADados", envir = ambiente)
+    exists("anchova_norte_california", envir = ambiente, inherits = FALSE)
   }, error = function(e) FALSE)
   if (!carregou) return(NULL)
-  get("cpue_tubarao", envir = ambiente, inherits = FALSE)
+  get("anchova_norte_california", envir = ambiente, inherits = FALSE)
 }
 
 # Preencha lacunas temporárias por interpolação apenas para decompose() e acf().
@@ -152,7 +152,7 @@ mod_series_temporais_ui <- function(id, painel = c("visualizar", "decompor", "au
         tags$h5("Configuração da série"),
         radioButtons(
           ns("source"), "Fonte:",
-          choices = c("Exemplo: CPUE de tubarão" = "exemplo", "Meus dados" = "dados"),
+          choices = c("Exemplo: desembarques de anchova-do-norte" = "exemplo", "Meus dados" = "dados"),
           selected = "exemplo"
         ),
         selectInput(ns("date_col"), "Coluna de tempo:", choices = NULL),
@@ -184,7 +184,7 @@ mod_series_temporais_server <- function(id, data_rv, import_info) {
   moduleServer(id, function(input, output, session) {
     # Mantenha a escolha antiga entre exemplo didático e base importada.
     dados_ativos <- reactive({
-      if (identical(input$source, "exemplo")) .carrega_cpue_tubarao() else data_rv()
+      if (identical(input$source, "exemplo")) .carrega_anchova_norte_california() else data_rv()
     })
     # Atualize as colunas disponíveis ao trocar de fonte.
     observe({
