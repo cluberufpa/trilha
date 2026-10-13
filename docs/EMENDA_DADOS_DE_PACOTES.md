@@ -64,12 +64,12 @@ objeto antigo saiu do pacote e a fonte ficou em `data-raw/substituidos/`):
 
 | Código | Saiu | Entrou | Licença |
 |---|---|---|---|
-| D12 | `bacterias_tratamento` (`MASS::bacteria`) | `ovinos_caprinos_fmdv` | CC0 |
+| D12 | `bacterias_tratamento` (`MASS::bacteria`) | `garoupa_pcr_histologia` | CC BY 3.0 AU |
 | D18 | `cabritos_acidos_graxos` | `truta_acidos_graxos` | CC BY 4.0 |
 | D44 | `plantas_absorcao_co2` (`datasets::CO2`) | `percas_hipoxia` | CC0 |
 | D47 | `terremotos_fiji` (`datasets::quakes`) | `pollock_alasca` | CC0 |
 | D48 | `laranjeiras_crescimento` (`datasets::Orange`) | `molinesias_crescimento` | CC BY 4.0 |
-| D52 | `paciente_peso` (`MASS::wtloss`) | `secagem_beterraba_gengibre` | CC BY 4.0 |
+| D52 | `paciente_peso` (`MASS::wtloss`) | `secagem_bagre` (13/10/2026; antes, `secagem_beterraba_gengibre`, que saiu por ser de vegetais) | CC BY 4.0 |
 
 Entraram também, sem trocar nada: D61 `anchova_norte_california` (série
 mensal, no lugar que seria do `astsa::rec`) e D62 `larvas_peixes_captura`

@@ -6,12 +6,20 @@ O conjunto é bom, mas é de vegetais, e há muitos estudos de secagem de peixe
 (decisão do professor, 13/10/2026). Escrito em 13/10/2026; usa a mesma estrutura
 da busca 08. Cole o texto abaixo da linha numa IA com busca na web.
 
-> Já examinados em 13/10/2026 e **não indicados como estão**:
+> Decisão registrada em 13/10/2026: Ohijeagbon et al. (2018) foi selecionado
+> para uma primeira aula de curva não linear, com o recorte de **80 °C**. Ele
+> tem dez medidas de massa entre 0 e 540 min e licença CC BY 4.0. É uma
+> exceção consciente: há uma só curva, sem réplicas, portanto não serve para
+> comparar temperaturas. A fonte transcrita e as ressalvas estão em
+> `resultados/14_secagem_pescado/RESULTADO_BUSCA.md`.
+>
+> Já examinados em 13/10/2026 e não indicados para ampliar a seleção:
 > - Ohijeagbon et al. (2018), *Data in Brief* 18:641–647,
 >   [10.1016/j.dib.2018.03.072](https://doi.org/10.1016/j.dib.2018.03.072), CC BY 4.0:
 >   bagre-africano (*Clarias gariepinus*) em secador a gás, 80, 100 e 120 °C, a cada
->   60 min. Só 27 pontos, sem réplicas, e a umidade chega a 0,000 (a unidade da
->   tabela diz base seca, a equação do artigo diz base úmida). Serve de reserva.
+>   60 min. As curvas de 100 e 120 °C seguem fora do recorte por terem apenas
+>   9 e 8 pontos; a umidade chega a 0,000 (a unidade da tabela diz base seca,
+>   a equação do artigo diz base úmida).
 > - Castillo-Téllez et al., sardinha (Zenodo
 >   [10.5281/zenodo.21006853](https://doi.org/10.5281/zenodo.21006853), CC BY 4.0):
 >   1787 medições em 28 curvas, mas os arquivos estão sob embargo até 1/1/2027.
