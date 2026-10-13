@@ -64,7 +64,7 @@ objeto antigo saiu do pacote e a fonte ficou em `data-raw/substituidos/`):
 
 | Código | Saiu | Entrou | Licença |
 |---|---|---|---|
-| D12 | `bacterias_tratamento` (`MASS::bacteria`) | `cabras_toxoplasma` | CC BY 4.0 |
+| D12 | `bacterias_tratamento` (`MASS::bacteria`) | `ovinos_caprinos_fmdv` | CC0 |
 | D18 | `cabritos_acidos_graxos` | `truta_acidos_graxos` | CC BY 4.0 |
 | D44 | `plantas_absorcao_co2` (`datasets::CO2`) | `percas_hipoxia` | CC0 |
 | D47 | `terremotos_fiji` (`datasets::quakes`) | `pollock_alasca` | CC0 |
