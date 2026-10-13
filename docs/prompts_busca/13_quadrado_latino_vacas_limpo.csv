@@ -1,0 +1,18 @@
+quadrado,animal,periodo,oferta_forragem_codigo,suplemento_codigo,tratamento_dietetico,ph_ruminal_medio,nitrogenio_amonical_mmol_l_medio,agv_total_mmol_l_medio,n_horarios_ph,n_horarios_nitrogenio_amonical,n_horarios_agv,resposta_principal
+Q1,1844,1,2,2,forragem_2__suplemento_2,5.984762,9.944286,95.355103,7,7,7,pH ruminal médio
+Q1,1844,2,2,1,forragem_2__suplemento_1,5.564762,5.115714,117.101943,7,7,7,pH ruminal médio
+Q1,1844,3,1,1,forragem_1__suplemento_1,5.823810,6.670000,88.532149,7,7,7,pH ruminal médio
+Q1,1844,4,1,2,forragem_1__suplemento_2,5.742857,7.992857,100.053620,7,7,7,pH ruminal médio
+Q1,2231,1,1,1,forragem_1__suplemento_1,6.063810,9.274286,96.334827,7,7,7,pH ruminal médio
+Q1,2231,2,1,2,forragem_1__suplemento_2,5.200000,3.590000,92.669114,7,7,7,pH ruminal médio
+Q1,2231,3,2,2,forragem_2__suplemento_2,5.985238,10.427143,79.717246,7,7,7,pH ruminal médio
+Q1,2231,4,2,1,forragem_2__suplemento_1,5.603333,8.467143,99.348980,7,7,7,pH ruminal médio
+Q1,2243,1,2,1,forragem_2__suplemento_1,5.875238,9.832857,110.384596,7,7,7,pH ruminal médio
+Q1,2243,2,2,2,forragem_2__suplemento_2,5.267143,4.227143,108.584315,7,7,7,pH ruminal médio
+Q1,2243,3,1,2,forragem_1__suplemento_2,5.947619,14.024286,75.624976,7,7,7,pH ruminal médio
+Q1,2243,4,1,1,forragem_1__suplemento_1,5.643810,8.407143,89.566387,7,7,7,pH ruminal médio
+Q1,5182,1,1,2,forragem_1__suplemento_2,5.915714,10.158571,91.719148,7,7,7,pH ruminal médio
+Q1,5182,2,1,1,forragem_1__suplemento_1,5.521429,5.844286,87.136474,7,7,7,pH ruminal médio
+Q1,5182,3,2,1,forragem_2__suplemento_1,5.889524,6.272857,81.814213,7,7,7,pH ruminal médio
+Q1,5182,4,2,2,forragem_2__suplemento_2,5.833333,7.382857,80.954394,7,7,7,pH ruminal médio
+
