@@ -34,3 +34,4 @@ Gerada em 12/10/2026 a partir do campo `analises`, `analise_principal` e `palavr
 | Mapa coroplético | 1 | aquicultura_br |
 | Mapa de bolhas/pontos | 1 | pollock_alasca |
 | Delineamentos (DIC/DBC/DQL/split-plot) | 7 | enobieta_baci, gammarus_dieta_temperatura_resumo, qfasa_predadores, qfasa_presas, whitefish_salinidade, mesocosmos_secagem |
+| Quadrado latino (ANOVA com dois blocos) | 1 | vacas_fistuladas |
