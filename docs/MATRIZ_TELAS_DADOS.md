@@ -7,7 +7,7 @@ Gerada em 12/10/2026 a partir do campo `analises`, `analise_principal` e `palavr
 | Uma/duas proporções | 4 | lebistes_parasitos, lagostas_kelp_sexo, cowichan_amostragem, pollock_alasca |
 | Qui-quadrado de aderência | 1 | lebistes_parasitos |
 | Qui-quadrado de independência | 2 | lebistes_parasitos, lagostas_kelp_sexo |
-| McNemar | 1 | ovinos_caprinos_fmdv |
+| McNemar | 1 | garoupa_pcr_histologia |
 | Teste t | 3 | pinguins, artemia_fitoesterois, caranguejos_biometria |
 | ANOVA de um fator | 4 | bagre_racao_isoproteica, pinguins, artemia_fitoesterois, tilapia_microalgas |
 | ANOVA com subamostras | 1 | whitefish_salinidade |
@@ -26,12 +26,12 @@ Gerada em 12/10/2026 a partir do campo `analises`, `analise_principal` e `palavr
 | Poisson / binomial negativa | 2 | molinesias_parasitos, larvas_peixes_captura |
 | Potência / peso-comprimento | 4 | peixes_neotropicais_biometria, cangulo_crescimento, ruffe_biometria, bighill_peixes |
 | Von Bertalanffy / crescimento | 8 | cangulo_crescimento, snapper_hg, truta_riacho_crescimento, mesocosmos_secagem, molinesias_crescimento, haemulon_crescimento |
-| Polinomial/logarítmica/exponencial | 2 | cangulo_crescimento, secagem_beterraba_gengibre |
+| Polinomial/logarítmica/exponencial | 1 | cangulo_crescimento (D52 vago: busca 14, secagem de pescado) |
 | Séries temporais | 2 | cpue_tubarao, anchova_norte_california |
 | PCA | 11 | morfometria_barbo, lago_vitoria, pinguins, truta_acidos_graxos, crabs_morfometria, peixes_morfometria_multivariada |
 | Agrupamentos (HCA/k-means) | 7 | morfometria_barbo, lago_vitoria, truta_acidos_graxos, peixes_morfometria_multivariada, peixes_nutricao_portugal, qfasa_predadores |
 | PERMANOVA | 2 | pinguins, peixes_morfometria_multivariada |
 | Mapa coroplético | 1 | aquicultura_br |
 | Mapa de bolhas/pontos | 1 | pollock_alasca |
-| Delineamentos (DIC/DBC/DQL/split-plot) | 7 | enobieta_baci, gammarus_dieta_temperatura_resumo, qfasa_predadores, qfasa_presas, whitefish_salinidade, mesocosmos_secagem |
-| Quadrado latino (ANOVA com dois blocos) | 1 | vacas_fistuladas |
+| Delineamentos (DIC/DBC/DQL/split-plot) | 7 | enobieta_baci, gammarus_dieta_temperatura_resumo, qfasa_predadores, qfasa_presas, whitefish_salinidade, mesocosmos_secagem, esgana_gata_ruido |
+| Quadrado latino (ANOVA com dois blocos) | 1 | esgana_gata_ruido |
