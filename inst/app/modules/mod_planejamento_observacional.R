@@ -864,16 +864,6 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
                     placeholder = "O que você deseja responder com este estudo?",
                     width = "100%"
                   ),
-                  shiny::radioButtons(
-                    ns("tipo_impacto"), "Qual a pergunta de impacto?",
-                    choices = c(
-                      "Controle–Impacto (CI): comparar sítios depois da mudança" = "ci",
-                      "Antes–Depois (BA): comparar o mesmo sítio antes e depois" = "ba",
-                      "BACI: antes–depois com sítios de referência" = "baci"
-                    ),
-                    selected = "baci",
-                    inline = FALSE
-                  ),
                   shiny::selectInput(ns("impacto_escala"), "Alcance do estudo:",
                     c("Um empreendimento / sistema específico", "Vários empreendimentos / sistemas"), width = "100%")
                 )
@@ -995,7 +985,7 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
                   # No BA (antes–depois) o próprio sítio é o seu controle, então
                   # a condição dos sítios não se aplica: escondemos o campo.
                   shiny::conditionalPanel(
-                    condition = sprintf("input['%s'] !== 'ba'", ns("tipo_impacto")),
+                    condition = variante_condicao_js(ns, "tipo_impacto", variantes_impacto(), "condicao"),
                     shiny::textInput(
                       ns("fator_nome"), "Nome da coluna da condição do sítio:",
                       value = "situacao",
@@ -1013,7 +1003,7 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
                     ns("n_uas"), "Sítios de impacto previstos:",
                     value = 3, min = 1, step = 1, width = "100%"
                   ),
-                  shiny::conditionalPanel(condition = sprintf("input['%s'] !== 'ba'", ns("tipo_impacto")),
+                  shiny::conditionalPanel(condition = variante_condicao_js(ns, "tipo_impacto", variantes_impacto(), "referencia"),
                     shiny::numericInput(ns("n_referencia"), "Sítios de referência previstos:", 3, min = 1, step = 1)),
                   shiny::p(class = "small text-muted", "Sítios são locais de coleta. Sua independência e o nível de generalização precisam ser justificados; vários pontos no mesmo canal não são vários canais."),
                   shiny::textInput(ns("coluna_unidade"), "Nome da coluna do sítio:", "sitio"),
@@ -1124,7 +1114,15 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
     ),
     bslib::navset_card_tab(
       id = ns("etapas"),
-      
+
+      # ABA "TIPO" (só no impacto): a variante escolhida (CI, BA ou BACI)
+      # decide campos, análises previstas e ficha (registro_variantes.R).
+      if (identical(tipo_resolvido, "impacto")) bslib::nav_panel("Tipo", icon = shiny::icon("code-branch"),
+        bslib::card_body(fillable = FALSE,
+          shiny::tags$style(shiny::HTML(variante_css())),
+          variante_seletor_ui(ns, "tipo_impacto", "Delineamento observacional · Impacto",
+            variantes_impacto(), selecionada = "baci"))),
+
       # ABA 1: O DELINEAMENTO E VARIÁVEIS DE RESPOSTA (3 COLUNAS)
       bslib::nav_panel("Definições", icon = shiny::icon("compass-drafting"),
         if (tipo_resolvido == "gradiente") bslib::navset_tab(id = ns("definicoes_gradiente"),
@@ -1177,7 +1175,7 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
                   shiny::h5(shiny::icon("calendar-days"), " 5. Campanhas e calendário"),
                   shiny::p(class = "small text-muted", "Cada sítio mantém o identificador nas campanhas. No CI há apenas campanhas depois; BA e BACI incluem antes e depois. No BACI, a referência acompanha o mesmo calendário."),
                   shiny::dateInput(ns("impacto_inicio"), "Início previsto do impacto:", "2028-01-01", width = "100%"),
-                  shiny::conditionalPanel(condition = sprintf("input['%s'] !== 'ci'", ns("tipo_impacto")),
+                  shiny::conditionalPanel(condition = variante_condicao_js(ns, "tipo_impacto", variantes_impacto(), "antes"),
                     bslib::layout_columns(col_widths = c(5, 7), gap = "10px",
                       shiny::numericInput(ns("impacto_antes"), "Campanhas antes:", 6, min = 1, step = 1, width = "100%"),
                       shiny::dateInput(ns("impacto_primeira_antes"), "Primeira campanha antes:", "2027-01-15", width = "100%"))),
@@ -1423,9 +1421,14 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
 
     # O tipo de pergunta de impacto (CI, BA ou BACI) só existe neste módulo;
     # fora dele vale o BACI, que é o desenho mais completo.
+    # A variante vem do dropdown de topo (registro_variantes.R), que também
+    # monta o esquema e as caixas das análises previstas.
+    seletor_impacto <- if (identical(tipo_resolvido, "impacto")) {
+      variante_seletor_server(input, output, ns, variantes_impacto(), "tipo_impacto", "baci")
+    }
     tipo_impacto <- shiny::reactive({
       if (!identical(tipo_resolvido, "impacto")) return("baci")
-      ou_vazio(input$tipo_impacto, "baci")
+      seletor_impacto$escolhida()
     })
     # BA e BACI repetem cada sítio nos momentos; o CI (só depois) não tem eixo de tempo.
     impacto_com_momentos <- shiny::reactive({
@@ -2759,7 +2762,11 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
           ),
           n_planejado = NULL,
           sorteio = NULL,
-          analise_sugerida = NULL
+          # A variante (CI, BA ou BACI) e as análises marcadas no dropdown de
+          # topo; a sugerida é a primeira marcada.
+          analise_sugerida = if (length(seletor_impacto$previstas())) seletor_impacto$previstas()[1] else NULL,
+          variante = tipo_impacto(),
+          analises_previstas = seletor_impacto$previstas()
         )))
       }
 

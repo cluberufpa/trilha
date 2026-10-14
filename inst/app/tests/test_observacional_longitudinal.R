@@ -6,6 +6,7 @@ library(shiny)
 if (!exists("%||%")) `%||%` <- function(a, b) if (is.null(a) || !length(a)) b else a
 source(file.path("modules", "ficha_planejamento.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_planejamento_variaveis.R"), encoding = "UTF-8")
+source(file.path("modules", "registro_variantes.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_planejamento_observacional.R"), encoding = "UTF-8")
 
 # 1. Longitudinal: a ficha grava eixos$tempo com os momentos, a unidade dada e

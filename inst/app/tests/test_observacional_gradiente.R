@@ -6,6 +6,7 @@ library(shiny)
 if (!exists("%||%")) `%||%` <- function(a, b) if (is.null(a) || !length(a)) b else a
 source(file.path("modules", "ficha_planejamento.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_planejamento_variaveis.R"), encoding = "UTF-8")
+source(file.path("modules", "registro_variantes.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_planejamento_observacional.R"), encoding = "UTF-8")
 
 # 1. Modo gerado: distancia_fonte em m, 8 estações de 50 a 400, pool 3.

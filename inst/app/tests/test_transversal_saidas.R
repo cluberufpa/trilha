@@ -3,6 +3,7 @@ library(shiny)
 if (!exists("%||%")) `%||%` <- function(a, b) if (is.null(a) || !length(a)) b else a
 source("modules/ficha_planejamento.R", encoding = "UTF-8")
 source("modules/mod_planejamento_variaveis.R", encoding = "UTF-8")
+source("modules/registro_variantes.R", encoding = "UTF-8")
 source("modules/mod_planejamento_observacional.R", encoding = "UTF-8")
 
 destino <- Sys.getenv("TRANSVERSAL_PREVIA", unset = tempfile("transversal_"))

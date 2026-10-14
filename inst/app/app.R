@@ -64,6 +64,7 @@ source("modules/mod_experimental_design.R", encoding = "UTF-8")
 source("modules/mod_planejamento_variaveis.R", encoding = "UTF-8")
 # Este R local falha ao converter alguns arquivos UTF-8 quando o argumento
 # encoding é forçado. A limpeza global de codificação permanece separada.
+source("modules/registro_variantes.R", encoding = "UTF-8")
 source("modules/mod_planejamento_observacional.R")
 source("modules/mod_n_poder.R", encoding = "UTF-8")
 source("modules/mod_monitoramento.R", encoding = "UTF-8")

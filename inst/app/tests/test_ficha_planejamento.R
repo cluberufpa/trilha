@@ -190,4 +190,18 @@ testServer(mod_n_correlacao_server, args = list(ficha_destino_rv = compartilhada
             identical(compartilhada()$n_planejado$valor, res_r$n))
 })
 
+# Variante e análises previstas: a tela de análise diz se a análise estava prevista.
+prevista <- ficha_mesclar(NULL, list(tipo = "impacto", variante = "ba",
+  analises_previstas = c("teste_t_pareado", "wilcoxon_pareado"), analise_sugerida = "teste_t_pareado"))
+stopifnot(
+  isTRUE(ficha_analise_prevista(prevista, "wilcoxon_pareado")),
+  isFALSE(ficha_analise_prevista(prevista, "anova_um_fator")),
+  is.na(ficha_analise_prevista(ficha_mesclar(NULL, list(analise_sugerida = "anova_um_fator")), "anova_um_fator")),
+  grepl("não prevista", as.character(ficha_aviso_analise_ui(prevista, "anova_um_fator")), fixed = TRUE),
+  grepl("Análise prevista", as.character(ficha_aviso_analise_ui(prevista, "wilcoxon_pareado")), fixed = TRUE),
+  !grepl("prevista na ficha", as.character(ficha_aviso_analise_ui(
+    ficha_mesclar(NULL, list(analise_sugerida = "anova_um_fator")), "anova_um_fator")), fixed = TRUE),
+  identical(ficha_rotulo_analise("teste_t_pareado"), "teste t pareado")
+)
+
 cat("OK: ficha de planejamento — objeto único, partes, planilha e projeto\n")

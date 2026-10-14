@@ -3,13 +3,17 @@
 # Projeto R e as telas de análise leem a mesma lista. O que não se sabe fica
 # NULL: a ficha nunca inventa um valor.
 
-# Os dez campos do contrato, nesta ordem.
+# Os doze campos do contrato, nesta ordem. `variante` (sub-delineamento escolhido
+# no módulo) e `analises_previstas` (as análises que o pesquisador marcou antes
+# da coleta) entraram em 14/10/2026; `analise_sugerida` segue sendo a primeira
+# das previstas, para quem já a lê.
 ficha_campos <- c(
   "origem", "tipo", "pergunta", "resposta_coluna", "eixos", "unidade_coluna",
-  "hierarquia", "n_planejado", "sorteio", "analise_sugerida"
+  "hierarquia", "n_planejado", "sorteio", "analise_sugerida",
+  "variante", "analises_previstas"
 )
 
-# Ficha vazia: os dez campos existem e todos começam como NULL.
+# Ficha vazia: os campos existem e todos começam como NULL.
 ficha_nova <- function() {
   ficha <- vector("list", length(ficha_campos))
   names(ficha) <- ficha_campos
@@ -96,10 +100,26 @@ ficha_rotulo_analise <- function(analise) {
     anova_um_fator = "ANOVA de um fator",
     anova_mista_subamostras = "ANOVA com subamostras (modelo misto)",
     regressao_linear_simples = "regressão linear simples",
-    series_temporais = "análise de séries temporais (menu Modelos de Regressão)"
+    series_temporais = "análise de séries temporais (menu Modelos de Regressão)",
+    teste_t_independente = "teste t de duas amostras",
+    mann_whitney = "Mann-Whitney",
+    teste_t_pareado = "teste t pareado",
+    wilcoxon_pareado = "Wilcoxon pareado",
+    anova_dois_fatores = "ANOVA de dois fatores com interação",
+    t_diferenca_baci = "teste t da diferença (depois − antes) entre impacto e referência",
+    modelo_misto_sitio = "modelo misto, com o sítio como efeito aleatório"
   )
   if (is.null(analise) || !nzchar(analise)) return("não definida")
   if (analise %in% names(rotulos)) unname(rotulos[analise]) else analise
+}
+
+# A análise desta tela está entre as previstas na ficha? TRUE ou FALSE; NA
+# quando a ficha não declarou análises previstas (fichas antigas ou de módulos
+# que ainda não têm variantes).
+ficha_analise_prevista <- function(ficha, analise_id) {
+  previstas <- ficha$analises_previstas
+  if (is.null(previstas)) return(NA)
+  analise_id %in% previstas
 }
 
 # Tabela campo | valor, para a aba da planilha e para leitura humana no projeto.
@@ -146,12 +166,17 @@ ficha_aviso_analise_ui <- function(ficha, analise_id) {
       "Nenhuma ficha de planejamento com análise sugerida. Escolha as colunas abaixo."))
   }
   coincide <- identical(sugerida, analise_id)
+  prevista <- ficha_analise_prevista(ficha, analise_id)
   shiny::div(
-    class = if (coincide) "alert alert-success py-2 small" else "alert alert-warning py-2 small",
+    class = if (coincide || isTRUE(prevista)) "alert alert-success py-2 small" else "alert alert-warning py-2 small",
     shiny::icon("link"), " ", shiny::tags$b("Sugestão do planejamento: "), ficha_rotulo_analise(sugerida),
     " (", ficha$origem %||% "planejamento", "). ",
     if (coincide) "As colunas previstas na ficha foram pré-selecionadas; confira se ainda correspondem à planilha importada."
-    else "Esta tela faz outra análise; confira se ela responde à pergunta planejada."
+    else "Esta tela faz outra análise; confira se ela responde à pergunta planejada.",
+    if (isTRUE(prevista)) shiny::tags$b(" Análise prevista na ficha."),
+    if (isFALSE(prevista)) shiny::tagList(
+      shiny::tags$b(" Análise não prevista na ficha."),
+      " Se ela for exploratória, diga isso no relatório.")
   )
 }
 

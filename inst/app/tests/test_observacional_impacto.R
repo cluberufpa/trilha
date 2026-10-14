@@ -5,6 +5,7 @@ library(shiny)
 if (!exists("%||%")) `%||%` <- function(a, b) if (is.null(a) || !length(a)) b else a
 source(file.path("modules", "ficha_planejamento.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_planejamento_variaveis.R"), encoding = "UTF-8")
+source(file.path("modules", "registro_variantes.R"), encoding = "UTF-8")
 source(file.path("modules", "mod_planejamento_observacional.R"), encoding = "UTF-8")
 
 # 1. BACI: dois períodos, campanhas identificadas e revisitas dos mesmos sítios.
@@ -35,8 +36,28 @@ testServer(mod_planejamento_observacional_server,
     identical(f$hierarquia$subamostra_coluna, "subamostra"),
     f$hierarquia$subamostras_por_sitio == 2L,
     isTRUE(f$hierarquia$repeticao_temporal),
-    is.null(f$analise_sugerida)
+    # Variante e análises previstas: sem mexer nas caixas, valem as principais.
+    identical(f$variante, "baci"),
+    identical(f$analises_previstas, "anova_dois_fatores"),
+    identical(f$analise_sugerida, "anova_dois_fatores")
   )
+  # O pesquisador marca mais uma análise: a sugerida continua sendo a primeira.
+  session$setInputs(analises_previstas = c("anova_dois_fatores", "modelo_misto_sitio"))
+  f2 <- ficha()
+  stopifnot(identical(f2$analises_previstas, c("anova_dois_fatores", "modelo_misto_sitio")),
+            identical(f2$analise_sugerida, "anova_dois_fatores"))
+  # Trocar a variante devolve as caixas às análises principais da nova variante.
+  session$setInputs(tipo_impacto = "ba")
+  f3 <- ficha()
+  stopifnot(identical(f3$variante, "ba"), identical(f3$analises_previstas, "teste_t_pareado"),
+            identical(f3$analise_sugerida, "teste_t_pareado"))
+  # Desmarcar tudo é uma decisão: nada previsto, nada sugerido.
+  session$setInputs(analises_previstas = character(0))
+  f4 <- ficha()
+  stopifnot(length(f4$analises_previstas) == 0L, is.null(f4$analise_sugerida))
+  # Volta ao BACI padrão para o resto do teste.
+  session$setInputs(tipo_impacto = "baci")
+  stopifnot(identical(ficha()$analises_previstas, "anova_dois_fatores"))
   campanhas <- campanhas_impacto()
   stopifnot(
     identical(campanhas$periodo, c("Antes", "Antes", "Depois", "Depois")),
