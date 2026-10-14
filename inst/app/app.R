@@ -247,39 +247,9 @@ ui <- page_navbar(
   id = "main_navbar",
   window_title = "Trilha",
   title = div(
-    style = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 7px !important; padding: 2px 6px !important; width: 100% !important; height: 100% !important;",
-    tags$a(
-      href = "https://www.r-project.org/",
-      target = "_blank",
-      style = "display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;",
-      tags$img(src = "r_logo.png", height = "52px", style = "opacity: 0.95;")
-    ),
-    tags$a(
-      href = "https://shiny.posit.co/",
-      target = "_blank",
-      style = "display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;",
-      tags$img(src = "shiny_logo.png", height = "59px", style = "opacity: 0.95;")
-    ),
-    tags$a(
-      id = "sobre-custom-btn",
-      href = "#",
-      title = "Sobre a Trilha",
-      `aria-label` = "Abrir Sobre a Trilha",
-      onclick = "var el = document.querySelector(\"a[data-value='Sobre']\"); if(el) el.click(); return false;",
-      style = "display: flex; flex-direction: column; align-items: center; justify-content: center; width: 56px; min-width: 56px; height: 76px; text-decoration: none; color: #1d4ed8 !important; padding: 3px; transition: all 0.2s ease; cursor: pointer;",
-      tags$i(class = "fas fa-university", style = "font-size: 1.7rem; color: #1d4ed8; margin-bottom: 3px;"),
-      span("Sobre", style = "font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.72rem; line-height: 1;")
-    ),
-    tags$a(
-      id = "ajuda-custom-btn",
-      href = "#",
-      title = "Ajuda de uso",
-      `aria-label` = "Abrir Ajuda de uso",
-      onclick = "var el = document.querySelector(\"a[data-value='Ajuda']\"); if(el) el.click(); return false;",
-      style = "display: flex; flex-direction: column; align-items: center; justify-content: center; width: 56px; min-width: 56px; height: 76px; text-decoration: none; color: #3b82f6 !important; padding: 3px; transition: all 0.2s ease; cursor: pointer;",
-      tags$i(class = "fas fa-circle-question", style = "font-size: 1.7rem; color: #3b82f6; margin-bottom: 3px;"),
-      span("Ajuda", style = "font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.72rem; line-height: 1;")
-    )
+    class = "trilha-marca",
+    tags$img(src = "logo_trilha_transparente.png", alt = "Trilha", class = "trilha-marca-logo"),
+    span("Da pergunta ao relatório", class = "trilha-marca-slogan")
   ),
   theme = bs_theme(
     version = 5,
@@ -287,294 +257,28 @@ ui <- page_navbar(
     primary = "#0d6efd",
     secondary = "#6c757d"
   ),
-  header = tags$head(
+  header = tagList(
+    div(
+      class = "trilha-toolbar",
+      tags$button(
+        id = "trilha-toggle-sidebar", type = "button", class = "trilha-toggle",
+        `aria-controls` = "main_navbar", `aria-expanded` = "true",
+        `aria-label` = "Recolher barra lateral", icon("bars")
+      ),
+      tags$nav(
+        id = "trilha-caminho", `aria-label` = "Caminho de navegação",
+        `aria-live` = "polite"
+      )
+    ),
+    tags$head(
+    tags$link(rel = "stylesheet", href = "layout-sidebar.css"),
+    tags$script(src = "layout-sidebar.js", defer = NA),
     tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"),
     tags$style(HTML("
       body {
         font-family: 'Inter', sans-serif !important;
         background-color: #f8f9fa;
       }
-      .navbar {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        padding-top: 0.2rem;
-        padding-bottom: 0.2rem;
-        position: sticky !important;
-        top: 0;
-        z-index: 1020;
-        background-color: #f8f9fa;
-      }
-      .navbar > .container-fluid {
-        display: grid !important;
-        grid-template-columns: 2.5fr 7fr 2.5fr !important;
-        gap: 1.5rem !important; /* Adicionado gap de 1.5rem para se alinhar perfeitamente com o corpo (layout_columns) */
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-        width: 100% !important;
-        align-items: center !important; /* Centraliza verticalmente as colunas no container pai */
-      }
-      .navbar-header {
-        grid-column: 3 !important; /* Posicionado na coluna da direita */
-        grid-row: 1 !important; /* Força na primeira linha do grid */
-        width: 100% !important; /* Estica para ocupar toda a terceira coluna do grid */
-        max-width: none !important;
-        margin-left: 0px !important; /* Sem margem para alinhamento horizontal perfeito */
-        height: auto !important;
-        display: flex !important; /* Altera para flexbox para controle de alinhamento robusto */
-        align-items: center !important; /* Centraliza verticalmente a marca/logos */
-        justify-content: center !important; /* Centraliza horizontalmente */
-        position: relative !important;
-        float: none !important;
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-      }
-      .navbar-header::before,
-      .navbar-header::after {
-        display: none !important;
-        content: none !important;
-      }
-      .navbar-brand {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
-        max-width: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        height: 90px !important; /* Ajustado para 90px de altura */
-        position: relative !important;
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        z-index: 1 !important;
-        float: none !important;
-      }
-      .navbar-brand::before {
-        content: '' !important;
-        position: absolute !important;
-        top: 0 !important; /* Alinha com o limite superior do pai */
-        bottom: 0 !important; /* Alinha com o limite inferior do pai */
-        left: 0 !important;
-        right: 0 !important;
-        background-color: rgba(224, 242, 254, 0.75) !important; /* Fundo azul celeste premium */
-        border: 2px solid rgba(13, 110, 253, 0.45) !important;
-        border-radius: 12px !important;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.05) !important;
-        z-index: -1 !important; /* Fica atrás do conteúdo */
-      }
-      .navbar-nav > li:has(.navbar-slogan-container) {
-        position: absolute !important;
-        top: -2px !important; /* Alinha com a borda externa superior do pai */
-        bottom: -2px !important; /* Alinha com a borda externa inferior do pai (altura dinâmica!) */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background-color: rgba(224, 242, 254, 0.75) !important; /* Fundo azul celeste premium */
-        border: 2px solid rgba(13, 110, 253, 0.45) !important;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.03), 0 2px 4px rgba(0,0,0,0.05);
-        z-index: 1000 !important;
-        padding: 0 !important;
-        transition: all 0.2s ease;
-        width: 35.71% !important; /* Corresponde a 2.5fr/7fr da largura do pai */
-        left: calc(-35.71% - 1.5rem) !important; /* Posicionado à esquerda no lugar do slogan (Coluna 1) */
-        right: auto !important;
-        border-radius: 12px !important;
-      }
-      .navbar-slogan-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 3px;
-        width: 100%;
-        min-width: 0;
-        padding: 2px 8px;
-        container-type: inline-size;
-      }
-      /* As margens transparentes do PNG ficam fora da área visível,
-         dando mais espaço à marca sem aumentar a altura do cabeçalho. */
-      .navbar-logo-area {
-        position: relative;
-        width: 100%;
-        height: 66px;
-        flex-shrink: 0;
-        overflow: hidden;
-      }
-      .navbar-logo-trilha {
-        display: block;
-        position: absolute;
-        top: -11px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: auto;
-        height: 84px;
-        max-width: 100%;
-        object-fit: contain;
-      }
-      .navbar-slogan-trilha {
-        color: #0F3B5F;
-        font-family: 'Inter', sans-serif;
-        font-size: clamp(7px, 3.6cqw, 14px);
-        font-weight: 700;
-        line-height: 1.2;
-        white-space: nowrap;
-        text-align: center;
-      }
-      .navbar-collapse {
-        grid-column: 2 !important;
-        grid-row: 1 !important; /* Força na primeira linha do grid */
-        display: flex !important;
-        justify-content: center !important;
-        align-items: center !important; /* MUDADO de stretch para center */
-        width: 100% !important;
-        position: relative !important; /* Contexto de posicionamento para o slogan */
-      }
-      
-      /* Estilo dos Menus Empilhados (Ícone no Topo, Texto Embaixo) */
-      .navbar-nav {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important; /* Evita quebra dos menus em múltiplas linhas */
-        align-items: center !important;
-        width: 100% !important;
-        height: 90px !important; /* Ajustado para 90px de altura */
-        justify-content: space-between !important;
-        gap: 2px !important;
-        border: 2px solid rgba(13, 110, 253, 0.45) !important;
-        padding: 4px 8px !important; /* Ajustado padding vertical */
-        border-radius: 12px !important;
-        background-color: rgba(228, 244, 230, 0.75) !important;
-        box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
-      }
-      .navbar-nav .nav-item {
-        flex: 1 1 0px !important;
-        text-align: center !important;
-      }
-      
-      .navbar-nav .nav-item .nav-link, 
-      .navbar-nav .nav-item .dropdown-toggle {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        font-size: 0.76rem !important; /* Aumentado para 0.76rem */
-        font-family: 'Outfit', sans-serif !important;
-        font-weight: 700 !important;
-        padding: 2px 2px !important; /* Padding vertical mínimo */
-        gap: 2px !important; /* Ajustado espaçamento entre ícone e texto */
-        line-height: 1.05 !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: none !important;
-        color: #495057 !important;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-      }
-      .navbar-nav .nav-item .nav-link:hover,
-      .navbar-nav .nav-item .dropdown-toggle:hover {
-        background-color: rgba(13, 110, 253, 0.05) !important;
-        color: #0d6efd !important;
-      }
-      .navbar-nav .nav-item.active .nav-link,
-      .navbar-nav .nav-item.show .dropdown-toggle,
-      .navbar-nav .nav-link.active {
-        background-color: rgba(13, 110, 253, 0.08) !important;
-        color: #0d6efd !important;
-      }
-      .navbar-nav .nav-item .nav-link i,
-      .navbar-nav .nav-item .dropdown-toggle i {
-        font-size: 1.45rem !important; /* Aumentado para 1.45rem */
-        margin-bottom: 1px !important; /* Margem mínima */
-        margin-right: 0px !important;
-      }
-      
-      /* Cores por classe: cada menu mantém sua cor quando a ordem muda. */
-      .exploracao-espaco h2, .exploracao-espaco h5 { color: #0F3B5F !important; }
-      .exploracao-espaco .exploracao-confirmar { background: #0F3B5F !important; border-color: #0F3B5F !important; color: white !important; }
-      .exploracao-espaco .exploracao-confirmar:hover { background: #2E7D8F !important; }
-      .exploracao-espaco > p { margin-bottom: .6rem !important; }
-      .exploracao-espaco .catalyser-base-selector-compact { margin: .5rem 0 .8rem !important; }
-      .exploracao-espaco { --bslib-spacer: 1rem; }
-      .exploracao-espaco .card-body { padding: 1.1rem; }
-      .exploracao-espaco .bslib-sidebar-layout { gap: 1rem; }
-      .exploracao-espaco .form-group { margin-bottom: .9rem; }
-      .exploracao-espaco pre { white-space: pre-wrap; line-height: 1.5; }
-      .exploracao-espaco input::placeholder { color: #7c8790; font-size: .9em; }
-      .exploracao-indicador { background: #f3f8f7; border-left: 3px solid #2E7D8F; border-radius: .5rem; padding: .8rem 1rem; margin-bottom: .6rem; }
-      .exploracao-indicador span { display: block; color: #61717d; font-size: .85rem; }
-      .exploracao-indicador strong { display: block; color: #0F3B5F; font-size: 1.5rem; }
-      .exploracao-saude { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: .5rem 0 1.2rem; }
-      .exploracao-saude .badge { padding: .5rem .7rem; font-weight: 500; white-space: normal; }
-      .descricao-conteudo .bslib-sidebar-layout { gap: 1rem; }
-      .descricao-conteudo .form-group { margin-bottom: .9rem; }
-      /* Importação: o status fica abaixo da configuração; a lista de
-         variáveis tem sua própria rolagem para liberar o gráfico abaixo. */
-      .importacao-lateral {
-        display: flex; flex-direction: column; gap: 16px; height: 100%;
-        min-height: 0;
-      }
-      .importacao-lateral > .card { flex: 0 0 auto; }
-      .importacao-status { margin-top: auto; }
-      .importacao-panorama { height: 100%; }
-      #resumo_variaveis_tabela .dataTables_info { padding-top: 4px; }
-      #resumo_variaveis_tabela th:nth-child(3),
-      #resumo_variaveis_tabela td:nth-child(3) {
-        min-width: 170px; white-space: nowrap;
-      }
-      .cor-menu-planejar { color: #8b5cf6 !important; } /* Planejando sua Pesquisa -> violeta */
-      .cor-menu-preparar { color: #0d6efd !important; } /* Preparando Dados -> azul */
-      .cor-menu-explorar { color: #00b894 !important; } /* Explorar e Visualizar -> verde-água */
-      .cor-menu-frequencias { color: #E89B3C !important; } /* Frequências e Proporções -> âmbar */
-      .cor-menu-parametricos { color: #f97316 !important; } /* Testes Paramétricos -> laranja */
-      .cor-menu-naoparametricos { color: #84cc16 !important; } /* Testes Não Paramétricos -> verde-limão */
-      .cor-menu-lineares { color: #7c3aed !important; } /* Regressões Lineares e MLG -> roxo */
-      .cor-menu-naolineares { color: #ec4899 !important; } /* Regressão Não Linear -> rosa/magenta */
-      .cor-menu-temporais { color: #2E7D8F !important; } /* Séries Temporais -> teal */
-      .cor-menu-multivariada { color: #d946ef !important; } /* Estatística Multivariada -> rosa/magenta */
-      .cor-menu-mapas { color: #6366f1 !important; } /* Mapear e Analisar -> roxo-violeta */
-      .cor-menu-laboratorio { color: #198754 !important; } /* Laboratório de Conceitos -> verde */
-      .cor-menu-comunicacao { color: #0ea5e9 !important; } /* Comunicação de Resultados -> azul-ciano */
-      
-      /* Atalhos da terceira faixa, dimensionados como as logos. */
-      #sobre-custom-btn,
-      #ajuda-custom-btn {
-        transition: all 0.2s ease;
-        flex: 0 0 56px !important;
-      }
-      #sobre-custom-btn:hover,
-      #ajuda-custom-btn:hover {
-        background-color: rgba(13, 110, 253, 0.08) !important;
-        border-radius: 8px;
-        transform: translateY(-1px);
-      }
-      .navbar-nav > li:has(> a[data-value='Ajuda']),
-      .navbar-nav > li:has(> a[data-value='Sobre']) {
-        display: none !important; /* Ajuda e Sobre usam os atalhos à direita. */
-      }
-      
-      /* Dropdowns da bslib mantêm o formato horizontal interno clássico */
-      .dropdown-menu .dropdown-item {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        text-align: left !important;
-        font-size: 0.85rem !important;
-        font-family: 'Inter', sans-serif !important;
-        padding: 8px 16px !important;
-        gap: 8px !important;
-      }
-      /* Recuo dos módulos para destacar os títulos de grupo em todos os menus. */
-      .navbar .dropdown-menu .dropdown-item {
-        padding-left: 35px !important;
-      }
-      .dropdown-menu .dropdown-item i {
-        font-size: 1rem !important;
-        color: #6c757d !important;
-      }
-      .dropdown-menu .dropdown-item:hover i {
-        color: #0d6efd !important;
-      }
-      
       .card {
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -796,7 +500,7 @@ ui <- page_navbar(
         font-size: 0.83rem !important;
       }
     "))
-  ),
+  )),
   
   # 1. Planejando sua Pesquisa
   nav_menu(
@@ -1510,7 +1214,7 @@ ui <- page_navbar(
     )
   ),
 
-  # Spacer to push Ajuda and Sobre to the right
+  # Ajuda e Sobre seguem como links diretos na barra lateral.
   nav_spacer(),
   
   # 13. Ajuda de Uso
@@ -1540,26 +1244,6 @@ ui <- page_navbar(
         uiOutput("about_topics_list_ui")
       ),
       uiOutput("about_content_display")
-    )
-  ),
-
-  # Identidade Trilha na primeira faixa
-  nav_item(
-    div(
-      class = "navbar-slogan-container",
-      # Simulação da identidade Trilha, com fundo transparente.
-      div(
-        class = "navbar-logo-area",
-        tags$img(
-          src = "logo_trilha_transparente.png",
-          class = "navbar-logo-trilha",
-          alt = "Trilha — logo com R no hexágono e caminho pontilhado"
-        )
-      ),
-      span(
-        "Da pergunta ao relatório, uma só trilha em R.",
-        class = "navbar-slogan-trilha"
-      )
     )
   )
 )
