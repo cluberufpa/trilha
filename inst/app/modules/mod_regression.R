@@ -1103,10 +1103,11 @@ mod_regression_server <- function(id, data_rv, import_info, is_logistic = FALSE,
       # 2. Carregamento de Dados
       if (info$source == "package") {
         code <- c(code,
-          "# Carregar pacote e dataset. Se o EAPADados faltar, instale uma vez:",
-          "# remotes::install_github('astuciasnor/EAPADados')",
-          "library(EAPADados)",
-          sprintf("dados <- as.data.frame(%s)", info$package_dataset),
+          if (pacote_origem_clara(info)) "# Carregar o conjunto. Se a clara faltar, instale uma vez:" else
+            "# Carregar pacote e dataset. Se o EAPADados faltar, instale uma vez:",
+          if (pacote_origem_clara(info)) "# remotes::install_github('cluberufpa/ClaRa')" else
+            "# remotes::install_github('astuciasnor/EAPADados')",
+          pacote_leitura_linhas(info, "dados", "lazy"),
           ""
         )
       } else {

@@ -138,9 +138,7 @@ calc_validar_expr <- function(nome, expr, df) {
 # reescalar) reduzem a um mutate que cria UMA coluna.
 calc_gerar_codigo <- function(passos, info) {
   if (!is.null(info) && identical(info$source, "package")) {
-    leitura <- c("library(EAPADados)",
-                 sprintf("data(%s)", info$package_dataset),
-                 sprintf("dados <- %s", info$package_dataset))
+    leitura <- pacote_leitura_linhas(info, "dados")
     usa_readxl <- FALSE
   } else {
     fn  <- if (!is.null(info)) info$file_name   else "SEU_ARQUIVO.xlsx"

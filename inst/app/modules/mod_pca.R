@@ -74,7 +74,7 @@ mod_pca_ui <- function(id) {
                          min = 1, max = 999999, step = 1),
             checkboxInput(ns("comparar_imputacao"), "Usar imputação (missMDA) como análise principal se houver NA", value = FALSE),
             helpText(HTML("Com a opção marcada e havendo ausentes nas ativas, a PCA roda sobre os valores estimados pela PCA iterativa (missMDA), mantendo todas as observações, e os casos completos viram verificação de robustez. Sem a opção, a análise é por casos completos, com contagem de excluídas. Suplementares com ausentes não são imputadas.")),
-            helpText(HTML("Em bases do EAPADados com papéis documentados (ex.: riqueza e trecho do rio Doubs), o painel abre com a configuração sugerida. A permutação (999 repetições) testa a significância dos eixos e das cargas.")),
+            helpText(HTML("Em conjuntos da ClaRa com papéis documentados (ex.: clorofila e estação do Lago Vitória), o painel abre com a configuração sugerida. A permutação (999 repetições) testa a significância dos eixos e das cargas.")),
             execucao_explicita_controles_ui(ns)
           )
         ),
@@ -196,14 +196,14 @@ mod_pca_server <- function(id, data_rv, import_info) {
     revisao_execucao <- execucao_revisao_dados(data_rv)
     gatilho_execucao <- reactiveVal(0L)
 
-    # Bases do EAPADados com papéis documentados na curadoria: ao carregar a
+    # Conjuntos da ClaRa com papéis documentados na curadoria: ao carregar a
     # base, abrimos com a configuração registrada (o usuário pode mudar).
     # Não usamos critério automático (ex.: valores inteiros) para sugerir
     # suplementares: só vale o que a curadoria documentou.
     papeis_sugeridos_pca <- function(info) {
       if (is.null(info) || !identical(info$source, "package")) return(NULL)
       list(
-        doubs_ambiente = list(quanti_sup = "riqueza", quali_sup = "trecho")
+        lago_vitoria = list(quanti_sup = "clorofila_a", quali_sup = "estacao")
       )[[info$package_dataset %||% ""]]
     }
 

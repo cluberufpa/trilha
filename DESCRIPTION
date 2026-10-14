@@ -61,7 +61,8 @@ Imports:
     missMDA,
     patchwork,
     EAPADados (>= 0.1.16),
-    clara (>= 0.14.0)
+    clara (>= 0.16.0),
+    FSAdata
 Suggests:
     here,
     knitr,

@@ -2981,12 +2981,12 @@ exportacao_regressao_clara_textos <- function(item, import_info = list()) {
   list(
     introducao = c(
       "*Sugestão de redação: adapte a pergunta e acrescente referências do seu tema antes de compartilhar o relatório.*", "",
-      if (barbo) "A forma corporal dos peixes pode ser descrita pela relação entre suas medidas morfométricas. No conjunto `morfometria_barbo`, do EAPADados, as medidas de *Barbus petenyi* já foram corrigidas alometricamente pelo comprimento padrão. Assim, a pergunta se refere à associação entre medidas de forma corporal, e não à velocidade de crescimento dos peixes. O conjunto é um recorte didático de dados disponibilizados no Mendeley Data [@takacs2022]." else
+      if (barbo) paste0("A forma corporal dos peixes pode ser descrita pela relação entre suas medidas morfométricas. No conjunto `morfometria_barbo`, ", exportacao_pacote_dados(import_info), ", as medidas de *Barbus petenyi* já foram corrigidas alometricamente pelo comprimento padrão. Assim, a pergunta se refere à associação entre medidas de forma corporal, e não à velocidade de crescimento dos peixes. O conjunto é um recorte didático de dados disponibilizados no Mendeley Data [@takacs2022].") else
         "A regressão linear simples descreve como uma variável numérica muda, em média, com outra, e quanto da variação da primeira a reta explica.", "",
       sprintf("Neste estudo, examinou-se como %s varia em função de %s.", q$rotulo_resposta, q$rotulo_preditor)),
     metodos = c(
       "*Sugestão de redação: complete a origem dos dados, o período, o local, a unidade amostral, as unidades de medida e os critérios de seleção.*", "",
-      if (barbo) c("Utilizou-se o recorte `morfometria_barbo` do EAPADados. A base de origem reúne indivíduos de cinco populações; filtros e exclusões aplicados neste projeto devem ser descritos. Uma reta conjunta descreve a associação no conjunto analisado e não separa relações dentro de cada população de diferenças entre populações.", ""),
+      if (barbo) c(paste0("Utilizou-se o recorte `morfometria_barbo` ", exportacao_pacote_dados(import_info), ". A base de origem reúne indivíduos de cinco populações; filtros e exclusões aplicados neste projeto devem ser descritos. Uma reta conjunta descreve a associação no conjunto analisado e não separa relações dentro de cada população de diferenças entre populações."), ""),
       sprintf("As análises foram feitas no R [@rcore2025]. A relação entre %s (resposta) e %s (preditor) foi descrita por regressão linear simples, ajustada por mínimos quadrados, com intervalo de confiança de %s%% e nível de significância de %s.",
               q$rotulo_resposta, q$rotulo_preditor, ic, alfa), "",
       paste("A normalidade dos resíduos foi avaliada pelo teste de Shapiro-Wilk e a constância da",
@@ -3816,14 +3816,14 @@ exportacao_textos_regressao <- function(item, import_info = list()) {
     introducao = c(
       "*Sugestão de redação: adapte a pergunta e acrescente referências do seu tema antes de compartilhar o relatório.*", "",
       if (barbo) {
-        "A forma corporal dos peixes pode ser descrita pela relação entre suas medidas morfométricas. No conjunto `morfometria_barbo`, do EAPADados, as medidas de *Barbus petenyi* já foram corrigidas alometricamente pelo comprimento padrão. Assim, a pergunta se refere à associação entre medidas de forma corporal, e não à velocidade de crescimento dos peixes. O conjunto é um recorte didático de dados disponibilizados no Mendeley Data [@takacs2022]."
+        paste0("A forma corporal dos peixes pode ser descrita pela relação entre suas medidas morfométricas. No conjunto `morfometria_barbo`, ", exportacao_pacote_dados(import_info), ", as medidas de *Barbus petenyi* já foram corrigidas alometricamente pelo comprimento padrão. Assim, a pergunta se refere à associação entre medidas de forma corporal, e não à velocidade de crescimento dos peixes. O conjunto é um recorte didático de dados disponibilizados no Mendeley Data [@takacs2022].")
       } else {
         "Na pesca e na aquicultura, estudar a relação entre duas medidas ajuda a formular perguntas sobre os organismos e os sistemas de produção. Uma regressão linear simples descreve como o valor médio de uma resposta varia ao longo de um preditor. A interpretação biológica depende da origem dos dados e de como as observações foram obtidas."
       }, "",
       sprintf("Neste estudo, investigou-se a associação entre %s e %s. O objetivo foi estimar a direção e a magnitude dessa associação, quantificar sua incerteza e avaliar se uma reta representa adequadamente a relação na faixa observada.", resposta, preditor)),
     metodos = c(
       "*Sugestão de redação: complete a origem dos dados, o período, o local, a unidade amostral, as unidades de medida e os critérios de seleção. Não declare independência sem conferir o delineamento.*", "",
-      if (barbo) "Utilizou-se o recorte `morfometria_barbo` do EAPADados. A base de origem reúne indivíduos de cinco populações; filtros e exclusões aplicados neste projeto devem ser descritos. As medidas já corrigidas pelo tamanho foram mantidas nessa escala. Uma reta conjunta descreve a associação no conjunto analisado e não separa relações dentro de cada população de diferenças entre populações." else NULL, "",
+      if (barbo) paste0("Utilizou-se o recorte `morfometria_barbo` ", exportacao_pacote_dados(import_info), ". A base de origem reúne indivíduos de cinco populações; filtros e exclusões aplicados neste projeto devem ser descritos. As medidas já corrigidas pelo tamanho foram mantidas nessa escala. Uma reta conjunta descreve a associação no conjunto analisado e não separa relações dentro de cada população de diferenças entre populações.") else NULL, "",
       sprintf("Ajustou-se uma regressão linear simples por mínimos quadrados ordinários, com %s como resposta e %s como preditor. Foram utilizados os pares completos dessas duas variáveis, com registro das exclusões por dados ausentes. Estimaram-se o intercepto e a inclinação, seus erros padrão e intervalos de confiança de %s%%. A hipótese de inclinação nula foi avaliada pelo teste t, com nível de significância de %s. O ajuste foi descrito por R², R² ajustado e teste F global.", resposta, preditor, ic, alfa), "",
       "A adequação da reta foi examinada por resíduos versus valores ajustados, procurando curvatura e mudanças de dispersão. A normalidade dos erros foi examinada por gráfico Q-Q e teste de Shapiro-Wilk, quando calculável; a constância da variância, pelo teste de Breusch-Pagan. A influência das observações foi investigada pela distância de Cook e pela alavancagem em conjunto com os resíduos padronizados. Esses diagnósticos orientam a investigação dos dados e não constituem regras automáticas de exclusão [@fox2019; @zuur2010].", "",
       if (isTRUE(p$avaliar_autocorrelacao))
@@ -4885,12 +4885,29 @@ preparo_idioma_tabela <- function(colunas = NULL) {
     paginate = list(first = "Primeira", previous = "Anterior", "next" = "Próxima", last = "Última"))
 }
 
+# Origem dos conjuntos de exemplo (tela de importação): "clara", "outros" (FSAdata e MASS,
+# lidos pela ClaRa) ou "eapadados" (o pacote antigo). Sem origem informada, vale o EAPADados,
+# que é o que os projetos e testes anteriores à ClaRa esperam.
+pacote_origem_clara <- function(info) {
+  isTRUE(info$package_origem %in% c("clara", "outros"))
+}
+
+# De onde veio o conjunto de exemplo, para o texto do relatório ("da ClaRa", "do EAPADados").
+exportacao_pacote_dados <- function(info) {
+  if (pacote_origem_clara(info)) "da ClaRa" else "do EAPADados"
+}
+
 preparo_leitura_entrada <- function(info) {
   q <- function(x) encodeString(as.character(x), quote = '"')
   arquivo <- info$file_name %||% "dados.xlsx"
   if (identical(info$source, "package")) {
-    c(sprintf("data(list = %s, package = \"EAPADados\")", q(info$package_dataset)),
-      sprintf("dados_brutos <- as.data.frame(get(%s))", q(info$package_dataset)))
+    if (pacote_origem_clara(info)) {
+      c("library(clara)",
+        sprintf("dados_brutos <- as.data.frame(carregar_dados(%s))", q(info$package_dataset)))
+    } else {
+      c(sprintf("data(list = %s, package = \"EAPADados\")", q(info$package_dataset)),
+        sprintf("dados_brutos <- as.data.frame(get(%s))", q(info$package_dataset)))
+    }
   } else if (tolower(tools::file_ext(arquivo)) %in% c("csv", "txt", "tsv")) {
     preparo_leitura_csv(info, "dados_brutos")
   } else {

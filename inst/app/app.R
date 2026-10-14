@@ -177,36 +177,46 @@ resumo_glimpse <- function(df) {
   do.call(rbind, linhas)
 }
 
-# Títulos dos conjuntos do EAPADados (para o painel da direita).
-eapa_titulos <- tryCatch({
-  res <- data(package = "EAPADados")$results
-  stats::setNames(res[, "Title"], sub("\\s.*$", "", res[, "Item"]))
-}, error = function(e) character(0))
+# Conjuntos de exemplo da ClaRa. O catálogo diz de onde vem cada um: da própria ClaRa ou de um
+# pacote de fora (FSAdata, MASS), que a ClaRa lê na hora. O seletor tem dois passos: a origem
+# (ClaRa ou Outros pacotes) e, dentro dela, o conjunto.
+clara_catalogo <- tryCatch({
+  e <- new.env(parent = emptyenv())
+  utils::data("catalogo_dados", package = "clara", envir = e)
+  cg <- e$catalogo_dados
+  for (v in c("nome", "rotulo", "titulo", "fonte_dados")) cg[[v]] <- enc2utf8(as.character(cg[[v]]))
+  cg
+}, error = function(err) NULL)
 
-# Lista dinâmica dos conjuntos do EAPADados: puxa TODOS os datasets do pacote
-# (novos conjuntos passam a aparecer sozinhos), mantendo só os que são data.frame
-# e tirando tabelas auxiliares (dicionários/referências). Se o pacote não estiver
-# disponível, cai numa lista mínima de segurança.
-eapa_datasets <- local({
-  aux <- c("dicionario_variaveis_amostragem", "referencias_dados_amostragem")
-  itens <- tryCatch(
-    sub("\\s.*$", "", data(package = "EAPADados")$results[, "Item"]),
-    error = function(e) character(0)
-  )
-  itens <- setdiff(itens, aux)
-  ok <- itens[vapply(itens, function(nm) {
-    obj <- tryCatch(get(nm, envir = asNamespace("EAPADados")), error = function(e) NULL)
-    is.data.frame(obj)
-  }, logical(1))]
-  ok <- sort(ok)
-  if (length(ok) == 0) {
-    ok <- c("artemia", "biometria_caranguejos", "camaroes_sexo",
-            "cangulo_crescimento", "captura_petrechos", "isoproteica_bagre",
-            "tilapia_crescimento", "walleye_erie")
+# Nomes dos conjuntos de uma origem ("clara" ou "outros"), com o rótulo à frente do nome.
+clara_conjuntos <- function(origem) {
+  if (is.null(clara_catalogo)) return(character(0))
+  cg <- clara_catalogo
+  if (identical(origem, "clara")) {
+    cg <- cg[cg$fonte_dados == "clara", , drop = FALSE]
+    rotulos <- paste0(cg$nome, " \u2014 ", cg$rotulo)
+  } else if (identical(origem, "outros")) {
+    cg <- cg[cg$fonte_dados != "clara", , drop = FALSE]
+    rotulos <- paste0(cg$nome, " (", cg$fonte_dados, ")")
+  } else {
+    return(character(0))
   }
-  ok
+  ordem <- order(cg$nome)
+  stats::setNames(cg$nome[ordem], rotulos[ordem])
+}
+clara_titulos <- if (is.null(clara_catalogo)) character(0) else
+  stats::setNames(clara_catalogo$titulo, clara_catalogo$nome)
+clara_dataset_default <- local({
+  ch <- clara_conjuntos("clara")
+  if ("pinguins" %in% ch) "pinguins" else unname(ch[1])
 })
-eapa_dataset_default <- if ("artemia" %in% eapa_datasets) "artemia" else eapa_datasets[1]
+
+# Conjuntos oferecidos em cada origem, e o conjunto que abre por padrão.
+exemplos_escolhas <- function(origem) clara_conjuntos(origem)
+exemplos_padrao <- function(origem) {
+  if (identical(origem, "outros")) unname(clara_conjuntos("outros")[1]) else clara_dataset_default
+}
+exemplos_origem_inicial <- "clara"
 
 # Cartão simples para itens do menu Mapear e Analisar que ainda estão em preparação.
 # Ele guarda o lugar do item no menu e explica ao aluno a pergunta que o item responde.
@@ -878,7 +888,7 @@ ui <- page_navbar(
               style = "padding: 12px 15px;",
               radioButtons("data_source", "Origem dos Dados:",
                            choices = c("Arquivo Local (CSV/Excel)" = "local",
-                                       "Pacote EAPADados" = "package")),
+                                       "Conjuntos de exemplo" = "package")),
               conditionalPanel(
                 condition = "input.data_source == 'local'",
                 fileInput("file_upload", "Escolha o arquivo (.csv, .xlsx, .xls):",
@@ -901,9 +911,13 @@ ui <- page_navbar(
               ),
               conditionalPanel(
                 condition = "input.data_source == 'package'",
-                selectizeInput("package_dataset", "Selecione o Dataset do EAPADados:",
-                  choices = eapa_datasets,
-                  selected = eapa_dataset_default,
+                radioButtons("package_origem", "Conjuntos de exemplo de:",
+                  choices = c("ClaRa" = "clara",
+                              "Outros pacotes (FSAdata, MASS)" = "outros"),
+                  selected = exemplos_origem_inicial),
+                selectizeInput("package_dataset", "Conjunto de dados:",
+                  choices = exemplos_escolhas(exemplos_origem_inicial),
+                  selected = exemplos_padrao(exemplos_origem_inicial),
                   options = list(
                     placeholder = "Digite ou escolha um conjunto de dados...",
                     openOnFocus = TRUE,
@@ -975,7 +989,7 @@ ui <- page_navbar(
               tags$ul(style = "padding-left: 15px; margin-bottom: 0; font-size: 0.85rem; line-height: 1.4;",
                 tags$li("CSV (.csv)"),
                 tags$li("Excel (.xlsx, .xls)"),
-                tags$li("Pacote R 'EAPADados'")
+                tags$li("Conjuntos de exemplo (ClaRa, FSAdata, MASS)")
               )
             )
           )
@@ -1555,11 +1569,14 @@ server <- function(input, output, session) {
   # Reinicializa o selectize do dataset ao mostrar o painel do pacote — sem isto,
   # o selectize nasce dentro de um conditionalPanel oculto e a BUSCA (digitar
   # parte do nome) não funciona. Ao reabrir visível, a busca passa a valer.
-  observeEvent(input$data_source, {
+  observeEvent(list(input$data_source, input$package_origem), {
     if (identical(input$data_source, "package")) {
-      sel <- if (!is.null(input$package_dataset) && nzchar(input$package_dataset)) input$package_dataset else eapa_dataset_default
+      origem <- input$package_origem %||% exemplos_origem_inicial
+      escolhas <- exemplos_escolhas(origem)
+      sel <- if (!is.null(input$package_dataset) && input$package_dataset %in% escolhas)
+        input$package_dataset else exemplos_padrao(origem)
       updateSelectizeInput(session, "package_dataset",
-        choices = eapa_datasets, selected = sel,
+        choices = escolhas, selected = sel,
         options = list(placeholder = "Digite ou escolha um conjunto de dados...",
                        openOnFocus = TRUE, maxOptions = 100, dropdownParent = "body",
                        onDropdownOpen = I("function($dropdown) { $dropdown.addClass('origem-lista-ampla'); }")),
@@ -1607,13 +1624,13 @@ server <- function(input, output, session) {
     ),
     import = list(
       title = "2. Importação e Tipagem",
-      keywords = "carregar ler csv excel xlsx eapadados converter tipo coluna numeric factor character date tipagem",
+      keywords = "carregar ler csv excel xlsx clara exemplos converter tipo coluna numeric factor character date tipagem",
       content = HTML("
         <h4 class='text-primary' style='font-family: \"Outfit\", sans-serif; font-weight: 700;'>Importação e Preparação de Dados</h4>
         <p>Para iniciar suas análises, o primeiro passo é carregar um conjunto de dados. A IDE suporta:</p>
         <ul>
           <li><b>Arquivos Locais:</b> Planilhas Excel (.xlsx, .xls) ou arquivos de texto delimitados (.csv). Você pode escolher a aba específica no Excel ou configurar o cabeçalho e separadores decimais no CSV.</li>
-          <li><b>Pacotes de Exemplo:</b> Datasets didáticos inclusos no pacote científico R 'EAPADados'.</li>
+          <li><b>Conjuntos de exemplo:</b> datasets didáticos da ClaRa (e, em <i>Outros pacotes</i>, os do FSAdata e do MASS que ela lê na hora).</li>
         </ul>
         <p><b>Tipagem de Variáveis:</b> Na barra lateral esquerda (após carregar o arquivo), você verá uma tabela listando cada coluna e seu tipo de dado atual. Você pode alterar a tipagem de forma interativa (ex: converter para <i>numeric</i>, <i>factor</i>, <i>character</i> ou <i>Date</i>) para garantir a consistência das suas análises.</p>
         <p><b>Filtrar Dados (coluna <i>Filtro</i>):</b> Cada coluna ganha um botão <b>Filtrar</b> adequado ao seu tipo. Para <i>factor</i>, abre uma janela com os níveis da variável (ex.: <i>Macho</i>/<i>Fêmea</i>); ao desmarcar um nível, as linhas correspondentes são removidas. Para <i>numeric</i>/<i>integer</i>, abre um controle deslizante de faixa (mínimo–máximo); apenas os valores dentro do intervalo escolhido são mantidos. Em ambos os casos o efeito é em tempo real e vale para <b>todas</b> as análises. O botão sinaliza quando há filtro ativo (ex.: <i>1/2</i> para níveis, <i>Faixa</i> para intervalos), e todos os filtros são reiniciados ao carregar um novo conjunto de dados.</p>
@@ -2744,7 +2761,9 @@ trilha::run_app(launch.browser = TRUE)</pre>
               tags$td(if (input$data_source == "local") {
                 if (is.null(input$file_upload)) "Arquivo Padrão" else input$file_upload$name
               } else {
-                paste("EAPADados:", input$package_dataset)
+                paste0(switch(input$package_origem %||% exemplos_origem_inicial,
+                              outros = "Outros pacotes", "ClaRa"),
+                       ": ", input$package_dataset)
               })
             )
           )
@@ -2869,23 +2888,16 @@ trilha::run_app(launch.browser = TRUE)</pre>
       
     } else if (input$data_source == "package") {
       req(input$package_dataset, nzchar(input$package_dataset))
-      req(input$package_dataset %in% eapa_datasets)   # só carrega um conjunto válido
-      if (requireNamespace("EAPADados", quietly = TRUE)) {
-        tryCatch({
-          # Carrega o dataset de forma ultra-rápida direto do namespace
-          df <- tryCatch({
-            get(input$package_dataset, envir = asNamespace("EAPADados"))
-          }, error = function(err) {
-            # Fallback seguro usando data()
-            data(list = input$package_dataset, package = "EAPADados", envir = environment())
-            get(input$package_dataset)
-          })
-          raw_data(as.data.frame(df))
-        }, error = function(e) {
-          showNotification(paste("Erro ao carregar do pacote:", e$message), type = "error")
-          # NÃO zera raw_data: mantém o último dataset válido
-        })
-      }
+      origem_exemplo <- input$package_origem %||% exemplos_origem_inicial
+      req(input$package_dataset %in% exemplos_escolhas(origem_exemplo))   # só carrega um conjunto válido
+      # Conjuntos da ClaRa (e os de FSAdata/MASS, que ela lê na hora e traduz).
+      tryCatch({
+        raw_data(as.data.frame(clara::carregar_dados(input$package_dataset)))
+      }, error = function(e) {
+        # NÃO zera raw_data: mantém o último conjunto válido.
+        showNotification(paste("Não foi possível carregar o conjunto:", conditionMessage(e)),
+                         type = "error", duration = NULL, id = "erro_exemplo")
+      })
     }
   })
   
@@ -3044,8 +3056,8 @@ trilha::run_app(launch.browser = TRUE)</pre>
     linha <- function(rotulo, valor) tags$tr(tags$td(tags$b(rotulo)), tags$td(valor))
 
     titulo <- if (identical(input$data_source, "package") &&
-                  !is.null(input$package_dataset) && input$package_dataset %in% names(eapa_titulos)) {
-      eapa_titulos[[input$package_dataset]]
+                  isTRUE(input$package_dataset %in% names(clara_titulos))) {
+      clara_titulos[[input$package_dataset]]
     }
 
     avisos <- list(
@@ -3061,7 +3073,8 @@ trilha::run_app(launch.browser = TRUE)</pre>
       h6("Panorama do conjunto", style = "color: #0d6efd; font-weight: 700; margin-bottom: 8px;"),
       if (!is.null(titulo)) p(style = "font-size:0.85rem; margin-bottom:6px;",
         icon("book"), " ", em(titulo), br(),
-        span(class = "text-muted small", "Documentação: ", code(paste0("?EAPADados::", input$package_dataset)))),
+        span(class = "text-muted small", "Documentação: ",
+             code(paste0("?clara::", input$package_dataset)))),
       tags$table(class = "table table-sm table-borderless", style = "margin-bottom: 6px; font-size: 0.85rem;",
         tags$tbody(
           linha("Numéricas:", n_num),
@@ -3093,6 +3106,7 @@ trilha::run_app(launch.browser = TRUE)</pre>
       csv_dec = if (!is.null(input$csv_dec)) input$csv_dec else ".",
       csv_header = if (!is.null(input$csv_header)) input$csv_header else TRUE,
       package_dataset = input$package_dataset,
+      package_origem = if (identical(input$data_source, "package")) input$package_origem %||% exemplos_origem_inicial,
       preparo_importacao = list(
         colunas = selected_cols_rv(), tipos = col_types_rv(),
         colunas_originais = names(raw_data()),

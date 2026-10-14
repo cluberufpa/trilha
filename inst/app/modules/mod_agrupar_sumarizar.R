@@ -95,8 +95,7 @@ agrupar_exprs_codigo <- function(variaveis, funcoes) {
 
 agrupar_gerar_codigo <- function(grupos, variaveis, funcoes, info = NULL) {
   if (!is.null(info) && identical(info$source, "package")) {
-    leitura <- c("library(EAPADados)", sprintf("data(%s)", info$package_dataset),
-                 sprintf("dados <- %s", info$package_dataset))
+    leitura <- pacote_leitura_linhas(info, "dados")
   } else {
     arquivo <- if (!is.null(info)) info$file_name else "SEU_ARQUIVO.xlsx"
     if (grepl("\\.csv$", arquivo, ignore.case = TRUE)) {

@@ -648,8 +648,7 @@ gerar_script_preparo <- function(pipeline, info, reg = tratamentos, base_extra =
     )
   } else {
     if (!is.null(info) && identical(info$source, "package")) {
-      leitura <- c("library(EAPADados)", sprintf("data(%s)", info$package_dataset),
-                   sprintf("dados <- %s", info$package_dataset))
+      leitura <- pacote_leitura_linhas(info, "dados")
       usa_readxl <- FALSE
     } else if (!is.null(info) && identical(tolower(tools::file_ext(info$file_name)), "csv")) {
       leitura <- preparo_leitura_csv(info)

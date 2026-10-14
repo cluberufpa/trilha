@@ -111,7 +111,7 @@ mod_correlacao_server <- function(id, data_rv, import_info) {
       req(input$var_x, input$var_y)
       info <- if (is.function(import_info)) import_info() else NULL
       if (!is.null(info) && identical(info$source, "package")) {
-        leitura <- c("library(EAPADados)", sprintf("data(%s)", info$package_dataset), sprintf("dados <- %s", info$package_dataset))
+        leitura <- pacote_leitura_linhas(info, "dados")
       } else {
         fn <- if (!is.null(info)) info$file_name else "SEU_ARQUIVO.xlsx"
         abn <- if (!is.null(info)) info$excel_sheet else "SUA_ABA"

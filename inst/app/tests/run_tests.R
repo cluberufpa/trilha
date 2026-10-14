@@ -391,6 +391,7 @@ testes <- c(
   "test_teste_t_clara_tela.R",
   "test_regressao_clara_tela.R",
   "test_medianas_clara_tela.R",
+  "test_exemplos_clara.R",
   "test_grafico_linhas_troca_y.R"
 )
 

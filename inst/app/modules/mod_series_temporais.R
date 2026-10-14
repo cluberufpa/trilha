@@ -3,16 +3,10 @@
 # A ordem no tempo é parte do dado. Este módulo mostra a série, a média móvel,
 # a decomposição e a autocorrelação sem introduzir previsão na versão 1.
 
-# Carregue o exemplo mensal de anchova apenas quando o pacote de dados estiver disponível.
+# Carregue o exemplo mensal de anchova pela porta de entrada da ClaRa.
 .carrega_anchova_norte_california <- function() {
-  if (!requireNamespace("EAPADados", quietly = TRUE)) return(NULL)
-  ambiente <- new.env(parent = emptyenv())
-  carregou <- tryCatch({
-    utils::data("anchova_norte_california", package = "EAPADados", envir = ambiente)
-    exists("anchova_norte_california", envir = ambiente, inherits = FALSE)
-  }, error = function(e) FALSE)
-  if (!carregou) return(NULL)
-  get("anchova_norte_california", envir = ambiente, inherits = FALSE)
+  tryCatch(as.data.frame(clara::carregar_dados("anchova_norte_california")),
+           error = function(e) NULL)
 }
 
 # Preencha lacunas temporárias por interpolação apenas para decompose() e acf().

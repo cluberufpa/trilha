@@ -1,5 +1,21 @@
 # Funções Utilitárias para Exportação de Dados - EAPA
 
+# Linhas de R que leem o conjunto de exemplo escolhido, para o código gerado pelas telas.
+# `forma = "data"` escreve data(nome) e depois a atribuição; `forma = "lazy"` usa o objeto
+# do pacote direto, dentro de as.data.frame().
+pacote_leitura_linhas <- function(info, destino = "dados", forma = c("data", "lazy")) {
+  forma <- match.arg(forma)
+  nome <- info$package_dataset
+  if (pacote_origem_clara(info)) {
+    return(c("library(clara)", sprintf('%s <- as.data.frame(carregar_dados("%s"))', destino, nome)))
+  }
+  if (identical(forma, "lazy")) {
+    c("library(EAPADados)", sprintf("%s <- as.data.frame(%s)", destino, nome))
+  } else {
+    c("library(EAPADados)", sprintf("data(%s)", nome), sprintf("%s <- %s", destino, nome))
+  }
+}
+
 #' Exporta um Data Frame para Excel (.xlsx) com Dicionário de Variáveis
 #'
 #' @param df Data frame de dados limpos.

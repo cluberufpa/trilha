@@ -440,9 +440,7 @@ arrumar_gerar_codigo <- function(passos, info, renomear = character(0),
   q   <- function(v) paste(sprintf('"%s"', v), collapse = ", ")
 
   if (!is.null(info) && identical(info$source, "package")) {
-    leitura <- c("library(EAPADados)",
-                 sprintf("data(%s)", info$package_dataset),
-                 sprintf("dados_largo <- %s", info$package_dataset))
+    leitura <- pacote_leitura_linhas(info, "dados_largo")
     usa_readxl <- FALSE
   } else if (!is.null(info) && identical(tolower(tools::file_ext(info$file_name)), "csv")) {
     leitura <- preparo_leitura_csv(info, "dados_largo")

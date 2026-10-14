@@ -278,8 +278,7 @@ mod_model_discovery_server <- function(id, data_rv, import_info) {
       if (info$source == "package") {
         code <- c(code,
           "# Carregar pacote e dataset",
-          "library(EAPADados)",
-          sprintf("dados <- as.data.frame(%s)", info$package_dataset),
+          pacote_leitura_linhas(info, "dados", "lazy"),
           ""
         )
       } else {
