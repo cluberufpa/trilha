@@ -50,6 +50,24 @@ body.bslib-page-navbar {
 #main_navbar { flex-direction: column; gap: 4px; width: 100%; }
 #main_navbar > li { flex-grow: 0 !important; width: 100%; }
 #main_navbar > .bslib-nav-spacer { display: none; }
+/* Três grupos visuais, sem acrescentar uma camada de cliques ao menu. */
+#main_navbar .trilha-menu-section {
+  margin: 14px 10px 4px;
+  padding-top: 16px;
+  border-top: 1px solid #50738d;
+  color: #c4d9ea;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+#main_navbar .trilha-menu-section-first {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
 #main_navbar > li > a {
   position: relative;
   display: grid;

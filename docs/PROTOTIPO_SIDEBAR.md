@@ -52,3 +52,14 @@ A ferramenta de navegador foi interrompida por reinício do ambiente, e a retoma
 - `inst/app/www/layout-sidebar.css`: aparência, rolagem e largura da barra.
 - `inst/app/www/layout-sidebar.js`: acordeão, identificação do ativo e recolhimento da barra.
 - `docs/PROTOTIPO_SIDEBAR.md`: execução, evidências e limites desta etapa.
+## Ajuste dos grupos laterais (14/10/2026)
+
+A pedido do autor, a barra agora apresenta três títulos com separadores:
+
+- **Pesquisa:** Planejando sua Pesquisa, Preparar Dados e Explorar e Visualizar.
+- **Análises:** Frequências e Proporções, Testes Paramétricos, Testes Não Paramétricos, Regressões Lineares e MLG, Regressão Não Linear, Séries Temporais, Estatística Multivariada e Mapear e Analisar.
+- **Aprender e comunicar:** Laboratório de Conceitos e Comunicação de Resultados.
+
+São títulos visuais, sem exigir um clique adicional. Ajuda e Sobre continuam disponíveis. O ajuste não altera o espaço vertical do cabeçalho central, o acordeão, os links ou o estado dos módulos.
+
+Verificação desta mudança: sintaxe R válida, comparação das declarações da UI com o commit anterior confirma apenas três novos títulos e preservação de todos os demais argumentos, e `git diff --check` sem erros. A ferramenta de navegador continuou falhando ao iniciar; a aparência desta atualização ainda não foi conferida no navegador.

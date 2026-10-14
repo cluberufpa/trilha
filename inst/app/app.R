@@ -502,6 +502,9 @@ ui <- page_navbar(
     "))
   )),
   
+  # Grupos visuais da navegação lateral; os menus e módulos seguem os mesmos.
+  nav_item(tags$h2(class = "trilha-menu-section trilha-menu-section-first", "Pesquisa")),
+
   # 1. Planejando sua Pesquisa
   nav_menu(
     title = HTML("Planejando<br>sua Pesquisa"),
@@ -785,6 +788,8 @@ ui <- page_navbar(
     nav_panel(title = "Matriz de dispersão", icon = icon("table-cells"), mod_exploracao_visual_ui("visual_matriz", "matriz")),
     nav_panel(title = "Mapa de calor de correlação", icon = icon("table-cells-large"), mod_exploracao_visual_ui("visual_calor", "calor"))
   ),
+
+  nav_item(tags$h2(class = "trilha-menu-section", "Análises")),
 
   # 4. Frequências e Proporções — respostas categóricas de unidades independentes.
   nav_menu(
@@ -1195,6 +1200,8 @@ ui <- page_navbar(
       )
     )
   ),
+
+  nav_item(tags$h2(class = "trilha-menu-section", "Aprender e comunicar")),
 
   # O Laboratório transversal aparece antes da etapa final de Comunicação.
   # Os itens ficam em grupos por pergunta; alguns reúnem variações em abas (segunda faixa).
