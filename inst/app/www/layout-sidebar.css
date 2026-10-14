@@ -3,6 +3,10 @@ body.bslib-page-navbar {
   --trilha-rail-width: 300px;
   --trilha-rail-content-width: 300px;
   --trilha-menu-font: 14.5px;
+  --trilha-menu-pad: 4px;
+  --trilha-group-space: 4px;
+  --trilha-group-pad: 5px;
+  --trilha-menu-icon: 20px;
   padding-left: var(--trilha-rail-width) !important;
   background: #f4f8fc;
   color: #0f3b5f;
@@ -58,7 +62,7 @@ body.bslib-page-navbar {
 #main_navbar > li { flex-grow: 0 !important; width: 100%; }
 #main_navbar > .bslib-nav-spacer { display: none; }
 .navbar:has(#main_navbar) .trilha-menu-section {
-  display: block; margin: 4px 7px 2px; padding-top: 5px;
+  display: block; margin: var(--trilha-group-space) 7px 2px; padding-top: var(--trilha-group-pad);
   border-top: 1px solid #50738d;
   color: #c4d9ea; font-family: inherit;
   font-size: var(--trilha-menu-font) !important;
@@ -70,11 +74,11 @@ body.bslib-page-navbar {
   position: relative; display: grid;
   grid-template-columns: 22px minmax(0, 1fr) 8px;
   column-gap: 6px; align-items: center;
-  padding: 4px 7px; border-bottom: 0; border-radius: 6px;
+  padding: var(--trilha-menu-pad) 7px; border-bottom: 0; border-radius: 6px;
   font-size: var(--trilha-menu-font); font-weight: 500; line-height: 1.35;
   white-space: nowrap; color: #f2f7fb;
 }
-#main_navbar > li > a > i { font-size: 20px; color: #d5edf5; text-align: center; }
+#main_navbar > li > a > i { font-size: var(--trilha-menu-icon); color: #d5edf5; text-align: center; }
 #main_navbar .caret { display: none; }
 #main_navbar .trilha-menu-label { grid-column: 2; grid-row: 1; white-space: nowrap; }
 #main_navbar > li > a:hover, #main_navbar > li > a:focus-visible { background: #244e6d; color: white; }
@@ -98,53 +102,65 @@ body.bslib-page-navbar {
 #main_navbar > li > .dropdown-menu { display: none !important; }
 .trilha-flyout[hidden], .trilha-flyout [hidden] { display: none !important; }
 .trilha-flyout {
+  --trilha-panel-bg: #123e5b;
   position: fixed; z-index: 1040; display: flex; flex-direction: column;
   width: 340px; max-height: calc(100dvh - 16px); box-sizing: border-box;
-  margin: 0; padding: 0; color: #0f3b5f; background: #fff;
-  border: 1px solid #d3e4ef; border-radius: 9px;
-  box-shadow: 0 10px 28px #062b4c33; overflow: hidden;
+  margin: 0; padding: 0; color: #f2f7fb; background: var(--trilha-panel-bg);
+  border: 1px solid #527990; border-radius: 9px;
+  box-shadow: 0 8px 24px #062b4c40; overflow: visible;
+  color-scheme: dark;
+}
+/* Fora da lista rolável: a ponta acompanha a linha de origem após o ajuste da altura. */
+.trilha-flyout::before {
+  content: ""; position: absolute; left: -8px; top: var(--trilha-pointer-y, 24px);
+  width: 0; height: 0; transform: translateY(-50%);
+  border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+  border-right: 8px solid var(--trilha-panel-bg);
+  pointer-events: none;
 }
 .trilha-flyout-header {
   display: grid; grid-template-columns: minmax(0, 1fr) 28px;
   align-items: center; gap: 8px;
   padding: 11px 12px 9px; flex-shrink: 0;
-  border-bottom: 1px solid #e4edf4;
+  border-bottom: 1px solid #527990;
 }
 #trilha-flyout-title {
-  margin: 0; color: #0f3b5f; font-size: 17px !important;
+  margin: 0; color: #f2f7fb; font-size: 17px !important;
   line-height: 1.25; font-weight: 700; overflow-wrap: anywhere;
 }
 .trilha-flyout-close {
-  border: 0; border-radius: 5px; background: #eef5fa; color: #45667d;
+  border: 0; border-radius: 5px; background: #244e6d; color: #f2f7fb;
   font-size: 24px; line-height: 1; padding: 2px;
 }
 .trilha-flyout-search {
   grid-column: 1 / -1; width: 100%; min-width: 0;
-  border: 1px solid #bfd5e3; border-radius: 5px;
-  padding: 6px 8px; font-size: 14px; background: #fff; color: #0f3b5f;
+  border: 1px solid #7dabbf; border-radius: 5px;
+  padding: 6px 8px; font-size: 14px; background: #0b304b; color: #f2f7fb;
 }
+.trilha-flyout-search::placeholder { color: #b6d5e6; opacity: 1; }
+.trilha-flyout-close:hover { background: #315f7d; }
 .trilha-flyout-list {
   flex: 0 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain;
-  scrollbar-width: thin; scrollbar-color: #bfd5e3 transparent;
+  scrollbar-width: thin; scrollbar-color: #7dabbf #123e5b;
   list-style: none; padding: 4px 8px 7px; margin: 0;
 }
 .trilha-flyout-group {
   padding: 7px 8px 3px; font-size: 11px; font-weight: 600; line-height: 1.25;
-  text-transform: uppercase; white-space: nowrap; color: #567a96;
+  text-transform: uppercase; white-space: nowrap; color: #b6d5e6;
 }
 .trilha-flyout-item {
   width: max-content; min-width: 100%; display: flex; align-items: center; gap: 8px;
-  padding: 5px 8px; border: 0; border-radius: 5px; background: transparent;
-  color: #0f3b5f; text-align: left; font: inherit;
+  padding: 6px 8px 6px 20px; border: 0; border-radius: 5px; background: transparent;
+  color: #f2f7fb; text-align: left; font: inherit;
   font-size: 14.5px; font-weight: 400; line-height: 1.35; white-space: nowrap;
 }
 .trilha-flyout-item > span { flex: 0 0 auto; white-space: nowrap; }
-.trilha-flyout-item > i { width: 20px; flex: 0 0 20px; font-size: 19px; color: #2e7d8f; }
-.trilha-flyout-item:hover { background: #edf5fa; }
-.trilha-flyout-item.active { background: #d4edf4; color: #075b78; font-weight: 600; }
-.trilha-flyout :is(button, input):focus-visible { outline: 2px solid #2e7d8f; outline-offset: -2px; }
+.trilha-flyout-item > i { width: 20px; flex: 0 0 20px; font-size: 19px; color: #d5edf5; text-align: center; }
+.trilha-flyout-item:hover { background: #244e6d; }
+.trilha-flyout-item.active { background: #086786; color: #fff; font-weight: 600; box-shadow: inset 3px 0 0 #8ce0e1; }
+.trilha-flyout :is(button, input):focus-visible { outline: 2px solid #8ce0e1; outline-offset: -2px; }
 .trilha-flyout-empty { margin: 0; padding: 12px; font-size: 14px; }
-.trilha-flyout-footer { flex-shrink: 0; padding: 6px 12px; border-top: 1px solid #e4edf4; font-size: 11px; color: #567a96; }
+.trilha-flyout-footer { flex-shrink: 0; padding: 6px 12px; border-top: 1px solid #527990; font-size: 11px; color: #b6d5e6; }
 .trilha-toolbar { display: flex; gap: 16px; align-items: center; background: #fff; border-bottom: 1px solid #d6e4ef; padding: 8px 18px; flex-shrink: 0; min-height: 48px; }
 .trilha-toggle { color: #0f3b5f; background: #eef5fa; border: 1px solid #bfd5e3; border-radius: 6px; padding: 6px 10px; }
 .trilha-toggle:focus-visible { outline: 3px solid #62b6b7; }

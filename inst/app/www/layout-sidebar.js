@@ -85,12 +85,34 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
     const available = window.innerWidth <= 600 ? Math.min(required, Math.floor(window.innerWidth * .4)) : required;
     document.body.style.setProperty("--trilha-rail-width", available + "px");
   }
+  function spaceSidebar() {
+    const style = document.body.style;
+    const set = (name, value) => style.setProperty("--trilha-" + name, value + "px");
+    // Parte do mínimo legível. Só distribui espaço quando todos os itens cabem.
+    set("menu-font", 14.5); set("menu-icon", 20); set("menu-pad", 4);
+    set("group-space", 4); set("group-pad", 5);
+    const viewport = rail.querySelector(".navbar-collapse");
+    const spare = () => Math.max(0, viewport.clientHeight - nav.getBoundingClientRect().height - 10);
+    if (spare() > 100) {
+      set("menu-font", 15);
+      const labels = Array.from(nav.querySelectorAll(".trilha-menu-label"));
+      // A fonte maior não deve alargar a barra compacta nem cortar os nomes.
+      if (Math.max(...labels.map(el => textWidth(label(el), el, "600"))) + 76 > 300) set("menu-font", 14.5);
+      set("menu-icon", 21);
+    }
+    const rows = nav.querySelectorAll(":scope > li > a").length;
+    const groups = nav.querySelectorAll(".trilha-menu-section").length;
+    const gain = Math.min(8, Math.floor(spare() / (2 * rows + 2 * groups) * 4) / 4);
+    set("menu-pad", 4 + gain);
+    set("group-space", 4 + gain * 1.3);
+    set("group-pad", 5 + gain * .5);
+  }
   function sizePanel() {
     const buttons = Array.from(list.querySelectorAll(".trilha-flyout-item"));
     const longest = Math.max(0, ...buttons.map(el => textWidth(label(el), el, "600")));
     const groups = Array.from(list.querySelectorAll(".trilha-flyout-group"));
     const groupWidth = Math.max(0, ...groups.map(el => textWidth(label(el).toLocaleUpperCase("pt-BR"), el)));
-    preferredPanelWidth = Math.ceil(Math.max(260, longest + 70, groupWidth + 42, textWidth(title.textContent, title) + 64));
+    preferredPanelWidth = Math.ceil(Math.max(260, longest + 82, groupWidth + 42, textWidth(title.textContent, title) + 64));
   }
   function positionPanel() {
     if (!opened) return;
@@ -103,8 +125,10 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
     panel.style.maxHeight = bounds.maxHeight + "px";
     // A nova largura pode mudar a altura das linhas.
     const height = panel.getBoundingClientRect().height;
-    panel.style.top = trilhaFlyoutBounds(bounds.left - 8, rect.top,
-      window.innerWidth, window.innerHeight, height, preferredPanelWidth).top + "px";
+    const top = trilhaFlyoutBounds(bounds.left - 8, rect.top,
+      window.innerWidth, window.innerHeight, height, preferredPanelWidth).top;
+    panel.style.top = top + "px";
+    panel.style.setProperty("--trilha-pointer-y", Math.max(12, Math.min(height - 12, rect.top + rect.height / 2 - top)) + "px");
   }
 
   function closePanel(restoreFocus = false) {
@@ -283,6 +307,7 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
   $(nav).on("shown.bs.tab", "a[data-bs-toggle='tab']", function () {
     identifyActive(this);
     closePanel(true);
+    fitNavigation();
   });
   nav.addEventListener("click", function (event) {
     if (event.target.closest("a[data-bs-toggle='tab']")) closePanel();
@@ -294,7 +319,7 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
     toggle.setAttribute("aria-label", collapsed ? "Mostrar barra lateral" : "Recolher barra lateral");
     window.dispatchEvent(new Event("resize"));
   });
-  function fitNavigation() { sizeSidebar(); if (opened) { sizePanel(); positionPanel(); } }
+  function fitNavigation() { spaceSidebar(); sizeSidebar(); if (opened) { sizePanel(); positionPanel(); } }
   window.addEventListener("resize", fitNavigation);
   document.fonts.ready.then(fitNavigation);
   document.fonts.addEventListener("loadingdone", fitNavigation);
@@ -302,4 +327,5 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
   rail.querySelector(".navbar-collapse").addEventListener("scroll", positionPanel, { passive: true });
   const initial = nav.querySelector("a[data-bs-toggle='tab'].active");
   if (initial) identifyActive(initial);
+  fitNavigation();
 });

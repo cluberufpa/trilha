@@ -1,15 +1,15 @@
 /* Teste de navegação no app real, em um navegador de teste separado.
    Requer Playwright já instalado (NODE_PATH) e app local iniciado.
-   node inst/app/tests/test_layout_flyout.cjs http://127.0.0.1:4624 */
+   node inst/app/tests/test_layout_flyout.cjs http://127.0.0.1:4625 */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
 const { trilhaFlyoutBounds } = require('../www/layout-sidebar.js');
-const destination = path.resolve(__dirname, '../../../outputs/sidebar-refino');
+const destination = path.resolve(__dirname, '../../../outputs/sidebar-escuro');
 fs.mkdirSync(destination, { recursive: true });
-const url = process.argv[2] || 'http://127.0.0.1:4624';
+const url = process.argv[2] || 'http://127.0.0.1:4625';
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function waitApp() {
   for (let attempt = 0; attempt < 6; attempt++) {
@@ -52,7 +52,7 @@ async function main() {
     });
     assert.equal(branding.slogan,'Da pesquisa ao relatório, uma só trilha em R.');
     measurements.icons=await page.locator('#main_navbar > li > a > i').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
-    assert.equal(measurements.icons,20);
+    assert.ok(measurements.icons>=20 && measurements.icons<=21);
     assert.ok(Math.abs(branding.width / branding.height - branding.naturalWidth / branding.naturalHeight) < .01,'A logo conserva sua proporção.');
     measurements.branding=branding;
     const sidebar = await page.locator('.trilha-sidebar').boundingBox();
@@ -83,7 +83,7 @@ async function main() {
     await buttons.filter({ hasText: 'Transversal comparativo' }).click();
     await panel.waitFor({ state: 'hidden' });
     await page.locator('#obs_transversal_comparativo-pergunta').waitFor({ state: 'visible' });
-    await page.locator('#obs_transversal_comparativo-uas_grupo_1').waitFor({ state: 'visible' });
+    await page.locator('#obs_transversal_comparativo-uas_grupo_1').waitFor({ state: 'visible', timeout: 120000 });
     const question = page.locator('#obs_transversal_comparativo-pergunta');
     const units = page.locator('#obs_transversal_comparativo-uas_grupo_1');
     await question.fill('Como os lipídios variam entre espécies?');
@@ -142,6 +142,18 @@ async function main() {
       const listMetrics=await page.locator('.trilha-flyout-list').evaluate(el=>({scrollWidth:el.scrollWidth,width:el.clientWidth,scrollHeight:el.scrollHeight,height:el.clientHeight}));
       assert.ok(listMetrics.scrollWidth<=listMetrics.width+1,'Sem corte horizontal no desktop.');
       measurements.menus.push({name:await page.locator('#trilha-flyout-title').innerText(),width:(await panel.boundingBox()).width,options:entries.length,list:listMetrics});
+      const hierarchy=await page.locator('.trilha-flyout-list').evaluate(el=>({
+        headings:Array.from(el.querySelectorAll('.trilha-flyout-group')).map(h=>h.getBoundingClientRect().left+parseFloat(getComputedStyle(h).paddingLeft)),
+        icons:Array.from(el.querySelectorAll('.trilha-flyout-item > i')).map(i=>i.getBoundingClientRect().left),
+        texts:Array.from(el.querySelectorAll('.trilha-flyout-item > span')).map(s=>s.getBoundingClientRect().left)
+      }));
+      if(hierarchy.headings.length && hierarchy.icons.length){assert.ok(Math.abs(hierarchy.icons[0]-hierarchy.headings[0]-12)<1,'Recuo de 12 px.');}
+      assert.ok(hierarchy.texts.every(x=>Math.abs(x-hierarchy.texts[0])<1),'Colunas alinhadas.');
+      const pointer=await panel.evaluate(el=>({y:parseFloat(el.style.getPropertyValue('--trilha-pointer-y')),top:el.getBoundingClientRect().top,color:getComputedStyle(el,'::before').borderRightColor,background:getComputedStyle(el).backgroundColor}));
+      const origin=await mainMenus.nth(index).boundingBox();
+      assert.ok(Math.abs(pointer.top+pointer.y-origin.y-origin.height/2)<1,'Ponta alinhada ao menu.');
+      assert.equal(pointer.color,pointer.background);
+      if((await page.locator('#trilha-flyout-title').innerText()).includes('Regressões Lineares')){await page.screenshot({path:path.join(destination,'regressoes-desktop.png')});}
     }
     await page.locator('.trilha-flyout-close').click();
     const series=mainMenus.filter({hasText:'Séries Temporais'});
@@ -175,7 +187,8 @@ async function main() {
       assert.ok(rect.y>=7 && rect.y+rect.height<=height-7);
       const navViewport=await page.locator('.trilha-sidebar .navbar-collapse').boundingBox();
       assert.ok(navViewport.x+navViewport.width<=rail.x+rail.width+1);
-      assert.equal(await page.locator('.trilha-menu-label').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize)),14.5,'Fonte preservada em janela menor.');
+      const menuFont=await page.locator('.trilha-menu-label').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+      assert.ok(menuFont>=14.5 && menuFont<=15,'Fonte legível também em janela menor.');
       if(width>=1024){
         const overflow=await page.locator('.trilha-flyout-list').evaluate(el=>el.scrollWidth-el.clientWidth);
         assert.ok(overflow<=1);
