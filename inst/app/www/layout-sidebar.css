@@ -1,7 +1,8 @@
-/* Casca lateral do protótipo. Os painéis e inputs originais ficam montados. */
+/* Navegação compacta. Larguras também são conferidas com a fonte real pelo JS. */
 body.bslib-page-navbar {
-  --trilha-rail-width: 356px;
-  --trilha-menu-font: 13px;
+  --trilha-rail-width: 300px;
+  --trilha-rail-content-width: 300px;
+  --trilha-menu-font: 14.5px;
   padding-left: var(--trilha-rail-width) !important;
   background: #f4f8fc;
   color: #0f3b5f;
@@ -21,256 +22,141 @@ body.bslib-page-navbar {
   display: flex;
   flex-direction: column !important;
   flex-wrap: nowrap !important;
-  height: 100%;
-  min-width: 0;
-  align-items: stretch;
-  padding: 0;
+  height: 100%; min-width: 0;
+  align-items: stretch; padding: 0;
 }
 .trilha-sidebar .navbar-brand {
-  display: block;
-  flex-shrink: 0;
-  width: 100%;
-  min-width: 0;
-  padding: 12px 22px;
-  margin: 0;
-  height: 110px;
+  display: block; flex-shrink: 0;
+  width: 100%; min-width: 0;
+  padding: 8px 12px; margin: 0; height: auto;
 }
-.trilha-marca { display: flex; flex-direction: column; align-items: center; }
+.trilha-marca { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .trilha-marca-logo {
-  width: 205px; max-width: 100%; height: 68px; object-fit: contain;
-  background: #f1f6fa; border-radius: 8px;
+  display: block;
+  width: 192px; max-width: 100%; height: auto;
+  object-fit: contain;
+  background: #f1f6fa; border-radius: 7px;
 }
-.trilha-marca-slogan { font-size: 13px; color: #e2eff7; }
+.trilha-marca-slogan {
+  display: block; max-width: 100%;
+  font-size: 12.5px; line-height: 1.25;
+  color: #e2eff7; white-space: normal; text-align: center;
+}
 .trilha-sidebar .navbar-toggler { display: none; }
 .trilha-sidebar .navbar-collapse:has(> #main_navbar) {
   display: block !important;
-  flex-grow: 1;
-  flex-basis: auto;
-  width: 100%;
-  min-width: 0;
-  overflow-y: auto;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: #7dabbf transparent;
-  padding: 0 12px 10px;
+  flex-grow: 1; flex-basis: auto;
+  width: 100%; min-width: 0; min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin; scrollbar-color: #7dabbf transparent;
+  padding: 0 5px 6px;
 }
-#main_navbar { flex-direction: column; gap: 1px; width: 100%; }
+#main_navbar {
+  flex-direction: column; gap: 1px;
+  width: 100%; min-width: calc(var(--trilha-rail-content-width) - 20px);
+}
 #main_navbar > li { flex-grow: 0 !important; width: 100%; }
 #main_navbar > .bslib-nav-spacer { display: none; }
-/* Três grupos visuais, sem acrescentar uma camada de cliques ao menu. */
 .navbar:has(#main_navbar) .trilha-menu-section {
-  display: block;
-  margin: 8px 10px 3px;
-  padding-top: 8px;
+  display: block; margin: 4px 7px 2px; padding-top: 5px;
   border-top: 1px solid #50738d;
-  color: #c4d9ea;
-  font-family: inherit;
+  color: #c4d9ea; font-family: inherit;
   font-size: var(--trilha-menu-font) !important;
-  font-weight: 500;
-  line-height: 1.3;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  font-weight: 500; line-height: 1.2; letter-spacing: .3px;
+  text-transform: uppercase; white-space: nowrap;
 }
-.navbar:has(#main_navbar) .trilha-menu-section-first {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
+.navbar:has(#main_navbar) .trilha-menu-section-first { margin-top: 0; padding-top: 0; border-top: 0; }
 #main_navbar > li > a {
-  position: relative;
-  display: grid;
-  grid-template-columns: 24px 1fr 10px;
-  column-gap: 10px;
-  align-items: center;
-  padding: 6px 10px;
-  border-bottom: 0;
-  border-radius: 7px;
-  font-size: var(--trilha-menu-font);
-  line-height: 1.4;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  color: #f2f7fb;
+  position: relative; display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 8px;
+  column-gap: 6px; align-items: center;
+  padding: 4px 7px; border-bottom: 0; border-radius: 6px;
+  font-size: var(--trilha-menu-font); font-weight: 500; line-height: 1.35;
+  white-space: nowrap; color: #f2f7fb;
 }
-#main_navbar > li > a > i { font-size: 18px; color: #d5edf5; text-align: center; }
+#main_navbar > li > a > i { font-size: 20px; color: #d5edf5; text-align: center; }
 #main_navbar .caret { display: none; }
-#main_navbar .trilha-menu-label { grid-column: 2; grid-row: 1; }
-#main_navbar > li > a:hover,
-#main_navbar > li > a:focus-visible { background: #244e6d; color: white; }
-#main_navbar > li.trilha-active-menu > a,
-#main_navbar > li > a.active { background: #086786; color: white; }
-#main_navbar > li.trilha-open > a { box-shadow: inset 0 0 0 1px #62b6b7; }
+#main_navbar .trilha-menu-label { grid-column: 2; grid-row: 1; white-space: nowrap; }
+#main_navbar > li > a:hover, #main_navbar > li > a:focus-visible { background: #244e6d; color: white; }
+/* Em uso: fundo petróleo e marca à esquerda. Aberto: contorno e seta para baixo. */
+#main_navbar > li.trilha-active-menu > a, #main_navbar > li > a.active {
+  background: #086786; color: white; font-weight: 600;
+  box-shadow: inset 3px 0 0 #8ce0e1;
+}
+#main_navbar > li.trilha-open > a {
+  outline: 1px solid #d5edf5; outline-offset: -1px;
+}
+#main_navbar > li.trilha-open:not(.trilha-active-menu) > a { background: #244e6d; }
 #main_navbar .dropdown-toggle::after {
-  margin: 0;
-  grid-column: 3;
-  grid-row: 1;
-  justify-self: end;
+  margin: 0; grid-column: 3; grid-row: 1; justify-self: end; transform: rotate(-90deg);
 }
-#main_navbar .dropdown-toggle::after { transform: rotate(-90deg); }
+#main_navbar .trilha-open > .dropdown-toggle::after { transform: none; }
 .trilha-active-note {
-  grid-column: 2 / 4;
-  font-size: 11px;
-  font-weight: 400;
-  padding-top: 2px;
-  overflow-wrap: anywhere;
-  color: #d6f5fa;
+  grid-column: 2 / 4; font-size: 11px; font-weight: 400;
+  line-height: 1.3; padding-top: 1px; white-space: normal; color: #d6f5fa;
 }
-/* Os links Shiny ficam ocultos no local original; só os atalhos flutuam. */
 #main_navbar > li > .dropdown-menu { display: none !important; }
 .trilha-flyout[hidden], .trilha-flyout [hidden] { display: none !important; }
 .trilha-flyout {
-  position: fixed;
-  z-index: 1040;
-  display: flex;
-  flex-direction: column;
-  width: 348px;
-  max-height: calc(100dvh - 16px);
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  color: #0f3b5f;
-  background: #fff;
-  border: 1px solid #d3e4ef;
-  border-radius: 10px;
-  box-shadow: 0 12px 32px #062b4c33;
-  overflow: hidden;
+  position: fixed; z-index: 1040; display: flex; flex-direction: column;
+  width: 340px; max-height: calc(100dvh - 16px); box-sizing: border-box;
+  margin: 0; padding: 0; color: #0f3b5f; background: #fff;
+  border: 1px solid #d3e4ef; border-radius: 9px;
+  box-shadow: 0 10px 28px #062b4c33; overflow: hidden;
 }
 .trilha-flyout-header {
-  display: grid;
-  grid-template-columns: 1fr 30px;
-  align-items: center;
-  gap: 12px 8px;
-  padding: 16px 14px 12px;
-  flex-shrink: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) 28px;
+  align-items: center; gap: 8px;
+  padding: 11px 12px 9px; flex-shrink: 0;
   border-bottom: 1px solid #e4edf4;
 }
 #trilha-flyout-title {
-  margin: 0;
-  color: #0f3b5f;
-  font-size: 17px !important;
-  line-height: 1.3;
-  font-weight: 700;
-  overflow-wrap: anywhere;
+  margin: 0; color: #0f3b5f; font-size: 17px !important;
+  line-height: 1.25; font-weight: 700; overflow-wrap: anywhere;
 }
 .trilha-flyout-close {
-  border: 0;
-  border-radius: 5px;
-  background: #eef5fa;
-  color: #45667d;
-  font-size: 24px;
-  line-height: 1;
-  padding: 3px;
+  border: 0; border-radius: 5px; background: #eef5fa; color: #45667d;
+  font-size: 24px; line-height: 1; padding: 2px;
 }
 .trilha-flyout-search {
-  grid-column: 1 / -1;
-  width: 100%;
-  min-width: 0;
-  border: 1px solid #bfd5e3;
-  border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 13px;
-  background: #fff;
-  color: #0f3b5f;
+  grid-column: 1 / -1; width: 100%; min-width: 0;
+  border: 1px solid #bfd5e3; border-radius: 5px;
+  padding: 6px 8px; font-size: 14px; background: #fff; color: #0f3b5f;
 }
 .trilha-flyout-list {
-  flex: 0 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: #bfd5e3 transparent;
-  list-style: none;
-  padding: 6px 10px 12px;
-  margin: 0;
+  flex: 0 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: #bfd5e3 transparent;
+  list-style: none; padding: 4px 8px 7px; margin: 0;
 }
 .trilha-flyout-group {
-  padding: 12px 8px 5px;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1.4;
-  text-transform: uppercase;
-  color: #567a96;
+  padding: 7px 8px 3px; font-size: 11px; font-weight: 600; line-height: 1.25;
+  text-transform: uppercase; white-space: nowrap; color: #567a96;
 }
 .trilha-flyout-item {
-  width: 100%;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 9px 8px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: #0f3b5f;
-  text-align: left;
-  font: inherit;
-  font-size: 13px;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
+  width: max-content; min-width: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; border: 0; border-radius: 5px; background: transparent;
+  color: #0f3b5f; text-align: left; font: inherit;
+  font-size: 14.5px; font-weight: 400; line-height: 1.35; white-space: nowrap;
 }
-.trilha-flyout-item > i { width: 18px; flex-shrink: 0; color: #2e7d8f; }
+.trilha-flyout-item > span { flex: 0 0 auto; white-space: nowrap; }
+.trilha-flyout-item > i { width: 20px; flex: 0 0 20px; font-size: 19px; color: #2e7d8f; }
 .trilha-flyout-item:hover { background: #edf5fa; }
 .trilha-flyout-item.active { background: #d4edf4; color: #075b78; font-weight: 600; }
 .trilha-flyout :is(button, input):focus-visible { outline: 2px solid #2e7d8f; outline-offset: -2px; }
-.trilha-flyout-empty { margin: 0; padding: 16px; font-size: 13px; }
-.trilha-flyout-footer {
-  flex-shrink: 0;
-  padding: 9px 16px;
-  border-top: 1px solid #e4edf4;
-  font-size: 11px;
-  color: #567a96;
-}
-.trilha-toolbar {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  background: #fff;
-  border-bottom: 1px solid #d6e4ef;
-  padding: 8px 18px;
-  flex-shrink: 0;
-  min-height: 48px;
-}
-.trilha-toggle {
-  color: #0f3b5f;
-  background: #eef5fa;
-  border: 1px solid #bfd5e3;
-  border-radius: 6px;
-  padding: 6px 10px;
-}
+.trilha-flyout-empty { margin: 0; padding: 12px; font-size: 14px; }
+.trilha-flyout-footer { flex-shrink: 0; padding: 6px 12px; border-top: 1px solid #e4edf4; font-size: 11px; color: #567a96; }
+.trilha-toolbar { display: flex; gap: 16px; align-items: center; background: #fff; border-bottom: 1px solid #d6e4ef; padding: 8px 18px; flex-shrink: 0; min-height: 48px; }
+.trilha-toggle { color: #0f3b5f; background: #eef5fa; border: 1px solid #bfd5e3; border-radius: 6px; padding: 6px 10px; }
 .trilha-toggle:focus-visible { outline: 3px solid #62b6b7; }
 #trilha-caminho { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; }
 #trilha-caminho > span + span::before { content: "/"; margin-right: 8px; color: #8ba9bd; }
 #trilha-caminho > span:last-child { font-weight: 600; }
 body.bslib-page-navbar.trilha-sidebar-collapsed { padding-left: 0 !important; }
 .trilha-sidebar-collapsed .trilha-sidebar { display: none; }
-@media (max-width: 900px) {
-  body.bslib-page-navbar { --trilha-rail-width: 280px; --trilha-menu-font: 12px; }
-  .trilha-sidebar .navbar-brand { padding: 12px; }
-}
+/* Sem reduzir fontes nem ocultar rótulos. Se faltar espaço físico, os
+   contêineres têm rolagem, inclusive horizontal para os nomes integrais. */
 @media (max-width: 600px) {
-  body.bslib-page-navbar { --trilha-rail-width: min(280px, 40vw); }
+  body.bslib-page-navbar { --trilha-rail-width: min(300px, 40vw); }
   .trilha-sidebar { top: 48px !important; height: calc(100dvh - 48px) !important; }
   .trilha-toolbar { position: relative; z-index: 1030; }
-  .trilha-marca-slogan { font-size: 10px; white-space: normal; text-align: center; }
-}
-
-/* Em celulares pequenos, os ícones mantêm os menus acessíveis e deixam
-   espaço para ler o flyout. Nomes completos ficam nos rótulos e no painel. */
-@media (max-width: 480px) {
-  body.bslib-page-navbar { --trilha-rail-width: 64px; }
-  .trilha-sidebar .navbar-brand { height: 80px; padding: 8px; }
-  .trilha-sidebar .navbar-collapse:has(> #main_navbar) { padding: 0 6px 8px; }
-  #main_navbar > li > a { display: flex; justify-content: center; padding: 8px 0; font-size: 0; }
-  #main_navbar > li > a > i { font-size: 19px; }
-  #main_navbar .dropdown-toggle::after, #main_navbar .caret { display: none; }
-  #main_navbar :is(.trilha-menu-label, .trilha-active-note, .trilha-menu-section), .trilha-marca-slogan {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
-  }
-  #main_navbar > li:has(.trilha-menu-section) { margin-top: 6px; border-top: 1px solid #50738d; }
 }

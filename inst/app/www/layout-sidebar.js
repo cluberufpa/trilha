@@ -1,8 +1,8 @@
 /* O flyout apresenta atalhos para os links originais do bslib. Os painéis,
    bindings Shiny e servidores dos módulos permanecem montados no lugar. */
-function trilhaFlyoutBounds(railRight, anchorTop, viewportWidth, viewportHeight, panelHeight) {
+function trilhaFlyoutBounds(railRight, anchorTop, viewportWidth, viewportHeight, panelHeight, preferredWidth = 348) {
   const left = Math.max(0, Math.ceil(railRight)) + 8;
-  const width = Math.max(0, Math.min(348, viewportWidth - left - 8));
+  const width = Math.max(0, Math.min(preferredWidth, viewportWidth - left - 8));
   const maxHeight = Math.max(0, viewportHeight - 16);
   const top = Math.max(8, Math.min(anchorTop, viewportHeight - Math.min(panelHeight, maxHeight) - 8));
   return { left, top, width, maxHeight };
@@ -21,6 +21,7 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
   const label = el => el.textContent.replace(/\s+/g, " ").trim();
   const normalize = text => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("pt-BR");
   let opened = null;
+  let preferredPanelWidth = 260;
 
   // Fora da navbar: position:fixed não fica preso ao overflow da barra.
   const panel = document.createElement("section");
@@ -59,19 +60,51 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
   panel.append(header, list, empty, footer);
   document.body.appendChild(panel);
 
+  // Mede os nomes com as fontes efetivamente carregadas, sem abreviação.
+  function textWidth(text, element, weight) {
+    const style = getComputedStyle(element);
+    const probe = document.createElement("span");
+    probe.setAttribute("aria-hidden", "true");
+    probe.style.cssText = "position:fixed;visibility:hidden;white-space:nowrap;width:max-content;pointer-events:none";
+    probe.style.fontFamily = style.fontFamily;
+    probe.style.fontSize = style.fontSize;
+    probe.style.fontWeight = weight || style.fontWeight;
+    probe.style.letterSpacing = style.letterSpacing;
+    probe.textContent = text;
+    document.body.appendChild(probe);
+    const width = probe.getBoundingClientRect().width;
+    probe.remove();
+    return width;
+  }
+  function sizeSidebar() {
+    const labels = Array.from(nav.querySelectorAll(".trilha-menu-label"));
+    if (!labels.length) return;
+    const longest = Math.max(...labels.map(el => textWidth(label(el), el, "600")));
+    const required = Math.max(300, Math.ceil(longest + 76));
+    document.body.style.setProperty("--trilha-rail-content-width", required + "px");
+    const available = window.innerWidth <= 600 ? Math.min(required, Math.floor(window.innerWidth * .4)) : required;
+    document.body.style.setProperty("--trilha-rail-width", available + "px");
+  }
+  function sizePanel() {
+    const buttons = Array.from(list.querySelectorAll(".trilha-flyout-item"));
+    const longest = Math.max(0, ...buttons.map(el => textWidth(label(el), el, "600")));
+    const groups = Array.from(list.querySelectorAll(".trilha-flyout-group"));
+    const groupWidth = Math.max(0, ...groups.map(el => textWidth(label(el).toLocaleUpperCase("pt-BR"), el)));
+    preferredPanelWidth = Math.ceil(Math.max(260, longest + 70, groupWidth + 42, textWidth(title.textContent, title) + 64));
+  }
   function positionPanel() {
     if (!opened) return;
     const heading = opened.querySelector(":scope > .dropdown-toggle");
     const rect = heading.getBoundingClientRect();
     const bounds = trilhaFlyoutBounds(rail.getBoundingClientRect().right, rect.top,
-      window.innerWidth, window.innerHeight, panel.getBoundingClientRect().height);
+      window.innerWidth, window.innerHeight, panel.getBoundingClientRect().height, preferredPanelWidth);
     panel.style.left = bounds.left + "px";
     panel.style.width = bounds.width + "px";
     panel.style.maxHeight = bounds.maxHeight + "px";
     // A nova largura pode mudar a altura das linhas.
     const height = panel.getBoundingClientRect().height;
     panel.style.top = trilhaFlyoutBounds(bounds.left - 8, rect.top,
-      window.innerWidth, window.innerHeight, height).top + "px";
+      window.innerWidth, window.innerHeight, height, preferredPanelWidth).top + "px";
   }
 
   function closePanel(restoreFocus = false) {
@@ -162,6 +195,7 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
       } else return;
       list.appendChild(row);
     });
+    sizePanel();
     panel.hidden = false;
     list.scrollTop = 0;
     positionPanel();
@@ -260,7 +294,11 @@ if (typeof document !== "undefined") document.addEventListener("DOMContentLoaded
     toggle.setAttribute("aria-label", collapsed ? "Mostrar barra lateral" : "Recolher barra lateral");
     window.dispatchEvent(new Event("resize"));
   });
-  window.addEventListener("resize", positionPanel);
+  function fitNavigation() { sizeSidebar(); if (opened) { sizePanel(); positionPanel(); } }
+  window.addEventListener("resize", fitNavigation);
+  document.fonts.ready.then(fitNavigation);
+  document.fonts.addEventListener("loadingdone", fitNavigation);
+  fitNavigation();
   rail.querySelector(".navbar-collapse").addEventListener("scroll", positionPanel, { passive: true });
   const initial = nav.querySelector("a[data-bs-toggle='tab'].active");
   if (initial) identifyActive(initial);

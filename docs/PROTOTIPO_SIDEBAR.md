@@ -6,12 +6,11 @@ Branch de trabalho: `feat/layout-sidebar`. Ajustes locais realizados em 14/10/20
 
 Os menus principais permanecem na barra, organizados em Pesquisa, Análises e Aprender e comunicar. Um clique abre um único painel flutuante à direita; outro menu troca o conteúdo, e repetir o clique fecha o painel. Selecionar um módulo (inclusive o já ativo), clicar fora, usar o botão de fechar ou pressionar Esc também fecha. O menu ativo, a indicação “Em uso” e o caminho do módulo são preservados.
 
-O painel tem largura preferida de 348 px, reduzida conforme o espaço disponível. Seu topo acompanha o menu acionado e é corrigido para caber na janela; redimensionamento e rolagem da barra recalculam a posição. Cabeçalho e rodapé ficam separados da lista, que tem rolagem própria. Menus com oito ou mais módulos oferecem busca local pelo nome, ignorando maiúsculas e acentos; grupos sem resultados ficam ocultos durante a busca.
+A largura do painel é medida pelos nomes reais com a fonte carregada no navegador e limitada ao espaço disponível; no refinamento atual, variou de 260 a 338 px. Seu topo acompanha o menu acionado e é corrigido para caber na janela; redimensionamento e rolagem da barra recalculam a posição. Cabeçalho e rodapé ficam separados da lista, que tem rolagem própria. Menus com oito ou mais módulos oferecem busca local pelo nome, ignorando maiúsculas e acentos; grupos sem resultados ficam ocultos durante a busca.
 
 Enter ou Espaço abre/fecha o menu; seta direita/baixo entra no painel. Setas, Home/End e Tab permitem percorrer os controles, e Esc devolve o foco ao botão de origem. O painel é não modal: a área central e os outros menus continuam acessíveis.
 
-Em larguras de até 480 px, a barra usa ícones para deixar espaço para o painel. Os nomes completos permanecem nos rótulos acessíveis, nos tooltips e no cabeçalho do flyout; o destaque do menu ativo permanece visível. Nas demais larguras, continuam os nomes e a indicação do módulo na barra.
-
+A fonte dos menus e módulos permanece em 14,5 px, inclusive nas janelas menores. Os rótulos não são escondidos, abreviados ou transformados em reticências. A lista principal e o flyout têm rolagem própria; quando a janela é estreita demais para comportar fisicamente os nomes, há também rolagem horizontal para mantê-los em uma linha. O painel continua inteiramente dentro da janela e à direita da barra.
 ## Preservação dos módulos
 
 A UI continua usando os mesmos painéis `nav_panel` e servidores. Os links originais ficam ocultos na navbar, preservando `data-value`, a seleção de abas e o binding `main_navbar` do Shiny. O flyout contém atalhos que acionam esses links; os campos dos módulos não são movidos, removidos ou recriados.
@@ -30,7 +29,7 @@ shiny::runApp("inst/app", launch.browser = TRUE)
 
 Reinicie o app para carregar esta versão da UI. Os endereços de CSS e JavaScript foram versionados para evitar cópias antigas em cache. O botão de três barras continua recolhendo/reabrindo a própria sidebar e fecha o flyout, se estiver aberto.
 
-A sessão de teste separada usou `http://127.0.0.1:4623`. Neste ambiente, foi necessário ajustar somente a sessão R antes da execução:
+A sessão de teste separada usou `http://127.0.0.1:4624`. Neste ambiente, foi necessário ajustar somente a sessão R antes da execução:
 
 ```r
 Sys.setlocale("LC_ALL", "Portuguese_Brazil.utf8")
@@ -64,7 +63,7 @@ Capturas de conferência: `outputs/sidebar-flyout/flyout-desktop.png` e `outputs
 Para repetir o teste, com o app já iniciado e Playwright disponível no `NODE_PATH`:
 
 ```text
-node inst/app/tests/test_layout_flyout.cjs http://127.0.0.1:4623
+node inst/app/tests/test_layout_flyout.cjs http://127.0.0.1:4624
 ```
 
 Ele é separado da suíte R oficial e não instala pacotes ou navegadores.
@@ -80,3 +79,20 @@ Esta etapa valida a navegação e sua integração com o Transversal. Não certi
 - `inst/app/www/layout-sidebar.js`: atalhos, busca, posição, seleção e foco.
 - `inst/app/tests/test_layout_flyout.cjs`: teste de interação no app local.
 - `docs/PROTOTIPO_SIDEBAR.md`: escopo, execução, validação e limites.
+## Refinamento de legibilidade (14/10/2026)
+
+- Sidebar medida em **300 px**, contra 356 px da versão anterior. Itens em **14,5 px**, ícones em **20 px**, coluna de ícones de 22 px e seta alinhada à direita. O nome mais longo é medido com peso 600 para manter o encaixe quando ficar ativo. Se fonte ou nomes mudarem, o cálculo ajusta a largura necessária.
+- Flyout em **313 px** no Planejamento e entre **260 e 338 px** nos treze menus. Itens em **14,5 px**, ícones em **19 px**, nomes integrais em uma linha. A largura considera o nome mais longo, o título e os grupos.
+- Menos espaçamento vertical: links principais com 4 px acima/abaixo, opções do flyout com 5 px, e separadores mais compactos. Em **1280 × 720 px de área útil**, todos os menus principais e as 14 opções do Planejamento couberam sem rolagem vertical. Em **1024 × 640 px**, as listas usam rolagem independente; nenhum item é removido para caber.
+- **Aberto**: contorno claro, fundo azul intermediário e seta para baixo. **Em uso**: fundo azul-petróleo, marca à esquerda e indicação do módulo. O teste selecionou “Visualizar e suavizar” em Séries Temporais e depois abriu Planejamento, conferindo que os dois estados coexistem em menus diferentes.
+- Marca original `inst/app/www/logo_trilha_transparente.png`: **2078 × 757 px**, sem slogan incorporado. O arquivo não foi alterado; é exibido inteiro em **192 × 69,94 px**, com proporção conferida. O slogan separado é exatamente **“Da pesquisa ao relatório, uma só trilha em R.”**, em duas linhas, com fonte de 12,5 px. O cabeçalho completo mede aproximadamente 120 px de altura.
+
+### Verificações desta revisão
+
+`test_layout_flyout.cjs` passou com status 0 contra o app real, em Chrome isolado, com zoom/escala visual de **100%**. Foram medidos os **13 menus e 87 opções**: todos os nomes preservados, em uma linha, sem overflow horizontal no desktop. O teste verificou fonte, proporção da marca, slogan, distinção dos estados, busca, teclado, fechamento, posição, preservação dos campos e retorno ao Transversal depois de trocar de módulo.
+
+As áreas úteis testadas foram **1440 × 900**, **1366 × 768**, **1280 × 720**, **1024 × 640**, além de larguras menores de 600, 480 e 320 px para conferir contenção e rolagem. Medidas detalhadas em `outputs/sidebar-refino/medidas.json`.
+
+Comparação das expressões R com o commit anterior: menus, corpos dos módulos e servidor idênticos. Sintaxe R/JavaScript e `git diff --check` sem erro. Nenhuma dependência de produção foi acrescentada. Os cálculos e exportadores não foram alterados; a suíte estatística completa não foi repetida. Ao abrir Séries com os dados iniciais, o módulo emitiu avisos gráficos sobre escala de cores e linhas ausentes; essas saídas estatísticas não foram revalidadas nesta tarefa de layout.
+
+Capturas inspecionadas: `outputs/sidebar-refino/flyout-estados.png` (1440 × 900), `flyout-estados-1280.png` (1280 × 720), `flyout-1024.png` (1024 × 640) e `flyout-estreito.png`. A ferramenta interativa não conseguiu ler a janela pessoal do autor; os tamanhos acima são as áreas úteis reais das sessões locais de teste. A UI mede a janela e a fonte novamente ao carregar, ao mudar de tamanho e após o carregamento de fontes, sem depender das dimensões da captura de referência.

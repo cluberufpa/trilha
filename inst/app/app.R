@@ -249,7 +249,7 @@ ui <- page_navbar(
   title = div(
     class = "trilha-marca",
     tags$img(src = "logo_trilha_transparente.png", alt = "Trilha", class = "trilha-marca-logo"),
-    span("Da pergunta ao relatório", class = "trilha-marca-slogan")
+    span(class = "trilha-marca-slogan", "Da pesquisa ao relatório, ", tags$br(), "uma só trilha em R.")
   ),
   theme = bs_theme(
     version = 5,
@@ -271,8 +271,8 @@ ui <- page_navbar(
       )
     ),
     tags$head(
-    tags$link(rel = "stylesheet", href = "layout-sidebar.css?v=4"),
-    tags$script(src = "layout-sidebar.js?v=4", defer = NA),
+    tags$link(rel = "stylesheet", href = "layout-sidebar.css?v=5"),
+    tags$script(src = "layout-sidebar.js?v=5", defer = NA),
     tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"),
     tags$style(HTML("
       body {
