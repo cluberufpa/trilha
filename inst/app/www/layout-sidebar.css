@@ -17,23 +17,27 @@ body.bslib-page-navbar {
   z-index: 1020;
   overflow: hidden;
 }
-.trilha-sidebar > .container-fluid {
+.navbar:has(#main_navbar) > .container-fluid {
   display: flex;
-  flex-direction: column;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
   height: 100%;
+  min-width: 0;
   align-items: stretch;
   padding: 0;
 }
 .trilha-sidebar .navbar-brand {
   display: block;
   flex-shrink: 0;
+  width: 100%;
+  min-width: 0;
   padding: 12px 22px;
   margin: 0;
   height: 110px;
 }
 .trilha-marca { display: flex; flex-direction: column; align-items: center; }
 .trilha-marca-logo {
-  width: 205px; height: 68px; object-fit: contain;
+  width: 205px; max-width: 100%; height: 68px; object-fit: contain;
   background: #f1f6fa; border-radius: 8px;
 }
 .trilha-marca-slogan { font-size: 13px; color: #e2eff7; }
@@ -42,6 +46,8 @@ body.bslib-page-navbar {
   display: block !important;
   flex-grow: 1;
   flex-basis: auto;
+  width: 100%;
+  min-width: 0;
   overflow-y: auto;
   min-height: 0;
   scrollbar-width: thin;
@@ -82,9 +88,12 @@ body.bslib-page-navbar {
   font-size: var(--trilha-menu-font);
   line-height: 1.4;
   white-space: normal;
+  overflow-wrap: anywhere;
   color: #f2f7fb;
 }
 #main_navbar > li > a > i { font-size: 18px; color: #d5edf5; text-align: center; }
+#main_navbar .caret { display: none; }
+#main_navbar .trilha-menu-label { grid-column: 2; grid-row: 1; }
 #main_navbar > li > a:hover,
 #main_navbar > li > a:focus-visible { background: #244e6d; color: white; }
 #main_navbar > li.trilha-active-menu > a,
@@ -96,7 +105,7 @@ body.bslib-page-navbar {
   grid-row: 1;
   justify-self: end;
 }
-#main_navbar .trilha-open > .dropdown-toggle::after { transform: rotate(180deg); }
+#main_navbar .dropdown-toggle::after { transform: rotate(-90deg); }
 .trilha-active-note {
   grid-column: 2 / 4;
   font-size: 11px;
@@ -105,41 +114,110 @@ body.bslib-page-navbar {
   overflow-wrap: anywhere;
   color: #d6f5fa;
 }
-#main_navbar > li > .dropdown-menu {
-  display: none;
-  position: static !important;
-  transform: none !important;
-  min-width: 0;
-  width: 100%;
-  margin: 4px 0 8px;
-  padding: 6px;
-  background: #f1f6fa;
+/* Os links Shiny ficam ocultos no local original; só os atalhos flutuam. */
+#main_navbar > li > .dropdown-menu { display: none !important; }
+.trilha-flyout[hidden], .trilha-flyout [hidden] { display: none !important; }
+.trilha-flyout {
+  position: fixed;
+  z-index: 1040;
+  display: flex;
+  flex-direction: column;
+  width: 348px;
+  max-height: calc(100dvh - 16px);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: #0f3b5f;
+  background: #fff;
+  border: 1px solid #d3e4ef;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px #062b4c33;
+  overflow: hidden;
+}
+.trilha-flyout-header {
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  align-items: center;
+  gap: 12px 8px;
+  padding: 16px 14px 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #e4edf4;
+}
+#trilha-flyout-title {
+  margin: 0;
+  color: #0f3b5f;
+  font-size: 17px !important;
+  line-height: 1.3;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.trilha-flyout-close {
   border: 0;
-  border-radius: 7px;
-  box-shadow: none;
-}
-#main_navbar > .trilha-open > .dropdown-menu { display: block; }
-#main_navbar .dropdown-header {
-  font-size: 10px;
+  border-radius: 5px;
+  background: #eef5fa;
   color: #45667d;
-  white-space: normal;
-  padding: 9px 6px 4px;
+  font-size: 24px;
+  line-height: 1;
+  padding: 3px;
 }
-#main_navbar .dropdown-item {
+.trilha-flyout-search {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #bfd5e3;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: #fff;
+  color: #0f3b5f;
+}
+.trilha-flyout-list {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #bfd5e3 transparent;
+  list-style: none;
+  padding: 6px 10px 12px;
+  margin: 0;
+}
+.trilha-flyout-group {
+  padding: 12px 8px 5px;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: #567a96;
+}
+.trilha-flyout-item {
+  width: 100%;
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  padding: 8px 6px;
-  font-size: 12px;
-  line-height: 1.4;
-  white-space: normal;
-  color: #0f3b5f;
+  gap: 10px;
+  padding: 9px 8px;
+  border: 0;
   border-radius: 5px;
+  background: transparent;
+  color: #0f3b5f;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
-#main_navbar .dropdown-item > i { width: 16px; flex-shrink: 0; color: #2e7d8f; }
-#main_navbar .dropdown-item:hover { background: #deedf4; }
-#main_navbar .dropdown-item.active { background: #2e7d8f; color: white; }
-#main_navbar .dropdown-item.active > i { color: white; }
+.trilha-flyout-item > i { width: 18px; flex-shrink: 0; color: #2e7d8f; }
+.trilha-flyout-item:hover { background: #edf5fa; }
+.trilha-flyout-item.active { background: #d4edf4; color: #075b78; font-weight: 600; }
+.trilha-flyout :is(button, input):focus-visible { outline: 2px solid #2e7d8f; outline-offset: -2px; }
+.trilha-flyout-empty { margin: 0; padding: 16px; font-size: 13px; }
+.trilha-flyout-footer {
+  flex-shrink: 0;
+  padding: 9px 16px;
+  border-top: 1px solid #e4edf4;
+  font-size: 11px;
+  color: #567a96;
+}
 .trilha-toolbar {
   display: flex;
   gap: 16px;
@@ -168,7 +246,31 @@ body.bslib-page-navbar.trilha-sidebar-collapsed { padding-left: 0 !important; }
   .trilha-sidebar .navbar-brand { padding: 12px; }
 }
 @media (max-width: 600px) {
-  body.bslib-page-navbar { padding-left: 0 !important; }
+  body.bslib-page-navbar { --trilha-rail-width: min(280px, 40vw); }
   .trilha-sidebar { top: 48px !important; height: calc(100dvh - 48px) !important; }
   .trilha-toolbar { position: relative; z-index: 1030; }
+  .trilha-marca-slogan { font-size: 10px; white-space: normal; text-align: center; }
+}
+
+/* Em celulares pequenos, os ícones mantêm os menus acessíveis e deixam
+   espaço para ler o flyout. Nomes completos ficam nos rótulos e no painel. */
+@media (max-width: 480px) {
+  body.bslib-page-navbar { --trilha-rail-width: 64px; }
+  .trilha-sidebar .navbar-brand { height: 80px; padding: 8px; }
+  .trilha-sidebar .navbar-collapse:has(> #main_navbar) { padding: 0 6px 8px; }
+  #main_navbar > li > a { display: flex; justify-content: center; padding: 8px 0; font-size: 0; }
+  #main_navbar > li > a > i { font-size: 19px; }
+  #main_navbar .dropdown-toggle::after, #main_navbar .caret { display: none; }
+  #main_navbar :is(.trilha-menu-label, .trilha-active-note, .trilha-menu-section), .trilha-marca-slogan {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+  #main_navbar > li:has(.trilha-menu-section) { margin-top: 6px; border-top: 1px solid #50738d; }
 }

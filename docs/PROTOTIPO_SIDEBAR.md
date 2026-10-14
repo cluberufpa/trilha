@@ -1,72 +1,82 @@
-# Protótipo local: navegação lateral
+# Protótipo local: navegação lateral com flyout
 
-Branch: `feat/layout-sidebar`, criada a partir de `main` em 14/10/2026.
+Branch de trabalho: `feat/layout-sidebar`. Ajustes locais realizados em 14/10/2026; nada publicado no remoto.
 
-## Escopo
+## Comportamento atual
 
-A navegação horizontal virou uma barra esquerda em azul-marinho, com menus em acordeão, rolagem própria, caminho do módulo ativo e botão para recolher a barra. Os nomes, agrupamentos e links existentes continuam disponíveis. O Transversal comparativo é o piloto conferido; os demais módulos ainda precisam de avaliação de layout.
+Os menus principais permanecem na barra, organizados em Pesquisa, Análises e Aprender e comunicar. Um clique abre um único painel flutuante à direita; outro menu troca o conteúdo, e repetir o clique fecha o painel. Selecionar um módulo (inclusive o já ativo), clicar fora, usar o botão de fechar ou pressionar Esc também fecha. O menu ativo, a indicação “Em uso” e o caminho do módulo são preservados.
 
-Os painéis continuam sendo os mesmos `nav_panel` do bslib. O JavaScript controla apenas a abertura visual dos menus e acompanha o evento real de seleção de aba. Abrir/recolher um menu não envia inputs ao servidor. A troca de módulos mantém a estratégia existente: os painéis e seus servidores são criados uma vez por sessão, e a navegação alterna a visibilidade. Não há novo `renderUI` nem chamada de módulo nessa camada.
+O painel tem largura preferida de 348 px, reduzida conforme o espaço disponível. Seu topo acompanha o menu acionado e é corrigido para caber na janela; redimensionamento e rolagem da barra recalculam a posição. Cabeçalho e rodapé ficam separados da lista, que tem rolagem própria. Menus com oito ou mais módulos oferecem busca local pelo nome, ignorando maiúsculas e acentos; grupos sem resultados ficam ocultos durante a busca.
 
-Não foram alterados campos, IDs, abas, regras, cálculos, fichas ou exportadores do Transversal. Variantes, UA-conjunto e Código R ficam para a etapa própria descrita em `PLANO_VARIANTES.md`. Nenhum arquivo foi movido, pacote atualizado ou mudança publicada no remoto. Os arquivos não rastreados que já existiam foram preservados.
+Enter ou Espaço abre/fecha o menu; seta direita/baixo entra no painel. Setas, Home/End e Tab permitem percorrer os controles, e Esc devolve o foco ao botão de origem. O painel é não modal: a área central e os outros menus continuam acessíveis.
 
-## Executar
+Em larguras de até 480 px, a barra usa ícones para deixar espaço para o painel. Os nomes completos permanecem nos rótulos acessíveis, nos tooltips e no cabeçalho do flyout; o destaque do menu ativo permanece visível. Nas demais larguras, continuam os nomes e a indicação do módulo na barra.
 
-No R/RStudio, com a pasta TRILHA como diretório de trabalho:
+## Preservação dos módulos
+
+A UI continua usando os mesmos painéis `nav_panel` e servidores. Os links originais ficam ocultos na navbar, preservando `data-value`, a seleção de abas e o binding `main_navbar` do Shiny. O flyout contém atalhos que acionam esses links; os campos dos módulos não são movidos, removidos ou recriados.
+
+O painel é anexado ao corpo da página com posição fixa e camada 1040. Assim, os contêineres de rolagem da barra não o cortam. Ele sobrepõe parte do conteúdo central, começando depois da borda direita da barra, sem deslocar o layout. A regra responsiva do tema que deslocava a lista principal para fora da barra foi corrigida.
+
+Não foram alterados nomes, agrupamentos internos, campos, IDs, abas, regras, cálculos, fichas ou exportadores dos módulos. Variantes, UA-conjunto e Código R continuam para a etapa própria de `PLANO_VARIANTES.md`. Nenhum arquivo foi movido ou dependência de produção acrescentada. O trabalho local não rastreado que já existia foi preservado.
+
+## Executar e revisar
+
+No R/RStudio, com TRILHA como diretório de trabalho:
 
 ```r
 shiny::runApp("inst/app", launch.browser = TRUE)
 ```
 
-Abra **Planejando sua Pesquisa → Transversal comparativo**. O botão de três barras, no cabeçalho, recolhe e reabre a navegação lateral.
+Reinicie o app para carregar esta versão da UI. Os endereços de CSS e JavaScript foram versionados para evitar cópias antigas em cache. O botão de três barras continua recolhendo/reabrindo a própria sidebar e fecha o flyout, se estiver aberto.
 
-A sessão de validação usou `127.0.0.1:4622`. O ambiente começou com locale `C` e não conseguiu ler arquivos UTF-8. Para esse caso específico, antes de abrir o app foi usado:
+A sessão de teste separada usou `http://127.0.0.1:4623`. Neste ambiente, foi necessário ajustar somente a sessão R antes da execução:
 
 ```r
 Sys.setlocale("LC_ALL", "Portuguese_Brazil.utf8")
 ```
 
-Isso ajusta somente a sessão R. O protótipo não altera a configuração regional do computador.
+O protótipo não muda a configuração regional do computador.
 
-## Verificação realizada
+## Validação desta mudança
 
-- Sintaxe de `app.R` e `git diff --check`: sem erro.
-- Comparação das expressões R com a base `main`: declarações dos menus, agrupamentos, corpos dos painéis e função `server` idênticos. Mudaram a marca, o cabeçalho e os estilos de navegação.
-- No navegador, seleção do Transversal com recolhimento automático; caminho e menu ativo corretos; reabertura reconhece o módulo selecionado.
-- Abertura de Planejamento seguida de Preparar Dados deixa apenas o último menu expandido, sem trocar o módulo central.
-- Pergunta preenchida, 7 UAs no primeiro grupo e nome da primeira resposta permaneceram após abrir/recolher menus e recolher/reabrir a barra.
-- O resumo reativo das Definições refletiu a alteração para 27 UAs e 54 unidades físicas. A seleção da aba Desenho funcionou; a figura ainda não havia terminado de aparecer na última captura de conferência.
-- Sem erro JavaScript registrado na consulta ao console após os ajustes. Havia avisos de depreciação do componente de datas existente.
-- `test_ficha_planejamento.R` e `test_observacional_impacto.R`: todas as verificações chegaram aos respectivos resumos OK. Os processos R devolveram status 1, inclusive na repetição isolada da ficha; portanto, esses resumos não foram tratados como uma execução integral com saída limpa.
-- `test_transversal_saidas.R`: passou pelas verificações e geração de Excel, Word e desenhos nos cenários de um fator, UAs diferentes e dois fatores; falhou mais adiante no cenário de estações, em `all(coleta_estacoes$pool == 1L)`, compatível com a falha prévia informada. O arquivo do módulo não foi modificado.
+O teste `inst/app/tests/test_layout_flyout.cjs` foi executado contra o app real em uma sessão isolada do Chrome já instalado, usando o Playwright disponível no ambiente de desenvolvimento. Terminou com status 0.
 
-## Limitações para a revisão
+Foi verificado:
 
-Não foi executada uma nova suíte completa; a suíte anterior do usuário não foi usada como evidência. A renderização final da figura, todas as abas, downloads pelo navegador, troca para outro módulo e retorno, navegação por teclado e telas pequenas ainda precisam de conferência. A barra tem rolagem independente; algumas telas antigas podem exigir recolhê-la para ganhar largura.
+- abertura por clique sem mudar as posições dos menus principais;
+- um único painel, troca de menu e fechamento no clique repetido;
+- busca com resultado e sem resultado, e destaque do módulo ativo;
+- fechamento por seleção, clique externo, botão e Esc;
+- seleção repetida do Transversal já ativo;
+- Enter, setas, Home/End e retorno do foco ao menu de origem;
+- preservação da pergunta preenchida e de 7 UAs no primeiro grupo do Transversal; o mesmo elemento de input permaneceu no DOM;
+- posição dentro da janela em larguras de 320, 480, 600, 900 e 1440 px, sem cobrir a barra;
+- menus principais dentro da barra também em janelas estreitas;
+- posição de menu próximo ao rodapé e ausência de busca em menu curto;
+- rolagem da lista sem deslocar o cabeçalho;
+- ausência de erros JavaScript na sessão de teste.
 
-A ferramenta de navegador foi interrompida por reinício do ambiente, e a retomada falhou ao criar o ambiente de segurança do processo (`HRESULT 0x80070020`). Por isso não foi possível salvar a captura de tela final. O app foi inspecionado visualmente durante os testes; isso não equivale a uma certificação de todos os módulos.
+A sintaxe JavaScript e `git diff --check` passaram. A comparação das expressões R confirmou menus, corpos dos painéis e servidor preservados; a UI também foi gerada. Essa verificação R apresentou os resumos OK, mas o subprocesso voltou a devolver status 1 após eles, como nas verificações anteriores deste ambiente; esse resultado não foi tratado como saída limpa de teste R. A sessão Shiny real foi inicializada e usada pelo teste de interação.
 
-## Arquivos do protótipo
+Capturas de conferência: `outputs/sidebar-flyout/flyout-desktop.png` e `outputs/sidebar-flyout/flyout-estreito.png`, inspecionadas visualmente. A ferramenta de navegador interativo continuou com erro ao iniciar; a validação foi concluída por teste automatizado em navegador separado.
 
-- `inst/app/app.R`: marca, cabeçalho, carregamento dos recursos e retirada dos estilos horizontais.
-- `inst/app/www/layout-sidebar.css`: aparência, rolagem e largura da barra.
-- `inst/app/www/layout-sidebar.js`: acordeão, identificação do ativo e recolhimento da barra.
-- `docs/PROTOTIPO_SIDEBAR.md`: execução, evidências e limites desta etapa.
-## Ajuste dos grupos laterais (14/10/2026)
+Para repetir o teste, com o app já iniciado e Playwright disponível no `NODE_PATH`:
 
-A pedido do autor, a barra agora apresenta três títulos com separadores:
+```text
+node inst/app/tests/test_layout_flyout.cjs http://127.0.0.1:4623
+```
 
-- **Pesquisa:** Planejando sua Pesquisa, Preparar Dados e Explorar e Visualizar.
-- **Análises:** Frequências e Proporções, Testes Paramétricos, Testes Não Paramétricos, Regressões Lineares e MLG, Regressão Não Linear, Séries Temporais, Estatística Multivariada e Mapear e Analisar.
-- **Aprender e comunicar:** Laboratório de Conceitos e Comunicação de Resultados.
+Ele é separado da suíte R oficial e não instala pacotes ou navegadores.
 
-São títulos visuais, sem exigir um clique adicional. Ajuda e Sobre continuam disponíveis. O ajuste não altera o espaço vertical do cabeçalho central, o acordeão, os links ou o estado dos módulos.
+## Limites
 
-Verificação desta mudança: sintaxe R válida, comparação das declarações da UI com o commit anterior confirma apenas três novos títulos e preservação de todos os demais argumentos, e `git diff --check` sem erros. A ferramenta de navegador continuou falhando ao iniciar; a aparência desta atualização ainda não foi conferida no navegador.
-## Compactação e largura da barra (14/10/2026)
+Esta etapa valida a navegação e sua integração com o Transversal. Não certifica o conteúdo ou os downloads de todos os módulos, dispositivos de toque ou todos os leitores de tela. A suíte R completa não foi repetida; as falhas prévias relatadas em `test_transversal_saidas.R`, gradiente e longitudinal não foram alteradas nem usadas como falhas novas desta navegação. Avaliar os layouts internos dos demais módulos continua sendo uma etapa própria.
 
-Novo ajuste solicitado pelo autor: largura de 280 para 356 px (aproximadamente mais 2 cm na referência de 96 px por polegada), fonte dos menus de 14 para 13 px e títulos dos grupos com a mesma variável de tamanho. O espaço vertical interno de cada link caiu de 12 para 6 px, o intervalo entre itens de 4 para 1 px e o bloco da marca de 124 para 110 px. Em janelas de até 900 px de largura, a barra usa 280 px e fonte de 12 px; a rolagem continua disponível quando necessário.
+## Arquivos da mudança
 
-Os grupos deixaram de usar o tamanho padrão de `h2`, mas mantêm identificação de cabeçalho para acessibilidade. O endereço do CSS ganhou uma versão para carregar a atualização após reiniciar o app, sem reutilizar uma cópia antiga do estilo.
-
-Verificação: sintaxe e comparação com o commit anterior confirmaram menus, painéis e servidor preservados. A UI foi efetivamente gerada e seus três títulos acessíveis foram conferidos no HTML. O processo R apresentou os dois resumos OK, mas voltou a terminar com status 1 após eles. `git diff --check` sem erros. A ferramenta de navegador continuou falhando ao iniciar; não foi certificado que todos os itens caibam na janela do autor nem foi salva uma nova captura.
+- `inst/app/app.R`: versão dos recursos de navegação.
+- `inst/app/www/layout-sidebar.css`: sidebar, flyout e adaptação de largura.
+- `inst/app/www/layout-sidebar.js`: atalhos, busca, posição, seleção e foco.
+- `inst/app/tests/test_layout_flyout.cjs`: teste de interação no app local.
+- `docs/PROTOTIPO_SIDEBAR.md`: escopo, execução, validação e limites.

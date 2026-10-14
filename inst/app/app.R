@@ -271,8 +271,8 @@ ui <- page_navbar(
       )
     ),
     tags$head(
-    tags$link(rel = "stylesheet", href = "layout-sidebar.css?v=3"),
-    tags$script(src = "layout-sidebar.js", defer = NA),
+    tags$link(rel = "stylesheet", href = "layout-sidebar.css?v=4"),
+    tags$script(src = "layout-sidebar.js?v=4", defer = NA),
     tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"),
     tags$style(HTML("
       body {
