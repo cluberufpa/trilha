@@ -271,7 +271,7 @@ ui <- page_navbar(
       )
     ),
     tags$head(
-    tags$link(rel = "stylesheet", href = "layout-sidebar.css"),
+    tags$link(rel = "stylesheet", href = "layout-sidebar.css?v=3"),
     tags$script(src = "layout-sidebar.js", defer = NA),
     tags$link(rel = "stylesheet", href = "https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"),
     tags$style(HTML("
@@ -503,7 +503,7 @@ ui <- page_navbar(
   )),
   
   # Grupos visuais da navegação lateral; os menus e módulos seguem os mesmos.
-  nav_item(tags$h2(class = "trilha-menu-section trilha-menu-section-first", "Pesquisa")),
+  nav_item(tags$div(class = "trilha-menu-section trilha-menu-section-first", role = "heading", `aria-level` = "2", "Pesquisa")),
 
   # 1. Planejando sua Pesquisa
   nav_menu(
@@ -789,7 +789,7 @@ ui <- page_navbar(
     nav_panel(title = "Mapa de calor de correlação", icon = icon("table-cells-large"), mod_exploracao_visual_ui("visual_calor", "calor"))
   ),
 
-  nav_item(tags$h2(class = "trilha-menu-section", "Análises")),
+  nav_item(tags$div(class = "trilha-menu-section", role = "heading", `aria-level` = "2", "Análises")),
 
   # 4. Frequências e Proporções — respostas categóricas de unidades independentes.
   nav_menu(
@@ -1201,7 +1201,7 @@ ui <- page_navbar(
     )
   ),
 
-  nav_item(tags$h2(class = "trilha-menu-section", "Aprender e comunicar")),
+  nav_item(tags$div(class = "trilha-menu-section", role = "heading", `aria-level` = "2", "Aprender e comunicar")),
 
   # O Laboratório transversal aparece antes da etapa final de Comunicação.
   # Os itens ficam em grupos por pergunta; alguns reúnem variações em abas (segunda faixa).

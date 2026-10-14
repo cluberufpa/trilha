@@ -1,6 +1,7 @@
 /* Casca lateral do protótipo. Os painéis e inputs originais ficam montados. */
 body.bslib-page-navbar {
-  --trilha-rail-width: 280px;
+  --trilha-rail-width: 356px;
+  --trilha-menu-font: 13px;
   padding-left: var(--trilha-rail-width) !important;
   background: #f4f8fc;
   color: #0f3b5f;
@@ -26,9 +27,9 @@ body.bslib-page-navbar {
 .trilha-sidebar .navbar-brand {
   display: block;
   flex-shrink: 0;
-  padding: 18px 22px;
+  padding: 12px 22px;
   margin: 0;
-  height: 124px;
+  height: 110px;
 }
 .trilha-marca { display: flex; flex-direction: column; align-items: center; }
 .trilha-marca-logo {
@@ -45,25 +46,26 @@ body.bslib-page-navbar {
   min-height: 0;
   scrollbar-width: thin;
   scrollbar-color: #7dabbf transparent;
-  padding: 0 12px 18px;
+  padding: 0 12px 10px;
 }
-#main_navbar { flex-direction: column; gap: 4px; width: 100%; }
+#main_navbar { flex-direction: column; gap: 1px; width: 100%; }
 #main_navbar > li { flex-grow: 0 !important; width: 100%; }
 #main_navbar > .bslib-nav-spacer { display: none; }
 /* Três grupos visuais, sem acrescentar uma camada de cliques ao menu. */
-#main_navbar .trilha-menu-section {
-  margin: 14px 10px 4px;
-  padding-top: 16px;
+.navbar:has(#main_navbar) .trilha-menu-section {
+  display: block;
+  margin: 8px 10px 3px;
+  padding-top: 8px;
   border-top: 1px solid #50738d;
   color: #c4d9ea;
   font-family: inherit;
-  font-size: 11px;
+  font-size: var(--trilha-menu-font) !important;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.3;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-#main_navbar .trilha-menu-section-first {
+.navbar:has(#main_navbar) .trilha-menu-section-first {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
@@ -74,14 +76,15 @@ body.bslib-page-navbar {
   grid-template-columns: 24px 1fr 10px;
   column-gap: 10px;
   align-items: center;
-  padding: 12px 10px;
+  padding: 6px 10px;
+  border-bottom: 0;
   border-radius: 7px;
-  font-size: 14px;
+  font-size: var(--trilha-menu-font);
   line-height: 1.4;
   white-space: normal;
   color: #f2f7fb;
 }
-#main_navbar > li > a > i { font-size: 19px; color: #d5edf5; text-align: center; }
+#main_navbar > li > a > i { font-size: 18px; color: #d5edf5; text-align: center; }
 #main_navbar > li > a:hover,
 #main_navbar > li > a:focus-visible { background: #244e6d; color: white; }
 #main_navbar > li.trilha-active-menu > a,
@@ -98,7 +101,7 @@ body.bslib-page-navbar {
   grid-column: 2 / 4;
   font-size: 11px;
   font-weight: 400;
-  padding-top: 5px;
+  padding-top: 2px;
   overflow-wrap: anywhere;
   color: #d6f5fa;
 }
@@ -161,9 +164,8 @@ body.bslib-page-navbar {
 body.bslib-page-navbar.trilha-sidebar-collapsed { padding-left: 0 !important; }
 .trilha-sidebar-collapsed .trilha-sidebar { display: none; }
 @media (max-width: 900px) {
-  body.bslib-page-navbar { --trilha-rail-width: 230px; }
-  .trilha-sidebar .navbar-brand { padding: 18px 12px; }
-  #main_navbar > li > a { font-size: 12px; }
+  body.bslib-page-navbar { --trilha-rail-width: 280px; --trilha-menu-font: 12px; }
+  .trilha-sidebar .navbar-brand { padding: 12px; }
 }
 @media (max-width: 600px) {
   body.bslib-page-navbar { padding-left: 0 !important; }

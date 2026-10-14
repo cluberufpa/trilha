@@ -63,3 +63,10 @@ A pedido do autor, a barra agora apresenta três títulos com separadores:
 São títulos visuais, sem exigir um clique adicional. Ajuda e Sobre continuam disponíveis. O ajuste não altera o espaço vertical do cabeçalho central, o acordeão, os links ou o estado dos módulos.
 
 Verificação desta mudança: sintaxe R válida, comparação das declarações da UI com o commit anterior confirma apenas três novos títulos e preservação de todos os demais argumentos, e `git diff --check` sem erros. A ferramenta de navegador continuou falhando ao iniciar; a aparência desta atualização ainda não foi conferida no navegador.
+## Compactação e largura da barra (14/10/2026)
+
+Novo ajuste solicitado pelo autor: largura de 280 para 356 px (aproximadamente mais 2 cm na referência de 96 px por polegada), fonte dos menus de 14 para 13 px e títulos dos grupos com a mesma variável de tamanho. O espaço vertical interno de cada link caiu de 12 para 6 px, o intervalo entre itens de 4 para 1 px e o bloco da marca de 124 para 110 px. Em janelas de até 900 px de largura, a barra usa 280 px e fonte de 12 px; a rolagem continua disponível quando necessário.
+
+Os grupos deixaram de usar o tamanho padrão de `h2`, mas mantêm identificação de cabeçalho para acessibilidade. O endereço do CSS ganhou uma versão para carregar a atualização após reiniciar o app, sem reutilizar uma cópia antiga do estilo.
+
+Verificação: sintaxe e comparação com o commit anterior confirmaram menus, painéis e servidor preservados. A UI foi efetivamente gerada e seus três títulos acessíveis foram conferidos no HTML. O processo R apresentou os dois resumos OK, mas voltou a terminar com status 1 após eles. `git diff --check` sem erros. A ferramenta de navegador continuou falhando ao iniciar; não foi certificado que todos os itens caibam na janela do autor nem foi salva uma nova captura.
