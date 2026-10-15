@@ -107,7 +107,9 @@ ficha_rotulo_analise <- function(analise) {
     wilcoxon_pareado = "Wilcoxon pareado",
     anova_dois_fatores = "ANOVA de dois fatores com interação",
     t_diferenca_baci = "teste t da diferença (depois − antes) entre impacto e referência",
-    modelo_misto_sitio = "modelo misto, com o sítio como efeito aleatório"
+    modelo_misto_sitio = "modelo misto, com o sítio como efeito aleatório",
+    kruskal_wallis = "Kruskal-Wallis",
+    ancova = "ANCOVA"
   )
   if (is.null(analise) || !nzchar(analise)) return("não definida")
   if (analise %in% names(rotulos)) unname(rotulos[analise]) else analise

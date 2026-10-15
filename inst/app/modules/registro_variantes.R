@@ -76,6 +76,87 @@ variantes_impacto <- function() {
   )
 }
 
+# ---- Transversal comparativo --------------------------------------------------
+
+# Mini-desenhos do transversal: cada UA é medida uma única vez. Caixas são
+# grupos; pontos são UAs (ou sítios).
+esquema_transversal_svg <- function(forma = c("um_fator", "dois_fatores", "sitios", "tempo")) {
+  forma <- match.arg(forma)
+  caixa <- function(x, y, l, a, cor, borda) sprintf(
+    '<rect x="%g" y="%g" width="%g" height="%g" rx="4" fill="%s" stroke="%s"/>', x, y, l, a, cor, borda)
+  ponto <- function(x, y, cor) sprintf('<circle cx="%g" cy="%g" r="3.5" fill="%s"/>', x, y, cor)
+  texto <- function(x, y, t, cor = "#5f6b73") sprintf(
+    '<text x="%g" y="%g" font-size="11" text-anchor="middle" fill="%s">%s</text>', x, y, cor, t)
+  azul <- c("#DDEFF0", "#2E7D8F"); coral <- c("#FCE5DE", "#E76F51")
+  corpo <- switch(forma,
+    um_fator = paste0(
+      vapply(0:2, function(i) paste0(caixa(i * 50, 22, 46, 46, azul[1], azul[2]),
+        ponto(i * 50 + 15, 40, azul[2]), ponto(i * 50 + 31, 40, azul[2]),
+        ponto(i * 50 + 15, 54, azul[2]), ponto(i * 50 + 31, 54, azul[2]),
+        texto(i * 50 + 23, 82, c("A", "B", "C")[i + 1])), character(1)), collapse = ""),
+    dois_fatores = paste0(
+      vapply(0:3, function(i) {
+        x <- (i %% 2) * 70; y <- (i %/% 2) * 36 + 8
+        paste0(caixa(x + 4, y, 62, 30, if (i %in% c(0, 3)) azul[1] else coral[1], if (i %in% c(0, 3)) azul[2] else coral[2]),
+          ponto(x + 26, y + 15, if (i %in% c(0, 3)) azul[2] else coral[2]), ponto(x + 44, y + 15, if (i %in% c(0, 3)) azul[2] else coral[2]))
+      }, character(1)), collapse = "") ,
+    sitios = paste0(
+      vapply(0:1, function(i) paste0(caixa(i * 76, 10, 70, 70, azul[1], azul[2]),
+        paste0(vapply(0:2, function(j) sprintf('<rect x="%g" y="%g" width="14" height="14" rx="2" fill="%s"/>',
+          i * 76 + 8 + j * 20, 28, azul[2]), character(1)), collapse = ""),
+        texto(i * 76 + 35, 58, "sítios"), texto(i * 76 + 35, 74, c("categoria A", "categoria B")[i + 1])), character(1)),
+      collapse = ""),
+    tempo = paste0(
+      vapply(0:2, function(i) paste0(caixa(i * 50, 22, 46, 46, coral[1], coral[2]),
+        ponto(i * 50 + 15, 40, coral[2]), ponto(i * 50 + 31, 40, coral[2]),
+        ponto(i * 50 + 15, 54, coral[2]), ponto(i * 50 + 31, 54, coral[2]),
+        texto(i * 50 + 23, 82, paste0("T", i + 1))), character(1)), collapse = ""))
+  paste0('<svg viewBox="0 0 150 90" width="150" height="90" role="img" aria-label="Esquema do desenho">',
+    corpo, "</svg>")
+}
+
+variantes_transversal <- function() {
+  list(
+    um_fator = list(
+      rotulo = "Um fator",
+      guia = "Compara grupos de uma só variável (espécies, sexos, locais), com cada UA medida uma vez.",
+      campos = "ambiente",
+      esquema = esquema_transversal_svg("um_fator"),
+      analises = list(
+        analise_prevista("anova_um_fator", "ANOVA de um fator, com comparações múltiplas", TRUE),
+        analise_prevista("teste_t_independente", "teste t de duas amostras (só com dois grupos)"),
+        analise_prevista("kruskal_wallis", "Kruskal-Wallis"))
+    ),
+    dois_fatores = list(
+      rotulo = "Dois fatores",
+      guia = "Compara os níveis de dois fatores cruzados (por exemplo, espécie e sexo).",
+      campos = c("ambiente", "fator2"),
+      esquema = esquema_transversal_svg("dois_fatores"),
+      analises = list(
+        analise_prevista("anova_dois_fatores", "ANOVA de dois fatores com interação", TRUE),
+        analise_prevista("ancova", "ANCOVA (com uma covariável medida)"))
+    ),
+    sitios_categorias = list(
+      rotulo = "Fator com sítios dentro das categorias",
+      guia = "Compara categorias de ambientes; a réplica é cada sítio, e não os pontos medidos dentro dele.",
+      campos = character(),
+      esquema = esquema_transversal_svg("sitios"),
+      analises = list(
+        analise_prevista("anova_um_fator", "ANOVA nos sítios (um valor por sítio)", TRUE),
+        analise_prevista("modelo_misto_sitio", "modelo misto, com o sítio dentro da categoria"))
+    ),
+    tempo_fator = list(
+      rotulo = "Tempo como fator",
+      guia = "UAs diferentes em cada tempo (novos peixes, novos pontos). Se a mesma UA é medida de novo, o desenho é longitudinal. Se só o tempo for o fator, use Um fator e chame o fator de tempo.",
+      campos = c("ambiente", "fator2"),
+      esquema = esquema_transversal_svg("tempo"),
+      analises = list(
+        analise_prevista("anova_dois_fatores", "ANOVA de dois fatores (grupo × tempo)", TRUE),
+        analise_prevista("ancova", "ANCOVA (com uma covariável medida)"))
+    )
+  )
+}
+
 # ---- Leitura do registro ----------------------------------------------------
 
 # Ids das análises marcadas de saída (as principais) de uma variante.

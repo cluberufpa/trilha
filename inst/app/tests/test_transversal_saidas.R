@@ -85,7 +85,7 @@ testServer(mod_planejamento_observacional_server,
       cuidados_transversal, coleta_desigual, esquema_transversal())
     stopifnot(any(grepl("20 unidades amostrais",
       officer::docx_summary(officer::read_docx(word_desigual))$text, fixed = TRUE)))
-    session$setInputs(usar_fator2 = TRUE, fator_nome = "especie",
+    session$setInputs(tipo_transversal = "dois_fatores", fator_nome = "especie",
       fator_niveis = "Espécie A, Espécie B", fator2_nome = "sexo",
       fator2_niveis = "Fêmea, Macho")
     session$flushReact()
@@ -106,7 +106,11 @@ testServer(mod_planejamento_observacional_server,
       dicionario_dados(), cuidados_transversal, tabela_coleta_dados(), esquema_transversal())
     ggplot2::ggsave(file.path(destino, "esquema_transversal_dois_fatores.png"), esquema_transversal(),
       width = 10, height = 6.1, dpi = 150, bg = "white")
-    session$setInputs(usar_fator2 = FALSE)
+    # A variante grava o desenho e as análises previstas na ficha.
+    stopifnot(identical(ficha()$variante, "dois_fatores"),
+      identical(ficha()$analises_previstas, "anova_dois_fatores"),
+      identical(ficha()$analise_sugerida, "anova_dois_fatores"))
+    session$setInputs(tipo_transversal = "um_fator")
     session$flushReact()
     stopifnot(!"sexo" %in% names(tabela_coleta_dados()))
 
@@ -155,4 +159,35 @@ stopifnot(grepl("teste-unidade_item", ui), grepl("garrafa de água", ui, fixed =
 stopifnot(grepl('data-value="Definições"', ui), grepl('data-value="Desenho"', ui), grepl('data-value="Resumo"', ui),
   lengths(regmatches(ui, gregexpr('id="teste-baixar_planilha"', ui))) == 1L,
   lengths(regmatches(ui, gregexpr('id="teste-baixar_relatorio"', ui))) == 1L)
+# Variantes do transversal: seletor na aba Tipo, campos e análises previstas.
+stopifnot(grepl("teste-tipo_transversal", ui), grepl("teste-variante_analises", ui),
+  !grepl("teste-usar_fator2", ui), grepl("teste-fator2_nome", ui))
+testServer(mod_planejamento_observacional_server,
+           args = list(tipo = "transversal_comparativo", ficha_destino_rv = NULL), {
+  session$flushReact()
+  f <- ficha()
+  # Padrão: um fator, com a ANOVA de um fator como análise principal.
+  stopifnot(identical(f$variante, "um_fator"), identical(f$analises_previstas, "anova_um_fator"),
+            is.null(f$eixos$segundo_fator))
+  # Tempo como fator: o segundo fator vira o tempo (UAs diferentes em cada tempo).
+  session$setInputs(tipo_transversal = "tempo_fator", fator2_nome = "tempo", fator2_niveis = "T1, T2, T3")
+  session$flushReact()
+  f <- ficha()
+  stopifnot(identical(f$variante, "tempo_fator"), identical(f$analises_previstas, "anova_dois_fatores"),
+            identical(f$eixos$segundo_fator$coluna, "tempo"),
+            identical(f$eixos$segundo_fator$nomes, c("T1", "T2", "T3")))
+  # Sítios dentro de categorias: a comparação ambiental é a das categorias.
+  session$setInputs(tipo_transversal = "sitios_categorias", comparacao_ambiental = "faixas")
+  session$flushReact()
+  f <- ficha()
+  stopifnot(identical(f$variante, "sitios_categorias"), is.null(f$eixos$segundo_fator),
+            identical(f$analises_previstas, "anova_um_fator"),
+            any(grepl("réplica é o ambiente", as.character(output$aviso_comparacao_ambiental), fixed = TRUE)))
+  # Mexer nas caixas vale: a sugerida passa a ser a primeira marcada.
+  session$setInputs(tipo_transversal = "um_fator")
+  session$setInputs(analises_previstas = c("kruskal_wallis", "anova_um_fator"))
+  f <- ficha()
+  stopifnot(identical(f$analises_previstas, c("kruskal_wallis", "anova_um_fator")),
+            identical(f$analise_sugerida, "kruskal_wallis"))
+})
 cat("Transversal: planilha e Word verificados. Prévia em", destino, "\n")

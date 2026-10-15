@@ -1,8 +1,11 @@
 # Plano das variantes de delineamento (14/10/2026)
 
-Estado: planejamento aprovado em 14/10/2026. **Impacto implementado** (registro
-em `modules/registro_variantes.R`, ficha com `variante` e `analises_previstas`);
-os demais módulos seguem a ordem da seção 7. Este documento registra o que foi
+Estado: planejamento aprovado em 14/10/2026. **Impacto** e **Transversal
+comparativo** implementados (registro em `modules/registro_variantes.R`, ficha
+com `variante` e `analises_previstas`). No Transversal entraram as quatro
+variantes (um fator, dois fatores, sítios dentro de categorias, tempo como
+fator); o segundo dropdown "Como a UA é formada?" (individual, composta,
+conjunto) ainda não foi feito. Os demais módulos seguem a ordem da seção 7. Este documento registra o que foi
 decidido e o que ainda está em aberto.
 
 ## 1. A ideia

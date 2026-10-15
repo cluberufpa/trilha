@@ -68,6 +68,7 @@ obs_apresentacao_ui <- function(tipo, definicao) {
     shiny::h3(class = "h6", "Como usar este módulo"),
     shiny::tags$ol(
       if (tipo == "impacto") shiny::tags$li("Escolha o tipo de estudo na coluna à direita."),
+      if (tipo == "transversal_comparativo") shiny::tags$li("Escolha o tipo de estudo no seletor acima."),
       shiny::tags$li("Na aba ", shiny::strong("Definições"), ", ajuste as características do delineamento."),
       shiny::tags$li("Na aba ", shiny::strong("Desenho"), ", visualize o esboço gerado a partir dessas escolhas."),
       shiny::tags$li("Na aba ", shiny::strong(if (tipo %in% c("impacto", "transversal_comparativo")) "Tabelas de coleta" else "Ficha do delineamento"), ", consulte a estrutura da planilha para registrar os dados das coletas.")),
@@ -845,7 +846,15 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
       placeholder = "O que você deseja responder com este estudo?",
       width = "100%"
     )
-    comparativo_ambiente_ui <- shiny::selectInput(ns("comparacao_ambiental"), "Comparação ambiental (opcional):",
+    # No transversal, "categorias de ambientes" é uma variante própria (aba Tipo);
+    # aqui ficam só as comparações em que a UA é medida dentro do próprio nível.
+    comparativo_ambiente_ui <- if (tipo_resolvido == "transversal_comparativo") shiny::conditionalPanel(
+      condition = variante_condicao_js(ns, "tipo_transversal", variantes_transversal(), "ambiente"),
+      shiny::selectInput(ns("comparacao_ambiental"), "Comparação ambiental (opcional):",
+        choices = c("Não se aplica" = "na",
+          "Faixas de um mesmo sistema (ex.: estuário interno, externo e costa)" = "faixas",
+          "Ambientes específicos escolhidos (ex.: três estuários)" = "especificos"),
+        selected = "na", width = "100%")) else shiny::selectInput(ns("comparacao_ambiental"), "Comparação ambiental (opcional):",
       choices = c("Não se aplica" = "na",
         "Faixas de um mesmo sistema (ex.: estuário interno, externo e costa)" = "faixas",
         "Ambientes específicos escolhidos (ex.: três estuários)" = "especificos",
@@ -870,12 +879,12 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
         placeholder = "Ex.: Tambaqui, Gurijuba, Pescada Amarela",
         width = "100%"
       ),
-      if (tipo_resolvido == "transversal_comparativo") shiny::tagList(
-        shiny::checkboxInput(ns("usar_fator2"), "Incluir um segundo fator", FALSE),
-        shiny::conditionalPanel(condition = sprintf("input['%s']", ns("usar_fator2")),
-          shiny::textInput(ns("fator2_nome"), "Segundo fator:", value = "sexo", width = "100%"),
-          shiny::textInput(ns("fator2_niveis"), "Categorias ou níveis do segundo fator:", value = "Fêmea, Macho", width = "100%"))
-    ))
+      # O segundo fator aparece nas variantes "Dois fatores" e "Tempo como fator".
+      if (tipo_resolvido == "transversal_comparativo") shiny::conditionalPanel(
+        condition = variante_condicao_js(ns, "tipo_transversal", variantes_transversal(), "fator2"),
+        shiny::textInput(ns("fator2_nome"), "Segundo fator:", value = "sexo", width = "100%"),
+        shiny::textInput(ns("fator2_niveis"), "Categorias ou níveis do segundo fator:", value = "Fêmea, Macho", width = "100%"))
+    )
   }
 
   definicoes_colunas <- list(
@@ -1346,7 +1355,13 @@ mod_planejamento_observacional_ui <- function(id, tipo, variaveis_ui = NULL) {
             shiny::div(class = "obs-tipo-colunas",
               obs_apresentacao_ui(tipo_resolvido, definicao),
               variante_seletor_ui(ns, "tipo_impacto", "Delineamento observacional · Impacto",
-                variantes_impacto(), selecionada = "baci"))) else obs_apresentacao_ui(tipo_resolvido, definicao),
+                variantes_impacto(), selecionada = "baci")))
+          else if (identical(tipo_resolvido, "transversal_comparativo")) shiny::tagList(
+            shiny::tags$style(shiny::HTML(variante_css())),
+            variante_seletor_ui(ns, "tipo_transversal", "Delineamento observacional · Transversal comparativo",
+              variantes_transversal(), selecionada = "um_fator"),
+            obs_apresentacao_ui(tipo_resolvido, definicao))
+          else obs_apresentacao_ui(tipo_resolvido, definicao),
           shiny::uiOutput(ns("planejamento_atual")))),
 
       # Definições: subabas próprias no impacto, transversal e gradiente.
@@ -1605,6 +1620,35 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
       if (!identical(tipo_resolvido, "impacto")) return("baci")
       seletor_impacto$escolhida()
     })
+    # Variante do transversal comparativo: um fator, dois fatores, sítios dentro
+    # de categorias ou tempo como fator. Decide o segundo fator, a comparação
+    # ambiental e as análises previstas na ficha.
+    seletor_transversal <- if (identical(tipo_resolvido, "transversal_comparativo")) {
+      variante_seletor_server(input, output, ns, variantes_transversal(), "tipo_transversal", "um_fator")
+    }
+    tipo_transversal <- shiny::reactive({
+      if (!identical(tipo_resolvido, "transversal_comparativo")) return("um_fator")
+      seletor_transversal$escolhida()
+    })
+    # Ao entrar em "Tempo como fator", o segundo fator vira o tempo; ao sair,
+    # volta ao exemplo de sexo (só se o pesquisador não tinha escrito outra coisa).
+    if (identical(tipo_resolvido, "transversal_comparativo")) {
+      shiny::observeEvent(tipo_transversal(), {
+        if (identical(tipo_transversal(), "tempo_fator") && ou_vazio(input$fator2_nome, "sexo") == "sexo") {
+          shiny::updateTextInput(session, "fator2_nome", value = "tempo")
+          shiny::updateTextInput(session, "fator2_niveis", value = "T1, T2, T3")
+        } else if (identical(tipo_transversal(), "dois_fatores") && ou_vazio(input$fator2_nome, "") == "tempo") {
+          shiny::updateTextInput(session, "fator2_nome", value = "sexo")
+          shiny::updateTextInput(session, "fator2_niveis", value = "Fêmea, Macho")
+        }
+      }, ignoreInit = TRUE)
+    }
+    # Comparação ambiental efetiva: "categorias" vem da variante, não do seletor.
+    comparacao_ambiental_efetiva <- shiny::reactive({
+      if (identical(tipo_transversal(), "sitios_categorias") && identical(tipo_resolvido, "transversal_comparativo")) return("categorias")
+      v <- ou_vazio(input$comparacao_ambiental, "na")
+      if (identical(tipo_resolvido, "transversal_comparativo") && !"ambiente" %in% variantes_transversal()[[tipo_transversal()]]$campos) "na" else v
+    })
     # BA e BACI repetem cada sítio nos momentos; o CI (só depois) não tem eixo de tempo.
     impacto_com_momentos <- shiny::reactive({
       identical(tipo_resolvido, "impacto") && !identical(tipo_impacto(), "ci")
@@ -1687,7 +1731,8 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
     })
 
     segundo_fator <- shiny::reactive({
-      tipo_resolvido == "transversal_comparativo" && isTRUE(input$usar_fator2)
+      tipo_resolvido == "transversal_comparativo" &&
+        tipo_transversal() %in% c("dois_fatores", "tempo_fator")
     })
     fator2_coluna <- shiny::reactive({
       nome <- gerar_nome_reduzido(ou_vazio(input$fator2_nome, "sexo"))
@@ -1877,14 +1922,14 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
       shiny::updateTabsetPanel(session, "planilhas_ficha", selected = "Unidades e características de partida")
     }, ignoreInit = TRUE)
     alcance_comparacao <- shiny::reactive({
-      switch(ou_vazio(input$comparacao_ambiental, "na"),
+      switch(comparacao_ambiental_efetiva(),
         faixas = "As diferenças serão interpretadas como associadas às faixas deste sistema estudado, no período informado. As estações descrevem a variação dentro do sistema; não são réplicas de outros estuários ou costas.",
         especificos = "As diferenças serão interpretadas como associadas aos ambientes estudados, nos locais e no período de coleta informados; não identificarão qual variável ambiental as produziu.",
         categorias = "A associação entre categoria e resposta dependerá de ambientes distintos em cada categoria. O número e a seleção desses ambientes deverão ser descritos no projeto; UAs de cultivo não serão usadas como sua contagem. Outras características que acompanham a categoria poderão contribuir para as diferenças, na região e no período estudados.",
         "As diferenças serão interpretadas como associadas aos grupos estudados, considerando os locais, o período e os critérios de seleção informados, sem estabelecer uma causa específica.")
     })
     output$aviso_comparacao_ambiental <- shiny::renderUI({
-      if (identical(input$comparacao_ambiental, "categorias"))
+      if (identical(comparacao_ambiental_efetiva(), "categorias"))
         shiny::div(class = "alert alert-warning small mt-2 mb-0",
           "Para comparar categorias, a réplica é o ambiente. Vários tanques no mesmo reservatório descrevem aquele reservatório, mas não substituem outros reservatórios da mesma categoria.")
     })
@@ -2987,7 +3032,16 @@ mod_planejamento_observacional_server <- function(id, tipo, ficha_destino_rv = N
         ),
         n_planejado = NULL,
         sorteio = NULL,
-        analise_sugerida = if (segundo_fator()) NULL else analise
+        analise_sugerida = if (identical(tipo_resolvido, "transversal_comparativo")) {
+          # Com as caixas da variante intactas vale a regra de sempre (que olha
+          # pools e subamostras); se o pesquisador mexeu, vale a primeira marcada.
+          previstas <- seletor_transversal$previstas()
+          if (!length(previstas)) NULL
+          else if (identical(previstas, variante_analises_principais(variantes_transversal(), tipo_transversal())) && !segundo_fator()) analise
+          else previstas[1]
+        } else if (segundo_fator()) NULL else analise,
+        variante = if (identical(tipo_resolvido, "transversal_comparativo")) tipo_transversal(),
+        analises_previstas = if (identical(tipo_resolvido, "transversal_comparativo")) seletor_transversal$previstas()
       ))
     })
 
