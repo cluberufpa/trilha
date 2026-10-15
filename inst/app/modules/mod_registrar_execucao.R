@@ -11,7 +11,7 @@ mod_analise_registravel_ui <- function(id, analise_ui, registro_ui) {
       title = "1. Configurar e executar",
       icon = icon("sliders"),
       div(
-        class = "pt-2",
+        class = "pt-0",
         analise_ui,
         div(
           class = "alert alert-light border small mt-3 mb-1",
@@ -25,7 +25,7 @@ mod_analise_registravel_ui <- function(id, analise_ui, registro_ui) {
       title = "2. Adicionar ao Projeto R",
       icon = icon("bookmark"),
       div(
-        class = "pt-2",
+        class = "pt-0",
         registro_ui
       )
     )

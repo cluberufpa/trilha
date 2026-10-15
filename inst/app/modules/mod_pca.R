@@ -99,7 +99,6 @@ mod_pca_ui <- function(id) {
         class = "pca-painel",
         navset_card_tab(
           id = ns("active_tab"),
-          title = "Painel de Resultados da PCA:",
         nav_panel(
           title = "Correlações",
           icon = icon("table-cells"),

@@ -76,11 +76,10 @@ mod_pareados_categoricos_ui <- function(id, tipo) {
     )
   }
   tagList(
-    h2(titulo, class = "h4 mb-1"),
-    div(class = "alert alert-light border mb-2", strong("Pergunta: "), pareados_pergunta(tipo)),
     bslib::navset_card_tab(
       bslib::nav_panel(
         "Configurar e executar",
+        p(class = "small text-muted mb-2", strong("Pergunta: "), pareados_pergunta(tipo)),
         mod_seletor_base_analise_ui(ns("base"), compacto = TRUE),
         bslib::layout_sidebar(
           sidebar = bslib::sidebar(

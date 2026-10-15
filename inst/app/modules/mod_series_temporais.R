@@ -133,17 +133,16 @@ mod_series_temporais_ui <- function(id, painel = c("visualizar", "decompor", "au
     )
   )
   tagList(
-    tags$h2(titulo_painel, class = "h4 mb-2"),
-    div(
-      class = "alert alert-light border mb-3",
-      icon("clock"), " A série temporal começa pela ordem dos registros. Esta versão explora, descreve e diagnostica a dependência no tempo. Previsão com ETS e ARIMA ficará para a v2."
-    ),
     bslib::layout_sidebar(
       fill = FALSE,
       fillable = FALSE,
       sidebar = bslib::sidebar(
         width = 330,
         tags$h5("Configuração da série"),
+        tags$details(
+          tags$summary("Como usar esta análise"),
+          tags$strong(titulo_painel),
+          p("A série temporal começa pela ordem dos registros. Esta versão explora, descreve e diagnostica a dependência no tempo. Previsão com ETS e ARIMA ficará para a v2.")),
         radioButtons(
           ns("source"), "Fonte:",
           choices = c("Exemplo: desembarques de anchova-do-norte" = "exemplo", "Meus dados" = "dados"),

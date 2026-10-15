@@ -53,7 +53,6 @@ mod_regressao_contagem_ui <- function(id, familia) {
   }
 
   tagList(
-    tags$h2(titulo, class = "h4 mb-3"),
     mod_seletor_base_analise_ui(ns("base")),
     bslib::layout_sidebar(
       fill = FALSE,

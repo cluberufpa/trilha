@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
-const destination = path.resolve(__dirname, '../../../outputs/sidebar-escuro');
+const destination = path.resolve(__dirname, '../../../outputs/sidebar-preparacao-exploracao');
 const url = process.argv[2] || 'http://127.0.0.1:4625';
 fs.mkdirSync(destination, { recursive: true });
 
@@ -40,6 +40,53 @@ async function checkZoom(zoom) {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.locator('#main_navbar.shiny-bound-input').waitFor();
     await page.evaluate(() => document.fonts.ready);
+    async function checkSidebar() {
+      const result = await page.locator('.trilha-sidebar').evaluate(rail => {
+        const viewport = rail.querySelector('.navbar-collapse');
+        const groups = []; const rows = []; const headings = [];
+        let heading;
+        for (const item of rail.querySelector('#main_navbar').children) {
+          const section = item.querySelector('.trilha-menu-section');
+          if (section) {
+            heading = section;
+            groups.push({title:section.textContent.toLocaleUpperCase('pt-BR'), menus:[]});
+            const style = getComputedStyle(section);
+            headings.push({font:style.fontFamily,size:style.fontSize,color:style.color,
+              weight:style.fontWeight,spacing:style.letterSpacing,
+              margin:style.margin,padding:style.padding});
+          }
+          const link = item.querySelector(':scope > a');
+          if (!link || !heading) continue;
+          const label = link.querySelector('.trilha-menu-label');
+          if (!label) continue;
+          const icon = link.querySelector('i');
+          const rect = link.getBoundingClientRect();
+          const textRect = label.getBoundingClientRect();
+          const style = getComputedStyle(link);
+          groups.at(-1).menus.push(label.textContent);
+          rows.push({name:label.textContent,indent:icon.getBoundingClientRect().left-heading.getBoundingClientRect().left,
+            left:rect.left,right:rect.right,arrowRight:rect.right-parseFloat(style.paddingRight),
+            textWidth:textRect.width,scrollWidth:label.scrollWidth,
+            lines:textRect.height/parseFloat(getComputedStyle(label).lineHeight)});
+        }
+        return {groups,headings,rows,rail:rail.getBoundingClientRect().toJSON(),
+          overflow:viewport.scrollWidth-viewport.clientWidth};
+      });
+      assert.deepEqual(result.groups.map(group=>group.title),
+        ['PESQUISA','PREPARAÇÃO E EXPLORAÇÃO','ANÁLISES','APRENDER E COMUNICAR']);
+      assert.deepEqual(result.groups[0].menus,['Planejando sua Pesquisa']);
+      assert.deepEqual(result.groups[1].menus,['Preparar Dados','Explorar e Visualizar']);
+      assert.deepEqual(result.headings[1],result.headings[2],'O novo título usa o mesmo estilo dos grupos.');
+      assert.ok(result.overflow<=1,'Sem rolagem horizontal na sidebar.');
+      for (const row of result.rows) {
+        assert.ok(row.indent>=6 && row.indent<=8,'Recuo de ícone e menu: '+row.name);
+        assert.ok(row.lines<=1.05 && row.scrollWidth<=row.textWidth+1,'Nome completo em uma linha: '+row.name);
+        assert.ok(row.left>=result.rail.left && row.right<=result.rail.right,'Seleção dentro da coluna.');
+        assert.ok(Math.abs(row.arrowRight-result.rows[0].arrowRight)<1,'Setas alinhadas à direita.');
+      }
+      return result;
+    }
+    report.sidebar = await checkSidebar();
     const session = await browser.newCDPSession(page);
     const { windowId } = await session.send('Browser.getWindowForTarget');
     const dimensions = () => page.evaluate(() => ({
@@ -68,6 +115,7 @@ async function checkZoom(zoom) {
     }
     await planning.click();
     await buttons.filter({ hasText: 'Transversal comparativo' }).click();
+    await page.locator('.obs-estudio:visible').getByRole('tab', {name:'Definições'}).click();
     const question = page.locator('#obs_transversal_comparativo-pergunta');
     const units = page.locator('#obs_transversal_comparativo-uas_grupo_1');
     await units.waitFor({ state: 'visible', timeout: 120000 });
@@ -133,6 +181,7 @@ async function checkZoom(zoom) {
       await session.send('Browser.setWindowBounds', { windowId, bounds: { width: width + 22, height: height + 98 } });
       await page.waitForTimeout(200);
       await regression.click();
+      await checkSidebar();
       const geometry = await checkGeometry();
       const sidebar = await page.locator('.trilha-sidebar').evaluate(el => {
         const list = el.querySelector('.navbar-collapse'); const link = el.querySelector('#main_navbar > li.dropdown > a');

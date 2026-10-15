@@ -46,18 +46,15 @@ parametrico_complementar_ui <- function(ns, tipo) {
 mod_parametrico_complementar_ui <- function(id, tipo) {
   ns <- NS(id)
   titulo <- parametrico_complementar_titulo(tipo)
-  # O painel do bslib espalha os filhos com gap de 16px; o wrapper junta as
-  # linhas de topo (título, pergunta, cartão) com 6px para caber na primeira dobra.
+  # A pergunta fica na aba de configuração; o topo conserva só a navegação.
   div(
     class = "catalyser-complementar html-fill-item html-fill-container",
     style = "display:flex; flex-direction:column; gap:6px;",
-    h2(titulo, class = "h4 mb-0"),
-    div(class = "alert alert-light border mb-0", style = "padding:4px 10px; font-size:0.85rem;",
-      strong("Pergunta: "), parametrico_complementar_pergunta(tipo)),
     bslib::navset_card_tab(
       id = ns("abas"),
       bslib::nav_panel(
         "Configurar e executar", value = "executar",
+        p(class = "small text-muted mb-2", strong("Pergunta: "), parametrico_complementar_pergunta(tipo)),
         mod_seletor_base_analise_ui(ns("base"), compacto = TRUE),
         bslib::layout_sidebar(
           sidebar = bslib::sidebar(

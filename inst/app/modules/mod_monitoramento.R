@@ -462,141 +462,170 @@ escrever_word_monitoramento <- function(caminho, cfg) {
 mod_monitoramento_ui <- function(id) {
   ns <- shiny::NS(id)
 
-  # Estilo local: faixas compactas, para a aba de definições caber na tela do notebook.
+  # Duas colunas principais, alinhadas pelo topo e com altura natural.
   estilo <- shiny::tags$style(shiny::HTML("
-    .mon-estudio .form-group { margin-bottom: 4px; }
-    .mon-estudio .control-label { font-size: 0.85rem; margin-bottom: 2px; }
+    .mon-estudio .form-group { margin-bottom: 8px; }
+    .mon-estudio .control-label { font-size: 0.85rem; margin-bottom: 4px; }
     .mon-estudio .card, .mon-estudio .card-body, .mon-estudio .tab-content, .mon-estudio .tab-pane {
       overflow: visible !important; height: auto !important; min-height: 0; }
-    .mon-estudio .card-body { display: block !important; padding: 10px 14px; }
+    .mon-estudio .card-body { display: block !important; padding: 10px 12px; }
     .mon-card { background: #ffffff; border: 1px solid #dbe5e8; border-radius: 10px;
-      padding: 10px 14px; box-shadow: 0 1px 3px rgba(15, 59, 95, 0.03); margin-bottom: 10px; }
-    .mon-card h5 { color: #0F3B5F; font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
-    .mon-linha { display: flex; gap: 8px; align-items: flex-end; }
-    .mon-linha .shiny-input-container { flex: 1; }
-    .mon-rem { margin-bottom: 6px; padding: 2px 9px; line-height: 1.4; }
-    .mon-coluna { border: 2px solid #168BFF; border-radius: 14px;
-      padding: 12px; height: 100%; min-width: 0; }
-    .mon-coluna .mon-card:last-child { margin-bottom: 0; }
+      padding: 10px 12px; box-shadow: 0 1px 3px rgba(15, 59, 95, 0.03); min-width: 0; }
+    .mon-card h5 { color: #0F3B5F; font-size: 0.92rem; font-weight: 700;
+      background: #cbdce9; padding: 8px 10px; border-radius: 4px; margin: 0 0 8px; }
+    .mon-card p, .mon-card ul { margin-bottom: 8px; }
+    .mon-coluna { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
     .mon-definicoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px; align-items: stretch; }
-    .mon-campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px 18px; align-items: start; }
+      gap: 16px; align-items: start; }
+    .mon-definicoes > * { min-width: 0; }
     .mon-definicoes .shiny-input-container { width: 100%; min-width: 0; }
-    .mon-definicoes .form-group { margin-bottom: 0; }
-    .mon-definicoes .mon-card { padding: 14px; }
-    .mon-definicoes .mon-card h5 { margin-bottom: 12px; }
-    .mon-definicoes .control-label { display: block; margin-bottom: 5px; }
-    .mon-definicoes .mon-data .input-group { width: 100% !important; }
-    .mon-frequencia { margin: 14px 0; }
-    .mon-esforco { border-top: 1px solid #dbe5e8; margin-top: 14px; padding-top: 12px; }
-    .mon-definicoes .mon-linha { gap: 8px; margin-bottom: 8px; }
-    .mon-definicoes .mon-linha .shiny-input-container { flex: 1 1 0; }
-    .mon-definicoes .mon-rem { flex: 0 0 30px; margin-bottom: 0;
-      min-height: 31px; padding: 3px 8px; }
-    .mon-planejar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px; min-height: 550px; align-items: stretch; }
-    .mon-divisao { border: 2px solid #4b5155; border-radius: 12px; padding: 12px;
-      display: flex; flex-direction: column; gap: 18px; min-width: 0; }
-    .mon-datas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .mon-datas > div { min-width: 0; }
-    .mon-datas .input-group > .form-control { min-width: 0; padding: 6px 8px; font-size: 0.85rem; }
+    .mon-definicoes .control-label { display: block; }
+    .mon-linha { display: flex; gap: 8px; align-items: flex-end; margin-bottom: 8px; }
+    .mon-linha .shiny-input-container { flex: 1 1 0; min-width: 0; margin-bottom: 0; }
+    .mon-rem { flex: 0 0 30px; margin-bottom: 0; min-height: 31px; padding: 3px 8px; }
+    .mon-datas, .mon-medida-campos { display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .mon-datas > div, .mon-medida-campos > div { min-width: 0; }
+    .mon-datas .input-group { width: 100% !important; }
+    .mon-datas .input-group > .form-control { min-width: 0; padding: 6px 8px; }
     .mon-datas .input-group > button { flex: 0 0 32px; width: 32px; padding: 6px 4px; }
-    .mon-planejar h5 { color: #0F3B5F; font-size: 0.92rem; font-weight: 700; margin: 0; }
-    .mon-planejar > div { min-width: 0; }
-    .mon-planejar .mon-frequencia { margin: 0; }
-    .mon-planejar .mon-frequencia .shiny-options-group { display: grid;
+    .mon-frequencia { margin: 8px 0; }
+    .mon-frequencia .shiny-options-group { display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
-    .mon-planejar .radio-inline { margin-left: 0; }
-    .mon-planejar .mon-secao { border-top: 1px solid #dbe5e8; padding-top: 16px; }
-    .mon-planejar .mon-esforco { border: 0; margin: 0; padding: 0; }
-    .mon-unidade-esforco { margin-top: 16px; }
-    .mon-respostas { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .75fr) minmax(0, 1fr) 30px;
-      gap: 8px; align-items: end; margin-bottom: 10px; }
-    .mon-respostas .mon-rem { margin: 0; min-height: 31px; }
-    .mon-opcional { margin-top: 8px; border-top: 1px solid #dbe5e8; padding-top: 16px; }
-    @media (max-width: 991px) { .mon-definicoes { grid-template-columns: minmax(0, 1fr); } }
-    @media (max-width: 575px) { .mon-campos { grid-template-columns: minmax(0, 1fr); } }
-    .mon-estudio .mon-card li { margin-bottom: 7px; }
+    .mon-frequencia .radio-inline { margin-left: 0; }
+    .mon-respostas { display: flex; flex-direction: column; gap: 4px;
+      border-bottom: 1px solid #dbe5e8; margin-bottom: 10px; padding-bottom: 6px; }
+    .mon-opcional { margin-top: 10px; border-top: 1px solid #dbe5e8; padding-top: 10px; }
+    .mon-estudio .mon-card li { margin-bottom: 4px; }
     .mon-estudio .mon-card li:last-child { margin-bottom: 0; }
-    .mon-modelo { background: #E6F3F1; padding: 14px; border-radius: 8px;
-      color: #0F3B5F; font-size: 1.2rem; text-align: center; margin: 12px 0; }
-    .mon-compacto .mon-coluna { padding: 8px; }
-    .mon-compacto .mon-card { padding: 8px 12px; margin-bottom: 8px; }
-    .mon-compacto .mon-card p, .mon-compacto .mon-card ul { margin-bottom: 6px; }
-    .mon-compacto .mon-card li { margin-bottom: 4px; }
-    .mon-compacto .mon-modelo { padding: 8px; margin: 6px 0; }
+    .mon-modelo { background: #E6F3F1; padding: 8px; border-radius: 8px;
+      color: #0F3B5F; font-size: 1.2rem; text-align: center; margin: 6px 0; }
     .mon-download-word, .mon-download-word:hover, .mon-download-word:focus {
       background-color: #0d6efd !important; border-color: #0d6efd !important; color: white !important; }
+    @media (max-width: 767px) { .mon-definicoes { grid-template-columns: minmax(0, 1fr); } }
+    @media (max-width: 575px) { .mon-datas, .mon-medida-campos { grid-template-columns: minmax(0, 1fr); } }
   "))
 
   shiny::div(class = "mon-estudio",
     estilo,
-    shiny::div(class = "alert alert-light border mb-2 py-2 px-3",
-      style = "border-left: 4px solid #2E7D8F !important;",
-      shiny::tags$b("Monitoramento (série temporal)"), shiny::tags$br(),
-      "Poucos locais medidos muitas vezes ao longo do tempo: desembarque pesqueiro, chuva, temperatura e qualidade da água em estação fixa, altura de maré. Defina a série, baixe o protótipo da tabela e ajuste o que precisar no Excel."
-    ),
     bslib::navset_card_tab(
       id = ns("abas"),
-
-      # Aba 1: o que o pesquisador define aqui alimenta a tabela e os metadados.
-      bslib::nav_panel("Definições", icon = shiny::icon("sliders"),
+      bslib::nav_panel("Tipo", icon = shiny::icon("code-branch"),
         bslib::card_body(fillable = FALSE,
-
-          # Duas colunas de cartões para aproveitar a largura da tela: à
-          # esquerda o tempo e o esforço; à direita as respostas.
           shiny::div(class = "mon-definicoes",
-            shiny::div(class = "mon-coluna",
-              shiny::div(class = "mon-planejar",
-                shiny::div(class = "mon-divisao",
-                  shiny::h5("1. Tempo"),
+            shiny::div(class = "mon-card",
+              shiny::h2(class = "h5", "Monitoramento (série temporal)"),
+              shiny::p(class = "mb-0", "Poucos locais medidos muitas vezes ao longo do tempo: desembarque pesqueiro, chuva, temperatura e qualidade da água em estação fixa, altura de maré. Defina a série, baixe o protótipo da tabela e ajuste o que precisar no Excel.")),
+            shiny::div(class = "mon-card",
+              shiny::h3(class = "h6", "Como usar este módulo"),
+              shiny::tags$ol(class = "mb-0",
+                shiny::tags$li("Em Definições, escolha a frequência, os locais, o esforço e as respostas."),
+                shiny::tags$li("Em Desenho, confira a estrutura da série e o calendário de visitas."),
+                shiny::tags$li("Em Tabelas de coleta, confira as colunas que serão preenchidas na coleta."),
+                shiny::tags$li("Em Definições, consulte Metodologia e Modelo e cuidados; revise o planejamento antes de baixar os arquivos no Resumo.")))))),
+
+      # Os controles permanecem montados ao alternar as quatro subabas.
+      bslib::nav_panel("Definições", icon = shiny::icon("sliders"),
+        bslib::navset_tab(id = ns("definicoes"),
+          bslib::nav_panel("Tempo e calendário",
+            bslib::card_body(fillable = FALSE,
+              shiny::div(class = "mon-definicoes",
+                shiny::div(class = "mon-card",
+                  shiny::h5("Planejamento temporal"),
                   shiny::div(class = "mon-datas",
                     shiny::div(class = "mon-data", shiny::uiOutput(ns("ui_inicio"))),
                     shiny::div(class = "mon-data", shiny::uiOutput(ns("ui_fim")))),
                   shiny::div(class = "mon-frequencia", shiny::radioButtons(ns("frequencia"), "Frequência:",
                     choices = c("Diária" = "diaria", "Semanal" = "semanal", "Quinzenal" = "quinzenal", "Mensal" = "mensal"),
                     selected = "mensal", inline = TRUE)),
-                  shiny::textInput(ns("horario"), "Horário da coleta (opcional):", placeholder = "Ex.: 8h, na preamar"),
-                  shiny::div(class = "mon-secao",
-                    shiny::radioButtons(ns("hora_real"), "Incluir a hora real na ficha?",
-                      choices = c("Não" = "nao", "Sim" = "sim"), inline = TRUE)),
+                  shiny::textInput(ns("horario"), "Horário da coleta (opcional):", placeholder = "Ex.: 8h, na preamar")),
+                shiny::div(class = "mon-card",
+                  shiny::h5("Registro das coletas"),
+                  shiny::radioButtons(ns("hora_real"), "Incluir a hora real na ficha?",
+                    choices = c("Não" = "nao", "Sim" = "sim"), inline = TRUE),
                   shiny::div(class = "mon-opcional",
                     shiny::checkboxInput(ns("data_real"), "Incluir a data efetiva da coleta", FALSE),
-                    shiny::p(class = "small text-muted mb-0", "Acrescenta data_real para registrar quando a visita aconteceu."))
-                ),
-                shiny::div(class = "mon-divisao",
-                  shiny::h5("2. Onde e com que esforço"),
-                  shiny::div(
+                    shiny::p(class = "small text-muted mb-0", "Acrescenta data_real para registrar quando a visita aconteceu.")))))),
+          bslib::nav_panel("Locais, esforço e respostas",
+            bslib::card_body(fillable = FALSE,
+              shiny::div(class = "mon-definicoes",
+                shiny::div(class = "mon-coluna",
+                  shiny::div(class = "mon-card",
+                    shiny::h5("Locais monitorados"),
                     shiny::uiOutput(ns("ui_locais")),
-                    shiny::actionButton(ns("add_local"), "+ local", class = "btn-sm btn-outline-primary")
-                  ),
-                  shiny::div(class = "mon-esforco",
+                    shiny::actionButton(ns("add_local"), "+ local", class = "btn-sm btn-outline-primary")),
+                  shiny::div(class = "mon-card",
+                    shiny::h5("Esforço e responsável"),
                     shiny::radioButtons(ns("tem_esforco"), "Registrar esforço em cada coleta?",
                       choices = c("Não" = "nao", "Sim" = "sim"), inline = TRUE),
-                    shiny::div(class = "mon-unidade-esforco",
-                      shiny::textInput(ns("unidade_esforco"), "Unidade de esforço:", value = "viagens"))
-                  ),
-                  shiny::div(class = "mon-opcional",
-                    shiny::checkboxInput(ns("responsavel"), "Incluir o responsável pela coleta", FALSE),
-                    shiny::p(class = "small text-muted mb-0", "Acrescenta responsavel para identificar quem realizou a visita."))
-                )
-              )
-            ),
-
-            shiny::div(class = "mon-coluna",
-
-              shiny::div(class = "mon-card",
-                shiny::h5("3. Respostas"),
-                shiny::p(class = "small text-muted mb-1",
-                  "Nome da coluna: deixe vazio para usar a sugestão (captura + kg → captura_kg) ou escreva um nome curto. Acentos, espaços e sinais serão convertidos para o padrão tidy."),
-                shiny::uiOutput(ns("ui_medidas")),
-                shiny::actionButton(ns("add_medida"), "+ medida", class = "btn-sm btn-outline-primary")
-              )
+                    shiny::textInput(ns("unidade_esforco"), "Unidade de esforço:", value = "viagens"),
+                    shiny::div(class = "mon-opcional",
+                      shiny::checkboxInput(ns("responsavel"), "Incluir o responsável pela coleta", FALSE),
+                      shiny::p(class = "small text-muted mb-0", "Acrescenta responsavel para identificar quem realizou a visita.")))),
+                shiny::div(class = "mon-card",
+                  shiny::h5("Medidas de resposta"),
+                  shiny::p(class = "small text-muted mb-1",
+                    "Nome da coluna: deixe vazio para usar a sugestão (captura + kg → captura_kg) ou escreva um nome curto. Acentos, espaços e sinais serão convertidos para o padrão tidy."),
+                  shiny::uiOutput(ns("ui_medidas")),
+                  shiny::actionButton(ns("add_medida"), "+ medida", class = "btn-sm btn-outline-primary"))))),
+          bslib::nav_panel("Metodologia", icon = shiny::icon("paragraph"),
+            bslib::card_body(fillable = FALSE,
+              shiny::h5("Metodologia do monitoramento"),
+              shiny::p(class = "small text-muted", "Texto baseado nas definições da série; complete o protocolo de coleta antes de usar no artigo."),
+              shiny::uiOutput(ns("metodologia")))),
+          # Modelo e cuidados: orientações preservadas em duas colunas.
+          bslib::nav_panel("Modelo e cuidados", icon = shiny::icon("book-open"),
+            bslib::card_body(fillable = FALSE,
+              shiny::div(class = "mon-compacto",
+              shiny::div(class = "mon-definicoes",
+                shiny::div(class = "mon-coluna",
+                shiny::div(class = "mon-card",
+                  shiny::h5("Quando usar"),
+                  shiny::p(class = "mb-0", "Poucos locais, muitas revisitas: captura, chuva ou qualidade da água. Muitas unidades em poucas visitas: use Longitudinal comparativo.")
+                ),
+                shiny::div(class = "mon-card",
+                  shiny::h5("Modelo de leitura da série"),
+                  shiny::div(class = "mon-modelo", "Y", shiny::tags$sub("i,t"),
+                    " = μ", shiny::tags$sub("i"), " + T", shiny::tags$sub("i"), "(t) + S",
+                    shiny::tags$sub("i"), "(t) + ε", shiny::tags$sub("i,t")),
+                  shiny::tags$ul(class = "mb-1",
+                    shiny::tags$li(shiny::strong("Y: "), "resposta no local i e na data t; μ: nível do local."),
+                    shiny::tags$li(shiny::strong("T: "), "tendência; ", shiny::strong("S: "), "padrão sazonal."),
+                    shiny::tags$li(shiny::strong("ε: "), "resíduo, que pode ter dependência temporal.")),
+                  shiny::p(class = "small mb-0", "Esquema aditivo didático; o painel não ajusta o modelo. A adequação depende dos dados.")),
+                shiny::div(class = "mon-card",
+                  shiny::h5("O exemplo dos currais"),
+                  shiny::p(class = "mb-0", "Três locais, dois currais por local: currais são subamostras. Equilibre as marés e registre as subamostras em ficha vinculada. Revisitas não criam novos locais."))),
+                shiny::div(class = "mon-coluna",
+                shiny::div(class = "mon-card",
+                  shiny::h5("Antes de começar"),
+                  shiny::tags$ul(class = "mb-0",
+                    shiny::tags$li("Defina pergunta, locais fixos e coordenadas."),
+                    shiny::tags$li("Justifique frequência e duração pelos ciclos do fenômeno."),
+                    shiny::tags$li("Registre método, horário, esforço e responsável.")
+                  )
+                ),
+                shiny::div(class = "mon-card",
+                  shiny::h5("Durante a coleta"),
+                  shiny::tags$ul(class = "mb-0",
+                    shiny::tags$li("Mantenha condições comparáveis; confira marés e defesos."),
+                    shiny::tags$li("Zero é observado; ausência fica vazia, com motivo."),
+                    shiny::tags$li("Anote ocorrências e mudanças de método ou equipamento.")
+                  )
+                ),
+                shiny::div(class = "mon-card",
+                  shiny::h5("Revisão mensal"),
+                  shiny::tags$ul(class = "mb-0",
+                    shiny::tags$li("Revise lacunas, valores inesperados e protocolo."),
+                    shiny::tags$li("Considere dependência temporal e entre locais.")
+                  )
+                ))
+              )),
+              shiny::p(class = "small text-muted mb-0",
+                "Quando a série estiver andando, a análise é a de Séries Temporais, no menu Modelos de Regressão.")
             )
           )
-        )
-      ),
+        )),
 
       bslib::nav_panel("Desenho", icon = shiny::icon("diagram-project"),
         bslib::card_body(fillable = FALSE,
@@ -611,7 +640,7 @@ mod_monitoramento_ui <- function(id) {
               shiny::uiOutput(ns("ui_desenho_locais")))
           ))),
       # Ficha: tabela completa, paginada; download disponível no Resumo.
-      bslib::nav_panel("Ficha do delineamento", icon = shiny::icon("table"),
+      bslib::nav_panel("Tabelas de coleta", value = "Ficha do delineamento", icon = shiny::icon("table"),
         bslib::card_body(fillable = FALSE,
           shiny::p(class = "small text-muted", "Tabela completa que o Excel vai trazer, com paginação. Uma linha por data e local, na ordem data, depois local."),
           DT::DTOutput(ns("tabela")),
@@ -621,68 +650,11 @@ mod_monitoramento_ui <- function(id) {
         )
       ),
 
-      bslib::nav_panel("Metodologia para artigo", icon = shiny::icon("paragraph"),
-        bslib::card_body(fillable = FALSE,
-          shiny::h5("Metodologia do monitoramento"),
-          shiny::p(class = "small text-muted", "Texto baseado nas definições da série; complete o protocolo de coleta antes de usar no artigo."),
-          shiny::uiOutput(ns("metodologia")))),
-      # Aba 3: orientação curta, em duas colunas de texto para aproveitar a tela.
-      bslib::nav_panel("Modelo e cuidados", icon = shiny::icon("book-open"),
-        bslib::card_body(fillable = FALSE,
-          shiny::div(class = "mon-compacto",
-          bslib::layout_columns(col_widths = c(6, 6),
-            shiny::div(class = "mon-coluna",
-            shiny::div(class = "mon-card",
-              shiny::h5("Quando usar"),
-              shiny::p(class = "mb-0", "Poucos locais, muitas revisitas: captura, chuva ou qualidade da água. Muitas unidades em poucas visitas: use Longitudinal comparativo.")
-            ),
-            shiny::div(class = "mon-card",
-              shiny::h5("Modelo de leitura da série"),
-              shiny::div(class = "mon-modelo", "Y", shiny::tags$sub("i,t"),
-                " = μ", shiny::tags$sub("i"), " + T", shiny::tags$sub("i"), "(t) + S",
-                shiny::tags$sub("i"), "(t) + ε", shiny::tags$sub("i,t")),
-              shiny::tags$ul(class = "mb-1",
-                shiny::tags$li(shiny::strong("Y: "), "resposta no local i e na data t; μ: nível do local."),
-                shiny::tags$li(shiny::strong("T: "), "tendência; ", shiny::strong("S: "), "padrão sazonal."),
-                shiny::tags$li(shiny::strong("ε: "), "resíduo, que pode ter dependência temporal.")),
-              shiny::p(class = "small mb-0", "Esquema aditivo didático; o painel não ajusta o modelo. A adequação depende dos dados.")),
-            shiny::div(class = "mon-card",
-              shiny::h5("O exemplo dos currais"),
-              shiny::p(class = "mb-0", "Três locais, dois currais por local: currais são subamostras. Equilibre as marés e registre as subamostras em ficha vinculada. Revisitas não criam novos locais."))),
-            shiny::div(class = "mon-coluna",
-            shiny::div(class = "mon-card",
-              shiny::h5("Antes de começar"),
-              shiny::tags$ul(class = "mb-0",
-                shiny::tags$li("Defina pergunta, locais fixos e coordenadas."),
-                shiny::tags$li("Justifique frequência e duração pelos ciclos do fenômeno."),
-                shiny::tags$li("Registre método, horário, esforço e responsável.")
-              )
-            ),
-            shiny::div(class = "mon-card",
-              shiny::h5("Durante a coleta"),
-              shiny::tags$ul(class = "mb-0",
-                shiny::tags$li("Mantenha condições comparáveis; confira marés e defesos."),
-                shiny::tags$li("Zero é observado; ausência fica vazia, com motivo."),
-                shiny::tags$li("Anote ocorrências e mudanças de método ou equipamento.")
-              )
-            ),
-            shiny::div(class = "mon-card",
-              shiny::h5("Revisão mensal"),
-              shiny::tags$ul(class = "mb-0",
-                shiny::tags$li("Revise lacunas, valores inesperados e protocolo."),
-                shiny::tags$li("Considere dependência temporal e entre locais.")
-              )
-            ))
-          )),
-          shiny::p(class = "small text-muted mb-0",
-            "Quando a série estiver andando, a análise é a de Séries Temporais, no menu Modelos de Regressão.")
-        )
-      ),
       bslib::nav_panel("Resumo", icon = shiny::icon("clipboard-check"),
         bslib::card_body(fillable = FALSE,
           shiny::h5("Resumo do planejamento"),
           shiny::uiOutput(ns("resumo")),
-          bslib::layout_columns(col_widths = c(6, 6),
+          shiny::div(class = "mon-definicoes",
             shiny::tableOutput(ns("resumo_tabela")),
             shiny::div(
               shiny::div(class = "d-flex flex-wrap gap-2",
@@ -809,19 +781,19 @@ mod_monitoramento_server <- function(id) {
         coluna <- nome_coluna_monitoramento(vals$nome[i], vals$unidade[i], vals$nome_coluna[i])
         shiny::div(
           shiny::div(class = "mon-respostas",
-            shiny::textInput(session$ns(paste0("medida_nome_", i)),
-              label = if (i == 1) "Medida:" else NULL,
-              value = vals$nome[i], placeholder = "Ex.: captura"),
-            shiny::textInput(session$ns(paste0("medida_unidade_", i)),
-              label = if (i == 1) "Unidade:" else NULL,
-              value = vals$unidade[i], placeholder = "Ex.: kg"),
-            shiny::textInput(session$ns(paste0("medida_coluna_", i)),
-              label = if (i == 1) "Nome da coluna:" else NULL,
-              value = vals$nome_coluna[i], placeholder = if (nzchar(coluna)) coluna else "Ex.: captura_kg"),
-            if (nrow(vals) > 1L) {
-              shiny::actionButton(session$ns(paste0("rem_medida_", i)), "\u00d7",
-                class = "btn-sm btn-outline-danger mon-rem")
-            }
+            shiny::div(class = "mon-medida-campos",
+              shiny::textInput(session$ns(paste0("medida_nome_", i)),
+                label = "Medida:", value = vals$nome[i], placeholder = "Ex.: captura"),
+              shiny::textInput(session$ns(paste0("medida_unidade_", i)),
+                label = "Unidade:", value = vals$unidade[i], placeholder = "Ex.: kg")),
+            shiny::div(class = "mon-linha",
+              shiny::textInput(session$ns(paste0("medida_coluna_", i)),
+                label = "Nome da coluna:", value = vals$nome_coluna[i],
+                placeholder = if (nzchar(coluna)) coluna else "Ex.: captura_kg"),
+              if (nrow(vals) > 1L) {
+                shiny::actionButton(session$ns(paste0("rem_medida_", i)), "\u00d7",
+                  class = "btn-sm btn-outline-danger mon-rem")
+              })
           ),
           if (identical(input$tem_esforco, "sim") && nzchar(coluna)) {
             shiny::div(class = "small mb-1", style = "margin-left: 2px;",
@@ -836,6 +808,12 @@ mod_monitoramento_server <- function(id) {
         )
       }))
     })
+
+    # Os controles dinâmicos inicializam mesmo nas subabas ainda não visitadas.
+    # Assim, calendário e metodologia recebem os valores padrão do plano inteiro.
+    for (campo in c("ui_inicio", "ui_fim", "ui_locais", "ui_medidas")) {
+      shiny::outputOptions(output, campo, suspendWhenHidden = FALSE)
+    }
 
     # ---- Configuração reativa -------------------------------------------------
     # Tudo o que a aba 1 define, reunido e com os nomes de coluna prontos.
@@ -890,7 +868,7 @@ mod_monitoramento_server <- function(id) {
       c0 <- cfg()
       respostas <- if (nrow(c0$medidas)) paste(c0$medidas$coluna, collapse = ", ") else "respostas a definir"
       shiny::div(class = "mon-compacto",
-      bslib::layout_columns(col_widths = c(6, 6),
+      shiny::div(class = "mon-definicoes",
         shiny::div(class = "mon-coluna",
           shiny::div(class = "mon-card", shiny::h5("Texto de metodologia previsto"),
             shiny::p(sprintf("Serão acompanhados %d locais fixos (%s), de %s a %s, com frequência %s. As %d datas por local produzirão %d registros previstos. Respostas: %s.",

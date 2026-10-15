@@ -57,27 +57,14 @@ reescalar_para_eixo <- function(y2, y1) {
 mod_exploracao_visual_ui <- function(id, tipo) {
   ns <- shiny::NS(id)
   div(class = "exploracao-espaco",
-    tags$h2(switch(
-      tipo,
-      histograma = "Histograma com densidade",
-      caixa_violino = "Comparar grupos",
-      dispersao = "Dispersão e tendência",
-      duplo_eixo = "Duas séries, dois eixos Y",
-      barras = "Barras",
-      rosca = "Rosca",
-      matriz = "Matriz de dispersão",
-      calor = "Mapa de calor de correlação"
-    ), class = "h4 mb-2"),
-    div(
-      class = "alert alert-light border mb-3",
-      icon("compass"), " Escolha as variáveis e observe o padrão. O gráfico orienta a próxima pergunta, mas não escolhe uma análise por você."
-    ),
     bslib::layout_sidebar(
       fill = FALSE,
       sidebar = bslib::sidebar(width = 310, uiOutput(ns("controles"))),
       uiOutput(ns("aviso")),
-      bslib::navset_card_tab(title = "Painel Visual:",
-        bslib::nav_panel("Gráfico", div(class = "mx-auto", style = "max-width:1100px;width:100%;", plotOutput(ns("grafico"), height = if (tipo %in% c("matriz", "calor")) "680px" else "460px"))),
+      bslib::navset_card_tab(
+        bslib::nav_panel("Gráfico",
+          p(class = "small text-muted mb-2", "Escolha as variáveis e observe o padrão. O gráfico orienta a próxima pergunta, mas não escolhe uma análise por você."),
+          div(class = "mx-auto", style = "max-width:1100px;width:100%;", plotOutput(ns("grafico"), height = if (tipo %in% c("matriz", "calor")) "680px" else "460px"))),
         bslib::nav_panel("Ver o código R", verbatimTextOutput(ns("codigo")))
       )
     )

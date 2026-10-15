@@ -1,6 +1,6 @@
 # Registro de variantes de delineamento — Trilha.
 # Cada módulo de planejamento guarda o que todos os seus desenhos têm em comum;
-# a variante (sub-delineamento) escolhida no topo da tela decide quais campos
+# a variante (sub-delineamento) escolhida na aba Tipo decide quais campos
 # aparecem, quais análises o desenho comporta e o que vai para a ficha.
 # Crescer = acrescentar uma entrada numa função variantes_*(); nada mais muda.
 # Plano e decisões: docs/PLANO_VARIANTES.md.
@@ -95,7 +95,7 @@ variante_condicao_js <- function(ns, id_input, variantes, campo) {
 
 # ---- Componente de tela: o dropdown de destaque ------------------------------
 
-# Cartão de topo do painel: "Qual é o seu desenho?", uma linha de texto, o
+# Cartão de seleção: "Qual é o seu desenho?", uma linha de texto, o
 # esquema e as caixas das análises previstas. As saídas são montadas pelo
 # servidor (variante_seletor_server), com ids fixos no namespace do módulo.
 variante_seletor_ui <- function(ns, id_input, titulo_modulo, variantes, selecionada) {
@@ -120,17 +120,18 @@ variante_css <- function() "
   .obs-variante-modulo { font-size: 0.8rem; color: #5f6b73; margin-bottom: 4px; }
   .obs-variante-linha { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .obs-variante-pergunta { font-size: 1.05rem; font-weight: 700; color: #0F3B5F; margin: 0; }
-  .obs-variante-linha .shiny-input-container { flex: 1; min-width: 240px; margin: 0; width: auto; }
-  .obs-variante-linha select { height: 42px; font-size: 1rem; font-weight: 600; color: #0F3B5F;
-    border: 2px solid #2E7D8F; border-radius: 8px; padding: 0 10px; }
+  .obs-variante-linha .shiny-input-container { flex: 1 1 240px; min-width: 0; margin: 0; width: 100%; }
+  .obs-variante-linha select { font-size: 1rem; font-weight: 600; color: #0F3B5F;
+    border: 2px solid #2E7D8F; border-radius: 8px; padding: 6px 10px; }
   .obs-variante-guia { margin: 8px 0 0; color: #3d4b53; font-size: 0.92rem; }
   .obs-variante-detalhe { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px;
     margin-top: 10px; padding-top: 10px; border-top: 1px solid #dbe5e8; align-items: start; }
   .obs-variante-legenda { font-size: 0.8rem; color: #5f6b73; margin-bottom: 2px; }
-  /* O Shiny limita o grupo a 300 px; aqui cada análise fica numa linha só. */
-  .obs-variante-analises .shiny-input-container { margin-bottom: 0; width: auto; max-width: none; }
+  .obs-variante-detalhe > * { min-width: 0; }
+  /* As análises acompanham a largura da coluna e preservam o texto completo. */
+  .obs-variante-analises .shiny-input-container { margin-bottom: 0; width: 100%; max-width: none; }
   .obs-variante-analises .checkbox { margin: 2px 0; }
-  .obs-variante-analises label { font-size: 0.82rem; color: #3d4b53; white-space: nowrap; }
+  .obs-variante-analises label { font-size: 0.82rem; color: #3d4b53; white-space: normal; overflow-wrap: anywhere; }
   .obs-variante-principal { font-size: 0.72rem; padding: 1px 7px; border-radius: 6px;
     background: #d9efe1; color: #1d5c37; margin-left: 4px; }
   @media (max-width: 600px) {

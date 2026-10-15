@@ -207,7 +207,6 @@ mod_nonparametric_ui <- function(id, fixed_test = "quiquadrado") {
       # COLUNA 2: RESULTADOS
       execucao_explicita_resultados_ui(ns, navset_card_tab(
         id = ns("active_tab"),
-        title = "Painel de Resultados:",
         nav_panel(
           title = "Resultado do Teste",
           icon = icon("table"),

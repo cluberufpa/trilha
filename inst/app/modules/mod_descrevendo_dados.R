@@ -35,12 +35,11 @@ exploracao_ficha_gravar <- function(ficha, dados, nome, tipo) {
 mod_explorar_dataset_ui <- function(id) {
   ns <- shiny::NS(id)
   div(class = "exploracao-espaco",
-    tags$h2("Explorar Dataset", class = "h4 mb-1"),
-    p("Confira o conjunto, observe cada variável e escolha a próxima pergunta.", class = "text-muted small mb-3"),
     mod_seletor_base_analise_ui(ns("base"), compacto = TRUE),
     div(class = "exploracao-espaco",
-      bslib::navset_card_tab(id = ns("abas"), title = "Painel de Resultados da Exploração:",
+      bslib::navset_card_tab(id = ns("abas"),
         bslib::nav_panel("Painel de retratos", value = "panorama",
+          p("Confira o conjunto, observe cada variável e escolha a próxima pergunta.", class = "text-muted small mb-2"),
           uiOutput(ns("indicadores")), uiOutput(ns("saude")),
           uiOutput(ns("paginacao_retratos")),
           uiOutput(ns("retratos_plot")),
@@ -68,16 +67,13 @@ mod_explorar_dataset_ui <- function(id) {
 mod_conhecer_variaveis_ui <- function(id) {
   ns <- shiny::NS(id)
   tagList(
-    tags$h2("Conhecer as Variáveis", class = "h4 mb-1"),
-    div(class = "alert alert-light border mb-2",
-      strong("Aqui a tabela conduz a leitura. "),
-      "Os gráficos são apoios para interpretar. Para ajustar figuras, use VISUALIZANDO OS DADOS, no mesmo menu. Estas frequências são descritivas; testes ficam em Frequências e Proporções."),
     mod_seletor_base_analise_ui(ns("base"), compacto = TRUE),
     bslib::navset_card_tab(
       id = ns("abas_conhecer"),
-      title = "Painel de Resultados das Variáveis:",
       bslib::nav_panel(
         "Resumo das contínuas", value = "resumo",
+        p(class = "text-muted small mb-2", strong("Aqui a tabela conduz a leitura. "),
+          "Os gráficos são apoios para interpretar. Para ajustar figuras, use VISUALIZANDO OS DADOS, no mesmo menu. Estas frequências são descritivas; testes ficam em Frequências e Proporções."),
         bslib::layout_columns(
           col_widths = c(7, 5),
           bslib::card(
@@ -326,15 +322,13 @@ mod_descrevendo_dados_ui <- function(id, area) {
     )
   }
   tagList(
-    # O título curto aproxima a pergunta do conteúdo e elimina o vazio superior.
-    tags$h2(titulo, id = ns("titulo"), class = "h4 mb-1"),
     # Um contêiner comum deixa a página crescer com os resultados, em vez de
     # comprimir gráfico e registrador na altura restante da janela.
     div(class = "descricao-conteudo", id = ns("conteudo"),
       # Uma única linha basta para escolher a base nas cinco perguntas do menu.
       mod_seletor_base_analise_ui(ns("base"), compacto = TRUE),
       do.call(bslib::navset_card_tab, c(
-        list(id = ns("abas"), title = paste0("Painel de Resultados de ", titulo, ":"), wrapper = function(...) bslib::card_body(..., fillable = FALSE)),
+        list(id = ns("abas"), wrapper = function(...) bslib::card_body(..., fillable = FALSE)),
         unname(Map(painel, unname(catalogo), names(catalogo))),
         list(bslib::nav_panel(
           "Inserir análise", value = "inserir", icon = icon("bookmark"),

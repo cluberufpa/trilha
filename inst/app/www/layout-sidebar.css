@@ -4,6 +4,7 @@ body.bslib-page-navbar {
   --trilha-rail-content-width: 300px;
   --trilha-menu-font: 14.5px;
   --trilha-menu-pad: 4px;
+  --trilha-menu-indent: 7px;
   --trilha-group-space: 4px;
   --trilha-group-pad: 5px;
   --trilha-menu-icon: 20px;
@@ -72,6 +73,9 @@ body.bslib-page-navbar {
 .navbar:has(#main_navbar) .trilha-menu-section-first { margin-top: 0; padding-top: 0; border-top: 0; }
 #main_navbar > li > a {
   position: relative; display: grid;
+  margin-left: var(--trilha-menu-indent);
+  width: calc(100% - var(--trilha-menu-indent));
+  box-sizing: border-box;
   grid-template-columns: 22px minmax(0, 1fr) 8px;
   column-gap: 6px; align-items: center;
   padding: var(--trilha-menu-pad) 7px; border-bottom: 0; border-radius: 6px;

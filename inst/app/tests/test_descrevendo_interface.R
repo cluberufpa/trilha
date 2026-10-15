@@ -37,19 +37,19 @@ for (area in names(descricao_catalogo())) {
   ui_area <- mod_descrevendo_dados_ui(paste0("teste_", area), area)
   html <- as.character(ui_area)
   if (identical(area, "descrever")) {
-    stopifnot(grepl("Conhecer as Variáveis", html, fixed = TRUE),
+    stopifnot(!grepl("<h2", html, fixed = TRUE),
+              grepl("Aqui a tabela conduz a leitura.", html, fixed = TRUE),
               grepl("Resumo das contínuas", html, fixed = TRUE),
               grepl("Tabelas de frequência", html, fixed = TRUE),
               grepl("Inserir análise", html, fixed = TRUE),
               grepl("col_widths = c(7, 5)", paste(deparse(body(mod_conhecer_variaveis_ui)), collapse = " "), fixed = TRUE))
     next
   }
-  # Explorar Dataset também tem tela própria: o título e a base compacta no
-  # topo, e as abas do panorama, sem a barra lateral das outras perguntas.
+  # A navegação superior identifica o módulo; a orientação vive no panorama.
   if (identical(area, "explorar")) {
     doc <- xml2::read_html(html)
-    titulo_h2 <- xml2::xml_text(xml2::xml_find_first(doc, "//h2"))
-    stopifnot(identical(trimws(titulo_h2), unname(titulos[["explorar"]])),
+    stopifnot(length(xml2::xml_find_all(doc, "//h2")) == 0L,
+              grepl("Confira o conjunto, observe cada variável", html, fixed = TRUE),
               grepl("Painel de retratos", html, fixed = TRUE),
               grepl("Mapa de ausentes", html, fixed = TRUE),
               grepl("Ficha de variáveis", html, fixed = TRUE),
@@ -57,11 +57,9 @@ for (area in names(descricao_catalogo())) {
               grepl("catalyser-base-selector-compact", html, fixed = TRUE))
     next
   }
-  # O título é o primeiro elemento, fora das sub-abas e antes da base.
-  # Assim ele também permanece presente na aba Inserir análise, sem dados.
-  stopifnot(identical(ui_area[[1]]$name, "h2"),
-            identical(ui_area[[1]]$children[[1]], unname(titulos[[area]])),
-            identical(ui_area[[1]]$attribs$id, paste0("teste_", area, "-titulo")))
+  # A página começa pelo conteúdo, sem repetir o nome já presente na navegação.
+  stopifnot(!grepl("<h2", html, fixed = TRUE),
+            !grepl("Painel de Resultados de ", html, fixed = TRUE))
   stopifnot(grepl("Inserir análise", html, fixed = TRUE),
             all(vapply(names(descricao_catalogo()[[area]]), function(s) grepl(s, html, fixed = TRUE), logical(1))))
   # O contêiner comum evita que a janela comprima gráficos e botões.

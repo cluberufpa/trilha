@@ -78,7 +78,6 @@ mod_proporcoes_ui <- function(id, tipo) {
     uiOutput(ns("esperadas_ui"))
   )
   tagList(
-    tags$h2(proporcoes_titulo(tipo), class = "h4 mb-3"),
     mod_seletor_base_analise_ui(ns("base")),
     bslib::layout_sidebar(
       fill = FALSE, fillable = FALSE,
